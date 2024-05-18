@@ -18,21 +18,21 @@
 #============================================================================#
 
 
-''' Accretive dictionaries: simple, validative, and productive. '''
+''' Accretive dictionaries. '''
 
 
 from . import __
+from . import classes as _classes
+from . import objects as _objects
 
 
 _accretion_function_names = (
     '_delitem_', '_getitem_', '_iter_', '_len_', '_setitem_', '_str_' )
 
 
-# TODO: Immutable class attributes from class factory class.
 class Dictionary(
-    __.RestrictedAttributesDirectory,
-    __.ImmutableAttributes,
-    __.AbstractDictionary,
+    _objects.ConcealerObject, __.AbstractDictionary,
+    metaclass = _classes.ConcealerABCFactory,
 ):
     ''' Simple accretive dictionary.
 
@@ -135,3 +135,6 @@ def _inject_accretion_functions( owner ): # pylint: disable=too-complex,too-many
     for name in _accretion_function_names:
         setattr( owner, name, locals( )[ name ] )
     return owner
+
+
+__all__ = __.discover_public_attributes( globals( ) )

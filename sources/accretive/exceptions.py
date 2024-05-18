@@ -21,9 +21,19 @@
 ''' Family of exceptions for package API. '''
 
 
-# TODO: Immutable class attributes from class factory class.
-class Omniexception( BaseException ):
+from . import __
+from . import classes as _classes # pylint: disable=cyclic-import
+from . import objects as _objects # pylint: disable=cyclic-import
+
+
+class Omniexception(
+    _objects.ConcealerObject, BaseException,
+    metaclass = _classes.ConcealerClass,
+):
     ''' Base for exceptions raised by package API. '''
+
+    _attribute_visibility_includes_ = frozenset(
+        ( '__cause__', '__context__', ) )
 
 
 class AbsentEntryError( Omniexception, KeyError ):
@@ -59,3 +69,6 @@ class IndelibleEntryError( Omniexception, TypeError ):
 
     def __init__( self, indicator ):
         super( ).__init__( f"Cannot remove existing entry for {indicator!r}." )
+
+
+__all__ = __.discover_public_attributes( globals( ) )

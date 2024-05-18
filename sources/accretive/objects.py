@@ -18,36 +18,37 @@
 #============================================================================#
 
 
-''' Accretive data structures.
-
-    Accretive data structures can grow but never shrink. Once something is
-    added to them, it cannot be altered or removed. They are particularly
-    useful for registrations, collected during initialization, which then must
-    be part of guaranteed state during later runtime. '''
-
-
-__version__ = '1.0a202405121610'
+''' Accretive objects. '''
 
 
 from . import __
-from . import aaliases
-from . import classes
-from . import dictionaries
-from . import exceptions
-from . import modules
-from . import objects
-from . import qaliases
 
-from .classes import *
-from .dictionaries import *
-from .exceptions import *
-from .modules import *
-from .objects import *
+
+class Object:
+    ''' Enforces object attributes accretion.
+
+        Cannot reassign or delete attributes after they are assigned.
+    '''
+
+    def __delattr__( self, name ):
+        from .exceptions import IndelibleAttributeError
+        raise IndelibleAttributeError( name )
+
+    def __setattr__( self, name, value ):
+        from .exceptions import ImmutableAttributeError
+        if hasattr( self, name ): raise ImmutableAttributeError( name )
+        super( ).__setattr__( name, value )
+
+
+class ConcealerObject( __.ConcealerExtension, Object ):
+    ''' Enforces object attributes accretion and concealment.
+
+        Cannot reassign or delete attributes after they are assigned.
+
+        By default, only lists public attributes. Additional attributes can be
+        added to the listing by providing an '_attribute_visibility_includes_'
+        attribute on a subclass.
+    '''
 
 
 __all__ = __.discover_public_attributes( globals( ) )
-
-
-reclassify_modules( globals( ) )
-_extra_visible_attribute_names = frozenset( ( '__all__', '__version__', ) )
-__.modules[ __package__ ].__class__ = ConcealerModule

@@ -25,52 +25,50 @@
 
 import typing as typ
 
+from abc import ABCMeta as ABCFactory
 from collections.abc import (
     Mapping as AbstractDictionary,
 )
+from sys import modules
+from types import ModuleType as Module
 
 
-# TODO: Immutable class attributes from class factory class.
-class ImmutableAttributes:
-    ''' Base class to enforce immutable attributes.
+class ConcealerExtension:
+    ''' Conceals attributes according to some criteria.
 
-        Cannot assign or delete attributes after they are assigned. '''
+        By default, public attributes are displayed.
+    '''
 
-    def __delattr__( self, name ):
-        from .exceptions import IndelibleAttributeError
-        raise IndelibleAttributeError( name )
-
-    def __setattr__( self, name, value ):
-        from .exceptions import ImmutableAttributeError
-        if hasattr( self, name ): raise ImmutableAttributeError( name )
-        super( ).__setattr__( name, value )
-
-
-# TODO: Immutable class attributes from class factory class.
-class RestrictedAttributesDirectory:
-    ''' Base class to restrict listing of attributes via 'dir' function.
-
-        By default, only lists public attributes. Additional attributes can be
-        added to the listing by providing a '_extra_visible_attribute_names'
-        attribute on a subclass. '''
-
-    _extra_visible_attribute_names = frozenset( )
+    _attribute_visibility_includes_ = frozenset( )
 
     def __dir__( self ):
-        return tuple(
+        return tuple( sorted(
             name for name in super( ).__dir__( )
             if  not name.startswith( '_' )
-                or name in self._extra_visible_attribute_names )
+                or name in self._attribute_visibility_includes_ ) )
 
 
 def discover_fqname( obj, module_name = __package__ ):
     ''' Discovers fully-qualified name of class.
 
         If given an instance, then the fully-qualified name of the class, to
-        which the instance belongs, is returned. '''
+        which the instance belongs, is returned.
+    '''
     from inspect import isclass
     return "{module_name}.{qname}".format(
         module_name = module_name,
         qname = (
             obj.__qualname__ if isclass( obj )
             else type( obj ).__qualname__ ) )
+
+
+def discover_public_attributes( attributes ):
+    ''' Discovers public attributes of certain types from dictionary.
+
+        By default, classes and functions are discovered.
+    '''
+    from inspect import isclass, isfunction
+    return tuple( sorted(
+        name for name, attribute in attributes.items( )
+        if  not name.startswith( '_' )
+            and ( isclass( attribute ) or isfunction( attribute ) ) ) )

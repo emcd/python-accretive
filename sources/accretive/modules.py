@@ -18,36 +18,45 @@
 #============================================================================#
 
 
-''' Accretive data structures.
-
-    Accretive data structures can grow but never shrink. Once something is
-    added to them, it cannot be altered or removed. They are particularly
-    useful for registrations, collected during initialization, which then must
-    be part of guaranteed state during later runtime. '''
-
-
-__version__ = '1.0a202405121610'
+''' Accretive modules. '''
 
 
 from . import __
-from . import aaliases
-from . import classes
-from . import dictionaries
-from . import exceptions
-from . import modules
-from . import objects
-from . import qaliases
+from . import classes as _classes
+from . import objects as _objects
 
-from .classes import *
-from .dictionaries import *
-from .exceptions import *
-from .modules import *
-from .objects import *
+
+class Module(
+    _objects.Object, __.Module,
+    metaclass = _classes.ConcealerClass,
+):
+    ''' Enforces module attributes accretion.
+
+        Cannot reassign or delete attributes after they are assigned.
+    '''
+
+
+class ConcealerModule( __.ConcealerExtension, Module ):
+    ''' Enforces module attributes accretion and concealment.
+
+        Cannot reassign or delete attributes after they are assigned.
+
+        By default, only lists public attributes. Additional attributes can be
+        added to the listing by providing an '_attribute_visibility_includes_'
+        attribute on a subclass.
+    '''
+
+
+def reclassify_modules( attributes, to_class = ConcealerModule ):
+    ''' Reclassifies modules in dictionary with custom module type.
+
+        Custom module type ensures immutable attributes
+        and restricts visibility of attributes.
+    '''
+    for attribute in attributes.values( ):
+        if not isinstance( attribute, __.Module ): continue
+        if isinstance( attribute, to_class ): continue
+        attribute.__class__ = to_class
 
 
 __all__ = __.discover_public_attributes( globals( ) )
-
-
-reclassify_modules( globals( ) )
-_extra_visible_attribute_names = frozenset( ( '__all__', '__version__', ) )
-__.modules[ __package__ ].__class__ = ConcealerModule

@@ -18,36 +18,7 @@
 #============================================================================#
 
 
-''' Accretive data structures.
-
-    Accretive data structures can grow but never shrink. Once something is
-    added to them, it cannot be altered or removed. They are particularly
-    useful for registrations, collected during initialization, which then must
-    be part of guaranteed state during later runtime. '''
+''' Assert basic characteristics of package and all modules therein. '''
 
 
-__version__ = '1.0a202405121610'
 
-
-from . import __
-from . import aaliases
-from . import classes
-from . import dictionaries
-from . import exceptions
-from . import modules
-from . import objects
-from . import qaliases
-
-from .classes import *
-from .dictionaries import *
-from .exceptions import *
-from .modules import *
-from .objects import *
-
-
-__all__ = __.discover_public_attributes( globals( ) )
-
-
-reclassify_modules( globals( ) )
-_extra_visible_attribute_names = frozenset( ( '__all__', '__version__', ) )
-__.modules[ __package__ ].__class__ = ConcealerModule
