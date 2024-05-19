@@ -26,6 +26,7 @@
 # pylint: disable=unused-import
 
 
+from . import __
 from .classes import (
     ABCFactory as acabcmeta,
     Class as actype,
@@ -44,3 +45,6 @@ from .objects import (
     ConcealerObject as hacobject,
     Object as acobject,
 )
+
+
+__all__ = __.discover_public_attributes( globals( ) )
