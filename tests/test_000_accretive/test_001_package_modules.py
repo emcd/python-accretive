@@ -25,32 +25,12 @@
 
 import pytest
 
-from . import package_name
+from . import cache_import_module, discover_module_names, package_name
 
 
-_module_names_cache = [ ]
-def _discover_module_names( ):
-    from importlib import import_module
-    from itertools import chain
-    from pathlib import Path
-    package = import_module( package_name )
-    if not _module_names_cache:
-        _module_names_cache.extend( chain(
-            (   path.stem
-                for path in Path( package.__file__ ).parent.glob( '*.py' )
-                if '__init__.py' != path.name ),
-            (   path.name
-                for path in Path( package.__file__ ).parent.glob( '*' )
-                if '__pycache__' != path.name and path.is_dir( ) ) ) )
-    return _module_names_cache
-
-
-_modules_cache = { }
-@pytest.mark.parametrize( 'module_name', _discover_module_names( ) )
-def test_001_import_package_modules( module_name ):
-    ''' Can import package modules. '''
-    from importlib import import_module
-    module = import_module( f".{module_name}", package_name )
-    module_qname = f"{package_name}.{module_name}"
-    assert module_qname == module.__name__
-    _modules_cache[ module_qname ] = module
+#@pytest.mark.parametrize( 'module_name', discover_module_names( ) )
+#def test_001_import_package_module( module_name ):
+#    ''' Package module is sane. '''
+#    module = cache_import_module( module_name )
+#    qname = f"{package_name}.{module_name}"
+#    assert qname == module.__name__

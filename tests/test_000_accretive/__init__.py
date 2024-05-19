@@ -22,3 +22,33 @@
 
 
 package_name = 'accretive'
+
+
+_modules_cache = { }
+def cache_import_module( module_name = '' ):
+    from importlib import import_module
+    if not module_name:
+        qname = package_name
+        arguments = ( package_name, )
+    else:
+        qname = "{package_name}.{module_name}"
+        arguments = ( f".{module_name}", package_name, )
+    if qname not in _modules_cache:
+        _modules_cache[ qname ] = import_module( *arguments )
+    return _modules_cache[ qname ]
+
+
+_module_names_cache = [ ]
+def discover_module_names( ):
+    from itertools import chain
+    from pathlib import Path
+    package = cache_import_module( )
+    if not _module_names_cache:
+        _module_names_cache.extend( chain(
+            (   path.stem
+                for path in Path( package.__file__ ).parent.glob( '*.py' )
+                if '__init__.py' != path.name ),
+            (   path.name
+                for path in Path( package.__file__ ).parent.glob( '*' )
+                if '__pycache__' != path.name and path.is_dir( ) ) ) )
+    return _module_names_cache
