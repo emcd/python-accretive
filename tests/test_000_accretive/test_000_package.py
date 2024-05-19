@@ -18,7 +18,14 @@
 #============================================================================#
 
 
-''' Assert basic characteristics of package and all modules therein. '''
+''' Assert basic characteristics of package. '''
 
 
+from . import package_name
 
+
+def test_001_import_package( ):
+    ''' Can import package. '''
+    from importlib import import_module
+    package = import_module( package_name )
+    assert package.__package__ == package_name
