@@ -20,12 +20,15 @@
 
 ''' Package of tests. '''
 
+# pylint: disable=magic-value-comparison
+
 
 package_name = 'accretive'
 
 
 _modules_cache = { }
 def cache_import_module( module_name = '' ):
+    ''' Imports module from package by name and caches it. '''
     from importlib import import_module
     if not module_name:
         qname = package_name
@@ -44,7 +47,6 @@ package = cache_import_module( )
 def _discover_module_names( ):
     from itertools import chain
     from pathlib import Path
-    package = cache_import_module( )
     return tuple( chain(
         (   path.stem
             for path in Path( package.__file__ ).parent.glob( '*.py' )

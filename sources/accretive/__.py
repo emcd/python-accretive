@@ -48,18 +48,10 @@ class ConcealerExtension:
                 or name in self._attribute_visibility_includes_ ) )
 
 
-def discover_fqname( obj, module_name = __package__ ):
-    ''' Discovers fully-qualified name of class.
-
-        If given an instance, then the fully-qualified name of the class, to
-        which the instance belongs, is returned.
-    '''
-    from inspect import isclass
-    return "{module_name}.{qname}".format(
-        module_name = module_name,
-        qname = (
-            obj.__qualname__ if isclass( obj )
-            else type( obj ).__qualname__ ) )
+def discover_fqname( obj ):
+    ''' Discovers fully-qualified name for class of instance. '''
+    class_ = type( obj )
+    return f"{class_.__module__}.{class_.__qualname__}"
 
 
 def discover_public_attributes( attributes ):

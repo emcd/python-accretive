@@ -71,10 +71,11 @@ class ABCFactory( Class, __.ABCFactory ):
     def __setattr__( class_, name, value ):
         from .exceptions import ImmutableAttributeError
         if hasattr( class_, name ):
-            #if '__abstractmethods__' == name or name.startswith( '_abc_' ):
-            if name.startswith( '_abc_' ):
+            # pylint: disable=magic-value-comparison
+            if '__abstractmethods__' == name or name.startswith( '_abc_' ):
                 __.ABCFactory.__setattr__( class_, name, value )
                 return
+            # pylint: enable=magic-value-comparison
             raise ImmutableAttributeError( name )
         __.ABCFactory.__setattr__( class_, name, value )
 
