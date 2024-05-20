@@ -26,7 +26,7 @@ from . import __
 
 class _ConcealerExtension( type ):
 
-    _class_attribute_visibility_includes_ = frozenset( )
+    _class_attribute_visibility_includes_: __.AbstractCollection = frozenset( )
 
     def __dir__( class_ ):
         return tuple( sorted(

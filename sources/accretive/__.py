@@ -20,6 +20,7 @@
 
 ''' Common constants, imports, and utilities. '''
 
+# ruff: noqa: F401
 # pylint: disable=unused-import
 
 
@@ -27,6 +28,7 @@ import typing as typ
 
 from abc import ABCMeta as ABCFactory
 from collections.abc import (
+    Collection as AbstractCollection,
     Mapping as AbstractDictionary,
 )
 from sys import modules
@@ -39,7 +41,7 @@ class ConcealerExtension:
         By default, public attributes are displayed.
     '''
 
-    _attribute_visibility_includes_ = frozenset( )
+    _attribute_visibility_includes_: AbstractCollection = frozenset( )
 
     def __dir__( self ):
         return tuple( sorted(

@@ -25,6 +25,8 @@
     useful for registrations, collected during initialization, which then must
     be part of guaranteed state during later runtime. '''
 
+# ruff: noqa: F401,F403
+
 
 from . import __
 from . import aaliases
@@ -46,6 +48,6 @@ __all__ = __.discover_public_attributes( globals( ) )
 __version__ = '1.0a202405121610'
 
 
-reclassify_modules( globals( ) )
+modules.reclassify_modules( globals( ) )
 _attribute_visibility_includes_ = frozenset( ( '__version__', ) )
-__.modules[ __package__ ].__class__ = ConcealerModule
+__.modules[ __package__ ].__class__ = modules.ConcealerModule

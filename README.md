@@ -28,15 +28,29 @@ steps:
    ```
    git pull
    ```
-1. Remove the `default` virtual environment:
+1. Remove the Hatch virtual environments:
    ```
-   hatch env remove default
+   hatch env prune
    ```
 
 The `default` virtual environment will be automatically rebuilt next time the
 application is run via Hatch.
 
-## Development
+# Development
+
+## Initial Installation
+
+1. Ensure that you have installed [pre-commit](https://pre-commit.com/) via
+   Pipx:
+   ```
+   pipx install pre-commit
+   ```
+1. Install Git pre-commit and pre-push hooks:
+   ```
+   pre-commit install --config .auxiliary/configuration/pre-commit.yaml
+   ```
+
+## Shell
 
 1. Run:
    ```

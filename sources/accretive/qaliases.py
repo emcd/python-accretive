@@ -23,6 +23,7 @@
     Useful for avoiding namespace collisions from attribute imports.
 '''
 
+# ruff: noqa: F401
 # pylint: disable=unused-import
 
 
