@@ -68,4 +68,9 @@ def discover_public_attributes( attributes ):
             and ( isclass( attribute ) or isfunction( attribute ) ) ) )
 
 
+def is_python_identifier( obj ):
+    ''' Is object a string which is a valid Python identifier? '''
+    return isinstance( obj, str ) and obj.isidentifier( )
+
+
 __all__ = ( )

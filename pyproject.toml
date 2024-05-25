@@ -106,6 +106,7 @@ ignored-parents = [
   'builtins.Exception',
   'builtins.KeyError',
   'builtins.TypeError',
+  'builtins.ValueError',
   'builtins.type',
 ]
 max-args = 5

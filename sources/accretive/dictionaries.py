@@ -37,7 +37,8 @@ class Dictionary(
     ''' Simple accretive dictionary.
 
         An accretive dictionary only accepts new entries; attempts to alter or
-        delete existing entries result in errors. '''
+        delete existing entries result in errors.
+    '''
 
     __slots__ = _accretion_function_names
 

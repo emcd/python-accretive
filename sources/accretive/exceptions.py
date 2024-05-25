@@ -36,11 +36,32 @@ class Omniexception(
         ( '__cause__', '__context__', ) )
 
 
+class AbsentAttributeError( Omniexception, AttributeError ):
+    ''' Attempt to access absent attribute. '''
+
+    def __init__( self, name ):
+        super( ).__init__( f"Cannot access missing attribute {name!r}." )
+
+
 class AbsentEntryError( Omniexception, KeyError ):
     ''' Attempt to access absent dictionary entry. '''
 
     def __init__( self, indicator ):
         super( ).__init__( f"Cannot access missing entry for {indicator!r}." )
+
+
+class EntryIndicatorValidationFailure( Omniexception, KeyError, ValueError ):
+    ''' Failure to validate dictionary entry indicator. '''
+
+    def __init__( self, indicator ):
+        super( ).__init__( f"Entry validation failed for key {indicator!r}." )
+
+
+class IllegalAttributeNameError( Omniexception, AttributeError, TypeError ):
+    ''' Attempt to assign attribute with illegal name. '''
+
+    def __init__( self, name ):
+        super( ).__init__( f"Cannot assign attribute with name {name!r}." )
 
 
 class ImmutableAttributeError( Omniexception, AttributeError, TypeError ):
