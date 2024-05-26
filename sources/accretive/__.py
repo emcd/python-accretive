@@ -50,6 +50,59 @@ class ConcealerExtension:
                 or name in self._attribute_visibility_includes_ ) )
 
 
+class CoreDictionary( ConcealerExtension, dict ):
+    ''' Accretive subclass of :py:class:`dict`.
+
+        Can be used as an instance dictionary.
+
+        Prevents attempts to mutate dictionary via inherited interface.
+    '''
+
+    def __init__( self, *iterables, **entries ):
+        super( ).__init__( )
+        self.update( *iterables, **entries )
+
+    def __getattribute__( self, name ):
+        from .exceptions import AbsentAttributeError
+        # Mask off mutable methods from parent class.
+        if name in ( 'clear', 'pop', 'popitem' ):
+            raise AbsentAttributeError( name )
+        return super( ).__getattribute__( name )
+
+    def __delitem__( self, key ):
+        from .exceptions import IndelibleEntryError
+        raise IndelibleEntryError( key )
+
+    def __getitem__( self, key ):
+        from .exceptions import AbsentEntryError
+        if key not in self: raise AbsentEntryError( key )
+        return super( ).__getitem__( key )
+
+    def __setitem__( self, key, value ):
+        from .exceptions import ImmutableEntryError
+        if key in self: raise ImmutableEntryError( key )
+        super( ).__setitem__( key, value )
+        return self
+
+    def copy( self ):
+        ''' Provides fresh copy of dictionary. '''
+        return type( self )( self )
+
+    def update( self, *iterables, **entries ):
+        ''' Adds new entries as a batch. '''
+        from itertools import chain
+        # Add values in order received, enforcing no alteration.
+        for indicator, value in chain.from_iterable( map(
+            lambda element: (
+                element.items( )
+                if isinstance( element, AbstractDictionary )
+                else element
+            ),
+            iterables + ( entries, )
+        ) ): self[ indicator ] = value
+        return self
+
+
 def discover_fqname( obj ):
     ''' Discovers fully-qualified name for class of instance. '''
     class_ = type( obj )

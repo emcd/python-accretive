@@ -25,43 +25,15 @@ from . import __
 from . import classes as _classes
 
 
-class _Dictionary( dict, metaclass = _classes.ConcealerClass ): # type: ignore
-    ''' Subclass of :py:class:`dict` compatible with ``__dict__`` slot.
-
-        Raises :py:exc:`InvalidOperationError` on attempts to invoke
-        mutation of dictionary via parent class interface. '''
-
-    def __getattribute__( self, name ):
-        from .exceptions import AbsentAttributeError
-        if name in ( 'clear', 'pop', 'popitem' ):
-            raise AbsentAttributeError( name )
-        return super( ).__getattribute__( name )
-
-    def __delitem__( self, key ):
-        from .exceptions import IndelibleEntryError
-        raise IndelibleEntryError( key )
+class _Dictionary( # type: ignore
+    __.CoreDictionary, metaclass = _classes.ConcealerClass
+):
 
     def __setitem__( self, key, value ):
-        from .exceptions import (
-            EntryIndicatorValidationFailure, ImmutableEntryError
-        )
+        from .exceptions import EntryIndicatorValidationFailure
         if not __.is_python_identifier( key ):
             raise EntryIndicatorValidationFailure( key )
-        if key in self:
-            raise ImmutableEntryError( key )
         super( ).__setitem__( key, value )
-
-    def update( self, *iterables, **entries ):
-        from itertools import chain
-        # Add values in order received, enforcing no alteration.
-        for indicator, value in chain.from_iterable( map(
-            lambda element: (
-                element.items( )
-                if isinstance( element, __.AbstractDictionary )
-                else element
-            ),
-            iterables + ( entries, )
-        ) ): self[ indicator ] = value
 
 
 class Namespace( metaclass = _classes.ConcealerClass ):

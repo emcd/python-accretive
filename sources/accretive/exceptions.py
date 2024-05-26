@@ -21,7 +21,7 @@
 ''' Family of exceptions for package API. '''
 
 
-from . import __
+from . import __ # pylint: disable=cyclic-import
 from . import classes as _classes # pylint: disable=cyclic-import
 from . import objects as _objects # pylint: disable=cyclic-import
 

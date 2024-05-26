@@ -26,8 +26,9 @@ from . import classes as _classes
 from . import objects as _objects
 
 
-_accretion_function_names = (
-    '_delitem_', '_getitem_', '_iter_', '_len_', '_setitem_', '_str_' )
+class _CoreDictionary( # type: ignore
+    __.CoreDictionary, metaclass = _classes.ConcealerClass
+): pass
 
 
 class Dictionary(
@@ -40,52 +41,48 @@ class Dictionary(
         delete existing entries result in errors.
     '''
 
-    __slots__ = _accretion_function_names
+    __slots__ = ( '_data_', )
 
     def __init__( self, *iterables, **entries ):
-        from itertools import chain
-        _inject_accretion_functions( self )
-        # Add values in order received, enforcing no alteration.
-        for indicator, value in chain.from_iterable( map(
-            lambda element: (
-                element.items( )
-                if isinstance( element, __.AbstractDictionary )
-                else element
-            ),
-            iterables + ( entries, )
-        ) ): self[ indicator ] = value
+        self._data_ = _CoreDictionary( *iterables, **entries )
         super( ).__init__( )
 
-    # pylint: disable=no-member
+    def __iter__( self ): return iter( self._data_ )
+
+    def __len__( self ): return len( self._data_ )
 
     def __repr__( self ):
         return "{fqname}( {contents} )".format(
             fqname = __.discover_fqname( self ),
-            contents = self._str_( ) )
+            contents = str( self._data_ ) )
 
-    def __str__( self ): return self._str_( )
-
-    def __iter__( self ): return self._iter_( )
-
-    def __len__( self ): return self._len_( )
+    def __str__( self ): return str( self._data_ )
 
     def __delitem__( self, key ):
-        self._delitem_( key )
-        return self
+        from .exceptions import IndelibleEntryError
+        raise IndelibleEntryError( key )
 
-    def __getitem__( self, key ): return self._getitem_( key )
+    def __getitem__( self, key ): return self._data_[ key ]
 
     def __setitem__( self, key, value ):
-        self._setitem_( key, value )
+        self._data_[ key ] = value
         return self
 
-    # pylint: enable=no-member
+    def copy( self ):
+        ''' Provides fresh copy of dictionary. '''
+        return type( self )( self )
+
+    def update( self, *iterables, **entries ):
+        ''' Adds new entries as a batch. '''
+        self._data_.update( *iterables, **entries )
+        return self
 
 
 class ProducerDictionary( Dictionary ):
     ''' Accretive dictionary which produces values for missing entries.
 
-        Accretive equivalent to 'collections.defaultdict'. '''
+        Accretive equivalent to 'collections.defaultdict'.
+    '''
 
     __slots__ = ( '_producer', )
 
@@ -95,47 +92,11 @@ class ProducerDictionary( Dictionary ):
         super( ).__init__( )
 
     def __getitem__( self, key ):
-        from .exceptions import AbsentEntryError
-        try: return super( ).__getitem__( key )
-        except AbsentEntryError:
-            self[ key ] = value = self._producer( )
-            return value
-
-
-def _inject_accretion_functions( owner ): # pylint: disable=too-complex,too-many-locals
-    from .exceptions import (
-        AbsentEntryError, ImmutableEntryError, IndelibleEntryError
-    )
-    dictionary = { }
-
-    # pylint: disable=possibly-unused-variable
-
-    def _str_( ): return str( dictionary )
-
-    def _iter_( ): return iter( dictionary )
-
-    def _len_( ): return len( dictionary )
-
-    def _delitem_( indicator ):
-        if indicator not in dictionary:
-            raise AbsentEntryError( indicator )
-        raise IndelibleEntryError( indicator )
-
-    def _getitem_( indicator ):
-        if indicator not in dictionary:
-            raise AbsentEntryError( indicator )
-        return dictionary[ indicator ]
-
-    def _setitem_( indicator, value ):
-        if indicator in dictionary:
-            raise ImmutableEntryError( indicator )
-        dictionary[ indicator ] = value
-
-    # pylint: enable=possibly-unused-variable
-
-    for name in _accretion_function_names:
-        setattr( owner, name, locals( )[ name ] )
-    return owner
+        if key not in self:
+            value = self._producer( )
+            self[ key ] = value
+        else: value = super( ).__getitem__( key )
+        return value
 
 
 __all__ = __.discover_public_attributes( globals( ) )
