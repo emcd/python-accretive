@@ -28,6 +28,12 @@ Module ``accretive``
    :imported-members:
 
 
+Module ``accretive.exceptions``
+-------------------------------------------------------------------------------
+
+.. automodule:: accretive.exceptions
+
+
 Module ``accretive.aaliases``
 -------------------------------------------------------------------------------
 

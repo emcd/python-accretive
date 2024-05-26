@@ -22,31 +22,19 @@
 
 
 from . import __
-from . import classes as _classes
+from . import objects as _objects
 
 
-class _Dictionary( # type: ignore
-    __.CoreDictionary, metaclass = _classes.ConcealerClass
-):
-
-    def __setitem__( self, key, value ):
-        from .exceptions import EntryIndicatorValidationFailure
-        if not __.is_python_identifier( key ):
-            raise EntryIndicatorValidationFailure( key )
-        super( ).__setitem__( key, value )
-
-
-class Namespace( metaclass = _classes.ConcealerClass ):
+class Namespace( _objects.Object ):
     ''' Simple accretive namespace.
 
         An accretive namespace only accepts new attributes; attempts to alter
         or delete existing attributes result in errors.
     '''
 
-    __slots__ = ( '__dict__', )
-
-    def __init__( self, **nomargs ):
-        super( ).__setattr__( '__dict__', _Dictionary( **nomargs ) )
+    def __init__( self, *iterables, **nomargs ):
+        super( ).__init__( )
+        super( ).__getattribute__( '__dict__' ).update( *iterables, **nomargs )
 
     def __repr__( self ):
         return "{fqname}( {contents} )".format(
@@ -54,22 +42,6 @@ class Namespace( metaclass = _classes.ConcealerClass ):
             contents = ', '.join( map(
                 lambda entry: f"{entry[0]} = {entry[1]!r}",
                 super( ).__getattribute__( '__dict__' ).items( ) ) ) )
-
-    def __delattr__( self, name ):
-        from .exceptions import IndelibleAttributeError
-        raise IndelibleAttributeError( name )
-
-    def __setattr__( self, name, value ):
-        from .exceptions import (
-            IllegalAttributeNameError,
-            ImmutableAttributeError,
-            ImmutableEntryError,
-        )
-        if not __.is_python_identifier( name ):
-            raise IllegalAttributeNameError( name )
-        try: super( ).__getattribute__( '__dict__' )[ name ] = value
-        except ImmutableEntryError:
-            raise ImmutableAttributeError( name ) from None
 
 
 class ConcealerNamespace( __.ConcealerExtension, Namespace ):

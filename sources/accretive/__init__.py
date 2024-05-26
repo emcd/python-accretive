@@ -40,7 +40,6 @@ from . import qaliases
 
 from .classes import *
 from .dictionaries import *
-from .exceptions import *
 from .modules import *
 from .namespaces import *
 from .objects import *

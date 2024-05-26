@@ -22,22 +22,55 @@
 
 
 from . import __
+from . import classes as _classes
+
+
+class _Dictionary( # type: ignore
+    __.CoreDictionary, metaclass = _classes.ConcealerClass
+):
+
+    def __setitem__( self, key, value ):
+        from .exceptions import EntryIndicatorValidationFailure
+        if not __.is_python_identifier( key ):
+            raise EntryIndicatorValidationFailure( key )
+        super( ).__setitem__( key, value )
 
 
 class Object:
-    ''' Enforces object attributes accretion.
+    ''' Simple accretive object.
 
         Cannot reassign or delete attributes after they are assigned.
     '''
+
+    __slots__ = ( '__dict__', )
+
+    def __init__( self, *posargs, **nomargs ):
+        super( ).__setattr__( '__dict__', _Dictionary( ) )
+        # Pass all arguments down MRO chain without consuming any.
+        super( ).__init__( *posargs, **nomargs )
+
+    def __repr__( self ):
+        return "{fqname}( )".format( fqname = __.discover_fqname( self ) )
 
     def __delattr__( self, name ):
         from .exceptions import IndelibleAttributeError
         raise IndelibleAttributeError( name )
 
     def __setattr__( self, name, value ):
-        from .exceptions import ImmutableAttributeError
-        if hasattr( self, name ): raise ImmutableAttributeError( name )
-        super( ).__setattr__( name, value )
+        from .exceptions import (
+            AbsentAttributeError,
+            IllegalAttributeNameError,
+            ImmutableAttributeError,
+            ImmutableEntryError,
+        )
+        if not __.is_python_identifier( name ):
+            raise IllegalAttributeNameError( name )
+        try: dictionary = super( ).__getattribute__( '__dict__' )
+        except AttributeError as exc:
+            raise AbsentAttributeError( '__dict__' ) from exc
+        try: dictionary[ name ] = value
+        except ImmutableEntryError:
+            raise ImmutableAttributeError( name ) from None
 
 
 class ConcealerObject( __.ConcealerExtension, Object ):
