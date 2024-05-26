@@ -50,7 +50,7 @@ repos:
   rev: 1.7.8
   hooks:
   - id: bandit
-    name: 'SAST: Bandit'
+    name: 'Lint: Bandit'
     args: [ '-c', 'pyproject.toml' ]
     #stages: [ 'push' ]
     fail_fast: true
@@ -69,7 +69,7 @@ repos:
   rev: 'v1.73.0'
   hooks:
   - id: semgrep
-    name: 'SAST: Semgrep (Python)'
+    name: 'Lint: Semgrep (Python)'
     # https://semgrep.dev/explore
     args: [ '--config', 'p/python', '--error', '--skip-unknown-extensions' ]
     stages: [ 'push' ]
@@ -94,15 +94,22 @@ repos:
     language: system
     always_run: true
     pass_filenames: false
-    entry: 'hatch --env develop run coverage run'
+    entry: 'hatch --env develop run testers'
 
-  # TODO: Build Documentation
-
-  - id: package-python
-    name: 'Package: Python: Sdist + Wheel'
+  - id: document-python
+    name: 'Document (Python)'
     stages: [ 'push' ]
     fail_fast: true
     language: system
     always_run: true
     pass_filenames: false
-    entry: 'hatch build --target sdist --target wheel'
+    entry: 'hatch --env develop run docsgen'
+
+  - id: package-python
+    name: 'Package (Python)'
+    stages: [ 'push' ]
+    fail_fast: true
+    language: system
+    always_run: true
+    pass_filenames: false
+    entry: 'hatch --env develop run packagers'
