@@ -42,6 +42,10 @@ from .modules import (
     ConcealerModule as AccretiveConcealerModule,
     Module as AccretiveModule,
 )
+from .namespaces import (
+    ConcealerNamespace as AccretiveConcealerNamespace,
+    Namespace as AccretiveNamespace,
+)
 from .objects import (
     ConcealerObject as AccretiveConcealerObject,
     Object as AccretiveObject,

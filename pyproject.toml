@@ -7,7 +7,7 @@ name = 'accretive'
 description = 'Accretive data structures.'
 dynamic = [ 'version' ]
 license = 'Apache-2.0'
-readme = { 'file' = 'README.md', 'content-type' = 'text/markdown' }
+readme = { 'file' = 'README.rst', 'content-type' = 'text/x-rst' }
 requires-python = '>= 3.8'
 dependencies = [ ]
 # TODO: classifiers: https://pypi.org/classifiers
@@ -16,6 +16,9 @@ dependencies = [ ]
 [[project.authors]]
 name = 'Eric McDonald'
 email = 'emcd@users.noreply.github.com'
+
+[tool.SELF]
+year-of-origin = 2024
 
 [tool.bandit]
 exclude_dirs = [ 'tests' ]
@@ -47,14 +50,42 @@ python = '3.8'
 description = ''' Development environment. '''
 dependencies = [
   'coverage[toml]',
+  'furo',
   'hypothesis',
   'icecream',
   'pylint',
   'pytest',
+  'sphinx',
+  'sphinx-copybutton',
+  'sphinx-inline-tabs',
 ]
 [tool.hatch.envs.develop.env-vars]
 HYPOTHESIS_STORAGE_DIRECTORY = '.auxiliary/caches/hypothesis'
 PYTHONUNBUFFERED = 'TRUE' # TODO: Only for coverage/pytest.
+[tool.hatch.envs.develop.scripts]
+docsgen = [
+  '''sphinx-build -E -b linkcheck -d .auxiliary/caches/sphinx \
+     documentation/sphinx .auxiliary/artifacts/sphinx-linkcheck''',
+  '''sphinx-build -a -d .auxiliary/caches/sphinx \
+     documentation/sphinx .auxiliary/artifacts/sphinx-html''',
+]
+linters = [
+  'pylint sources documentation tests',
+]
+packagers = [
+  'hatch build --target sdist --target wheel'
+  # TODO: Sign packages.
+]
+testers = [
+  'coverage run',
+  # TODO: Report coverage.
+]
+make-all = [
+  'linters',
+  'testers',
+  'packagers',
+  'docsgen',
+]
 [tool.hatch.version]
 path = 'sources/accretive/__init__.py'
 

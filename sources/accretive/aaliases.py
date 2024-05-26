@@ -42,6 +42,10 @@ from .modules import (
     ConcealerModule as hacmodule,
     Module as acmodule,
 )
+from .namespaces import (
+    ConcealerNamespace as hacnamespace,
+    Namespace as acnamespace,
+)
 from .objects import (
     ConcealerObject as hacobject,
     Object as acobject,
