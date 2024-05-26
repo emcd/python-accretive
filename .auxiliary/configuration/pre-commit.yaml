@@ -9,21 +9,35 @@ repos:
   rev: v4.6.0
   hooks:
   - id: check-added-large-files
-  - id: check-ast
-    fail_fast: true
+    name: 'Check: Large Files'
   - id: check-case-conflict
-  - id: check-docstring-first
-  - id: check-json
+    name: 'Check: Filename Case Conflict'
   - id: check-merge-conflict
+    name: 'Check: Merge Conflict Markers'
   - id: check-symlinks
-  - id: check-toml
+    name: 'Check: Dangling Symlinks'
   - id: check-vcs-permalinks
-  - id: check-yaml
-  - id: debug-statements
+    name: 'Check: VCS Permalinks'
   - id: destroyed-symlinks
+    name: 'Check: Destroyed Symlinks'
   - id: detect-private-key
+    name: 'Check: Detect Private Keys'
   - id: mixed-line-ending
+    name: 'Check: Detect Mixed Line Endings'
     args: [ '--fix', 'no' ]
+  - id: check-ast
+    name: 'Validate: Python Files'
+    fail_fast: true
+  - id: check-json
+    name: 'Validate: JSON Files'
+  - id: check-toml
+    name: 'Validate: TOML Files'
+  - id: check-yaml
+    name: 'Validate: YAML Files'
+  - id: check-docstring-first
+    name: 'Check: Docstring First (Python)'
+  - id: debug-statements
+    name: 'Check: Debug Statements (Python)'
 
 - repo: https://github.com/astral-sh/ruff-pre-commit
   rev: v0.4.4
@@ -41,7 +55,6 @@ repos:
     #stages: [ 'push' ]
     fail_fast: true
     additional_dependencies: [ 'bandit[toml]' ]
-    always_run: true
 
 - repo: https://github.com/pre-commit/mirrors-mypy
   rev: v1.10.0
@@ -51,7 +64,6 @@ repos:
     stages: [ 'push' ]
     fail_fast: true
     additional_dependencies: [ 'tokenize-rt' ]
-    always_run: true
 
 - repo: https://github.com/semgrep/semgrep
   rev: 'v1.73.0'
