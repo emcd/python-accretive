@@ -49,12 +49,16 @@ python = '3.8'
 [tool.hatch.envs.develop]
 description = ''' Development environment. '''
 dependencies = [
+  'bandit',
   'coverage[toml]',
   'furo',
   'hypothesis',
   'icecream',
+  'mypy',
   'pylint',
   'pytest',
+  'semgrep',
+  'ruff',
   'sphinx',
   'sphinx-copybutton',
   'sphinx-inline-tabs',
@@ -88,6 +92,9 @@ make-all = [
 ]
 [tool.hatch.version]
 path = 'sources/accretive/__init__.py'
+
+[tool.mypy]
+cache_dir = '.auxiliary/caches/mypy'
 
 # https://pylint.pycqa.org/en/latest/user_guide/configuration/index.html
 [tool.pylint.main]
@@ -227,6 +234,8 @@ python_functions = [ 'test_[0-9][0-9][0-9]_*' ]
 cache_dir = '.auxiliary/caches/pytest'
 #filterwarnings = [ 'ignore::DeprecationWarning' ]
 
+[tool.ruff]
+cache-dir = '.auxiliary/caches/ruff'
 [tool.ruff.lint]
 ignore = [
   'E701', # Multiple statements on one line
