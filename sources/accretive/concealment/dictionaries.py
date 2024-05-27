@@ -18,40 +18,30 @@
 #============================================================================#
 
 
-''' Accretive data structures.
-
-    Accretive data structures can grow but never shrink. Once something is
-    added to them, it cannot be altered or removed. They are particularly
-    useful for registrations, collected during initialization, which then must
-    be part of guaranteed state during later runtime. '''
-
-# ruff: noqa: F401,F403
+''' Accretive dictionaries with attributes concealment. '''
 
 
-from . import __
-from . import aaliases
-from . import classes
-from . import concealment
-from . import dictionaries
-from . import exceptions
-from . import modules
-from . import namespaces
-from . import objects
-from . import qaliases
+from .. import __
+from .. import dictionaries as _dictionaries
 
-from .classes import *
-from .dictionaries import *
-from .modules import *
-from .namespaces import *
-from .objects import *
+
+class Dictionary( __.ConcealerExtension, _dictionaries.Dictionary ):
+    ''' Simple accretive dictionary.
+
+        Cannot alter or remove existing entries.
+    '''
+
+
+class ProducerDictionary(
+    __.ConcealerExtension,
+    _dictionaries.ProducerDictionary
+):
+    ''' Accretive dictionary which produces values for missing entries.
+
+        Cannot alter or remove existing entries.
+
+        Accretive equivalent to 'collections.defaultdict'.
+    '''
 
 
 __all__ = __.discover_public_attributes( globals( ) )
-__version__ = '1.0a202405121610'
-
-
-# TODO: Use 'complete.modules.reclassify_modules' on all packages.
-modules.reclassify_modules( globals( ) )
-_attribute_visibility_includes_ = frozenset( ( '__version__', ) )
-# TODO: Use 'complete.modules.Module' as package module class.
-__.modules[ __package__ ].__class__ = modules.Module

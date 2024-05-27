@@ -25,33 +25,51 @@
 
 import pytest
 
-from . import cache_import_module
+from itertools import product
+
+from . import (
+    CONCEALMENT_PACKAGES_NAMES,
+    MODULES_QNAMES,
+    PACKAGE_NAME,
+    cache_import_module,
+)
 
 
-module_name = 'classes'
-module = cache_import_module( module_name )
-exceptions = cache_import_module( 'exceptions' )
-simple_class_names = ( 'Class', 'ABCFactory' )
-concealer_class_names = ( 'ConcealerClass', 'ConcealerABCFactory' )
-abc_class_names = ( 'ABCFactory', 'ConcealerABCFactory' )
-class_names = simple_class_names + concealer_class_names
+THESE_MODULE_QNAMES = tuple(
+    name for name in MODULES_QNAMES if name.endswith( '.classes' ) )
+THESE_CONCEALMENT_MODULE_QNAMES = tuple(
+    name for name in THESE_MODULE_QNAMES
+    if name.startswith( CONCEALMENT_PACKAGES_NAMES ) )
+ABC_FACTORIES_NAMES = ( 'ABCFactory', )
+THESE_CLASSES_NAMES = ( 'Class', *ABC_FACTORIES_NAMES, )
+
+exceptions = cache_import_module( f"{PACKAGE_NAME}.exceptions" )
 
 
-@pytest.mark.parametrize( 'class_name', class_names )
-def test_100_instantiation( class_name ):
+@pytest.mark.parametrize(
+    'module_qname, class_name',
+    product( THESE_MODULE_QNAMES, THESE_CLASSES_NAMES )
+)
+def test_100_instantiation( module_qname, class_name ):
     ''' Class instantiates. '''
+    module = cache_import_module( module_qname )
     class_factory_class = getattr( module, class_name )
+
     class Object( metaclass = class_factory_class ):
         ''' test '''
 
     assert isinstance( Object, class_factory_class )
 
 
-@pytest.mark.parametrize( 'class_name', class_names )
-def test_101_accretion( class_name ):
+@pytest.mark.parametrize(
+    'module_qname, class_name',
+    product( THESE_MODULE_QNAMES, THESE_CLASSES_NAMES )
+)
+def test_101_accretion( module_qname, class_name ):
     ''' Class accretes. '''
-
+    module = cache_import_module( module_qname )
     class_factory_class = getattr( module, class_name )
+
     class Object( metaclass = class_factory_class ):
         ''' test '''
         attr = 42
@@ -72,11 +90,15 @@ def test_101_accretion( class_name ):
     assert 'foo' == Object.accreted_attr
 
 
-@pytest.mark.parametrize( 'class_name', concealer_class_names )
-def test_102_attribute_concealment( class_name ):
+@pytest.mark.parametrize(
+    'module_qname, class_name',
+    product( THESE_CONCEALMENT_MODULE_QNAMES, THESE_CLASSES_NAMES )
+)
+def test_110_attribute_concealment( module_qname, class_name ):
     ''' Class conceals attributes. '''
-
+    module = cache_import_module( module_qname )
     class_factory_class = getattr( module, class_name )
+
     class Object( metaclass = class_factory_class ):
         ''' test '''
         _class_attribute_visibility_includes_ = frozenset( ( '_private', ) )
@@ -91,12 +113,19 @@ def test_102_attribute_concealment( class_name ):
     assert '_private' in dir( Object )
 
 
-@pytest.mark.parametrize( 'class_name', abc_class_names )
-def test_110_abc_mutation_allowance( class_name ):
+# TODO: Test non-concealment.
+
+
+@pytest.mark.parametrize(
+    'module_qname, class_name',
+    product( THESE_MODULE_QNAMES, ABC_FACTORIES_NAMES )
+)
+def test_200_abc_mutation_allowance( module_qname, class_name ):
     ''' Class allows mutation of ABC machinery. '''
     from abc import abstractmethod
-
+    module = cache_import_module( module_qname )
     class_factory_class = getattr( module, class_name )
+
     class AbstractObject( metaclass = class_factory_class ):
         ''' test '''
         @abstractmethod

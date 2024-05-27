@@ -35,8 +35,23 @@ from sys import modules
 from types import ModuleType as Module
 
 
+class ClassConcealerExtension( type ):
+    ''' Conceals class attributes according to some criteria.
+
+        By default, public attributes are displayed.
+    '''
+
+    _class_attribute_visibility_includes_: AbstractCollection = frozenset( )
+
+    def __dir__( class_ ):
+        return tuple( sorted(
+            name for name in super( ).__dir__( )
+            if  not name.startswith( '_' )
+                or name in class_._class_attribute_visibility_includes_ ) )
+
+
 class ConcealerExtension:
-    ''' Conceals attributes according to some criteria.
+    ''' Conceals instance attributes according to some criteria.
 
         By default, public attributes are displayed.
     '''

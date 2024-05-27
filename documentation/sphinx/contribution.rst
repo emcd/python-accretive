@@ -96,7 +96,3 @@ Internal Development Interface
 
 .. automodule:: accretive.__
    :ignore-module-all: true
-
-.. currentmodule:: accretive.classes
-
-.. autoclass:: _ConcealerExtension

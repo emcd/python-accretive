@@ -26,7 +26,7 @@ from . import classes as _classes
 
 
 class _Dictionary( # type: ignore
-    __.CoreDictionary, metaclass = _classes.ConcealerClass
+    __.CoreDictionary, metaclass = _classes.Class
 ):
 
     def __setitem__( self, key, value ):
@@ -37,7 +37,7 @@ class _Dictionary( # type: ignore
 
 
 class Object:
-    ''' Simple accretive object.
+    ''' Enforces object attributes accretion.
 
         Cannot reassign or delete attributes after they are assigned.
     '''
@@ -57,31 +57,13 @@ class Object:
         raise IndelibleAttributeError( name )
 
     def __setattr__( self, name, value ):
-        from .exceptions import (
-            AbsentAttributeError,
-            IllegalAttributeNameError,
-            ImmutableAttributeError,
-            ImmutableEntryError,
-        )
         if not __.is_python_identifier( name ):
+            from .exceptions import IllegalAttributeNameError
             raise IllegalAttributeNameError( name )
-        try: dictionary = super( ).__getattribute__( '__dict__' )
-        except AttributeError as exc:
-            raise AbsentAttributeError( '__dict__' ) from exc
-        try: dictionary[ name ] = value
-        except ImmutableEntryError:
-            raise ImmutableAttributeError( name ) from None
-
-
-class ConcealerObject( __.ConcealerExtension, Object ):
-    ''' Enforces object attributes accretion and concealment.
-
-        Cannot reassign or delete attributes after they are assigned.
-
-        By default, only lists public attributes. Additional attributes can be
-        added to the listing by providing an '_attribute_visibility_includes_'
-        attribute on a subclass.
-    '''
+        if hasattr( self, name ):
+            from .exceptions import ImmutableAttributeError
+            raise ImmutableAttributeError( name )
+        super( ).__setattr__( name, value )
 
 
 __all__ = __.discover_public_attributes( globals( ) )

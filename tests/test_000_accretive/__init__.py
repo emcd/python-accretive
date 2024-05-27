@@ -23,35 +23,47 @@
 # pylint: disable=magic-value-comparison
 
 
-package_name = 'accretive'
+from types import MappingProxyType as DictionaryProxy
+
+
+PACKAGE_NAME = 'accretive'
+PACKAGES_NAMES = (
+    PACKAGE_NAME,
+    *(  f"{PACKAGE_NAME}.{name}" for name
+        in ( 'concealment', ) )
+)
+CONCEALMENT_PACKAGES_NAMES = tuple(
+    f"{PACKAGE_NAME}.{name}" for name in ( 'concealment', 'complete', ) )
+PROTECTION_PACKAGES_NAMES = tuple(
+    f"{PACKAGE_NAME}.{name}" for name in ( 'protection', 'complete', ) )
 
 
 _modules_cache = { }
-def cache_import_module( module_name = '' ):
+def cache_import_module( qname ):
     ''' Imports module from package by name and caches it. '''
     from importlib import import_module
-    if not module_name:
-        qname = package_name
-        arguments = ( package_name, )
-    else:
-        qname = f"{package_name}.{module_name}"
-        arguments = ( f".{module_name}", package_name, )
+    package_name, *maybe_module_name = qname.rsplit( '.', maxsplit = 1 )
+    if not maybe_module_name: arguments = ( qname, )
+    else: arguments = ( f".{maybe_module_name[0]}", package_name, )
     if qname not in _modules_cache:
         _modules_cache[ qname ] = import_module( *arguments )
     return _modules_cache[ qname ]
 
 
-package = cache_import_module( )
-
-
-def _discover_module_names( ):
-    from itertools import chain
+def _discover_module_names( package_name ):
     from pathlib import Path
-    return tuple( chain(
-        (   path.stem
-            for path in Path( package.__file__ ).parent.glob( '*.py' )
-            if '__init__.py' != path.name ),
-        (   path.name
-            for path in Path( package.__file__ ).parent.glob( '*' )
-            if '__pycache__' != path.name and path.is_dir( ) ) ) )
-module_names = _discover_module_names( )
+    package = cache_import_module( package_name )
+    return tuple(   path.stem
+                    for path in Path( package.__file__ ).parent.glob( '*.py' )
+                    if '__init__.py' != path.name and path.is_file( ) )
+
+MODULES_NAMES_BY_PACKAGE_NAME = DictionaryProxy( {
+    name: _discover_module_names( name ) for name in PACKAGES_NAMES } )
+PACKAGES_NAMES_BY_MODULE_QNAME = DictionaryProxy( {
+    f"{subpackage_name}.{module_name}": subpackage_name
+    for subpackage_name in PACKAGES_NAMES
+    for module_name in MODULES_NAMES_BY_PACKAGE_NAME[ subpackage_name ] } )
+MODULES_QNAMES = tuple( PACKAGES_NAMES_BY_MODULE_QNAME.keys( ) )
+MODULES_NAMES_BY_MODULE_QNAME = DictionaryProxy( {
+    name: name.rsplit( '.', maxsplit = 1 )[ -1 ]
+    for name in PACKAGES_NAMES_BY_MODULE_QNAME.keys( ) } )

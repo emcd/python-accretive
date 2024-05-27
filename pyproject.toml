@@ -137,7 +137,8 @@ valid-metaclass-classmethod-first-arg = [ 'maker', 'factory' ]
 # TODO: exclude-too-few-public-methods: Consider exception hierarchies.
 ignored-parents = [
   'abc.ABCMeta',
-  'accretive.classes._ConcealerExtension',
+  'accretive.__.ClassConcealerExtension',
+  'accretive.objects.Class',
   'accretive.objects.Object',
   'builtins.AttributeError',
   'builtins.BaseException',

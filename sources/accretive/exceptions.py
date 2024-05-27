@@ -26,9 +26,12 @@ from . import classes as _classes # pylint: disable=cyclic-import
 from . import objects as _objects # pylint: disable=cyclic-import
 
 
+class _Class( __.ClassConcealerExtension, _classes.Class ): pass
+
+
 class Omniexception(
-    _objects.ConcealerObject, BaseException,
-    metaclass = _classes.ConcealerClass,
+    __.ConcealerExtension, _objects.Object, BaseException,
+    metaclass = _Class,
 ):
     ''' Base for exceptions raised by package API. '''
 

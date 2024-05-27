@@ -18,27 +18,16 @@
 #============================================================================#
 
 
-''' Accretive class factory classes (aka., metaclasses). '''
+''' Accretive metaclasses. '''
 
 
 from . import __
 
 
-class _ConcealerExtension( type ):
-
-    _class_attribute_visibility_includes_: __.AbstractCollection = frozenset( )
-
-    def __dir__( class_ ):
-        return tuple( sorted(
-            name for name in super( ).__dir__( )
-            if  not name.startswith( '_' )
-                or name in class_._class_attribute_visibility_includes_ ) )
-
-
 class Class( type ):
     ''' Enforces class attributes accretion.
 
-        Cannot reassign or delete attributes after they are assigned.
+        Cannot reassign or delete class attributes after they are assigned.
     '''
 
     def __delattr__( class_, name ):
@@ -51,44 +40,19 @@ class Class( type ):
         super( ).__setattr__( name, value )
 
 
-class ConcealerClass( _ConcealerExtension, Class ):
-    ''' Enforces class attributes accretion.
-
-        Cannot reassign or delete attributes after they are assigned.
-
-        By default, only lists public attributes. Additional attributes can be
-        added to the listing by providing a
-        '_class_attribute_visibility_includes_' attribute on a subclass.
-    '''
-
-
 class ABCFactory( Class, __.ABCFactory ):
     ''' Enforces class attributes accretion.
 
-        Cannot reassign or delete attributes after they are assigned.
+        Cannot reassign or delete class attributes after they are assigned.
     '''
 
     def __setattr__( class_, name, value ):
-        from .exceptions import ImmutableAttributeError
-        if hasattr( class_, name ):
-            # pylint: disable=magic-value-comparison
-            if '__abstractmethods__' == name or name.startswith( '_abc_' ):
-                __.ABCFactory.__setattr__( class_, name, value )
-                return
-            # pylint: enable=magic-value-comparison
-            raise ImmutableAttributeError( name )
-        __.ABCFactory.__setattr__( class_, name, value )
-
-
-class ConcealerABCFactory( _ConcealerExtension, ABCFactory ):
-    ''' Enforces class attributes accretion.
-
-        Cannot reassign or delete attributes after they are assigned.
-
-        By default, only lists public attributes. Additional attributes can be
-        added to the listing by providing a
-        '_class_attribute_visibility_includes_' attribute on a subclass.
-    '''
+        # pylint: disable=magic-value-comparison
+        if '__abstractmethods__' == name or name.startswith( '_abc_' ):
+            __.ABCFactory.__setattr__( class_, name, value )
+            return
+        # pylint: enable=magic-value-comparison
+        super( ).__setattr__( name, value )
 
 
 __all__ = __.discover_public_attributes( globals( ) )

@@ -23,112 +23,144 @@
 
 import pytest
 
-from . import cache_import_module, module_names, package, package_name
+from . import (
+    MODULES_NAMES_BY_MODULE_QNAME,
+    MODULES_QNAMES,
+    PACKAGE_NAME,
+    PACKAGES_NAMES,
+    PACKAGES_NAMES_BY_MODULE_QNAME,
+    cache_import_module,
+)
 
 
-def test_000_sanity( ):
+@pytest.mark.parametrize( 'package_name', PACKAGES_NAMES )
+def test_000_sanity( package_name ):
     ''' Package is sane. '''
+    package = cache_import_module( package_name )
     assert package.__package__ == package_name
     assert package.__name__ == package_name
 
 
-@pytest.mark.parametrize( 'module_name', module_names )
-def test_010_attribute_module_existence( module_name ):
+@pytest.mark.parametrize( 'module_qname', MODULES_QNAMES )
+def test_010_attribute_module_existence( module_qname ):
     ''' Package module is attribute of package. '''
+    package_name = PACKAGES_NAMES_BY_MODULE_QNAME[ module_qname ]
+    package = cache_import_module( package_name )
+    module_name = MODULES_NAMES_BY_MODULE_QNAME[ module_qname ]
     assert module_name in package.__dict__
 
 
-@pytest.mark.parametrize( 'module_name', module_names )
-def test_011_attribute_module_classification( module_name ):
+@pytest.mark.parametrize( 'module_qname', MODULES_QNAMES )
+def test_011_attribute_module_classification( module_qname ):
     ''' Package attribute is module. '''
     from inspect import ismodule
+    package_name = PACKAGES_NAMES_BY_MODULE_QNAME[ module_qname ]
+    package = cache_import_module( package_name )
+    module_name = MODULES_NAMES_BY_MODULE_QNAME[ module_qname ]
     assert ismodule( getattr( package, module_name ) )
 
 
 @pytest.mark.parametrize(
-    'module_name',
-    ( module_name for module_name in module_names
-      if not module_name.startswith( '_' ) )
+    'module_qname',
+    (   module_qname for module_qname, module_name
+        in MODULES_NAMES_BY_MODULE_QNAME.items( )
+        if not module_name.startswith( '_' ) )
 )
-def test_012_attribute_module_visibility( module_name ):
+def test_012_attribute_module_visibility( module_qname ):
     ''' Package module is in package attributes directory. '''
+    package_name = PACKAGES_NAMES_BY_MODULE_QNAME[ module_qname ]
+    package = cache_import_module( package_name )
+    module_name = MODULES_NAMES_BY_MODULE_QNAME[ module_qname ]
     assert module_name in dir( package )
 
 
-@pytest.mark.parametrize(
-    'module_name',
-    ( module_name for module_name in module_names
-      if module_name.startswith( '_' ) )
-)
-def test_013_attribute_module_invisibility( module_name ):
-    ''' Package module is not in package attributes directory. '''
-    assert module_name not in dir( package )
+#@pytest.mark.parametrize(
+#    'module_qname',
+#    (   module_qname for module_qname, module_name
+#        in MODULES_NAMES_BY_MODULE_QNAME.items( )
+#        if module_name.startswith( '_' ) )
+#)
+#def test_013_attribute_module_invisibility( module_qname ):
+#    ''' Package module is not in package attributes directory. '''
+#    package_name = PACKAGES_NAMES_BY_MODULE_QNAME[ module_qname ]
+#    package = cache_import_module( package_name )
+#    module_name = MODULES_NAMES_BY_MODULE_QNAME[ module_qname ]
+#    assert module_name not in dir( package )
 
 
 @pytest.mark.parametrize( 'aname', ( '__version__', ) )
 def test_015_miscellaneous_attribute_existence( aname ):
     ''' Miscellaneous attribute exists in package. '''
+    package = cache_import_module( PACKAGE_NAME )
     assert aname in package.__dict__
 
 
 @pytest.mark.parametrize( 'aname, aclass', ( ( '__version__', str ), ) )
 def test_016_miscellaneous_attribute_classification( aname, aclass ):
     ''' Miscellaaneous attribute is correct class. '''
+    package = cache_import_module( PACKAGE_NAME )
     assert isinstance( getattr( package, aname ), aclass )
 
 
 @pytest.mark.parametrize( 'aname', ( '__version__', ) )
 def test_017_miscellaneous_attribute_visibility( aname ):
     ''' Miscellaneous attribute is in package attributes directory. '''
+    package = cache_import_module( PACKAGE_NAME )
     assert aname in dir( package )
 
 
-def test_030_wildcard_exportation( ):
+@pytest.mark.parametrize( 'package_name', PACKAGES_NAMES )
+def test_030_wildcard_exportation( package_name ):
     ''' Package provides wildcard exports. '''
+    package = cache_import_module( package_name )
     assert hasattr( package, '__all__' )
     assert isinstance( package.__all__, tuple )
 
 
-def test_031_wildcard_exports_existence( ):
+@pytest.mark.parametrize( 'package_name', PACKAGES_NAMES )
+def test_031_wildcard_exports_existence( package_name ):
     ''' Wildcard exports are attributes of package. '''
+    package = cache_import_module( package_name )
     exports = frozenset( package.__all__ )
     assert exports == exports & package.__dict__.keys( )
 
 
-def test_032_wildcard_exports_visibility( ):
+@pytest.mark.parametrize( 'package_name', PACKAGES_NAMES )
+def test_032_wildcard_exports_visibility( package_name ):
     ''' Wildcard exports are in package attributes directory. '''
+    package = cache_import_module( package_name )
     exports = frozenset( package.__all__ )
     assert exports == exports & frozenset( dir( package ) )
 
 
-@pytest.mark.parametrize( 'module_name', module_names )
-def test_100_sanity( module_name ):
+@pytest.mark.parametrize( 'module_qname', MODULES_QNAMES )
+def test_100_sanity( module_qname ):
     ''' Package module is sane. '''
-    module = cache_import_module( module_name )
-    qname = f"{package_name}.{module_name}"
+    package_name = PACKAGES_NAMES_BY_MODULE_QNAME[ module_qname ]
+    module = cache_import_module( module_qname )
     assert module.__package__ == package_name
-    assert module.__name__ == qname
+    assert module.__name__ == module_qname
 
 
-@pytest.mark.parametrize( 'module_name', module_names )
-def test_130_wildcard_exportation( module_name ):
+@pytest.mark.parametrize( 'module_qname', MODULES_QNAMES )
+def test_130_wildcard_exportation( module_qname ):
     ''' Package module provides wildcard exports. '''
-    module = cache_import_module( module_name )
+    module = cache_import_module( module_qname )
     assert hasattr( module, '__all__' )
     assert isinstance( module.__all__, tuple )
 
 
-@pytest.mark.parametrize( 'module_name', module_names )
-def test_131_wildcard_exports_existence( module_name ):
+@pytest.mark.parametrize( 'module_qname', MODULES_QNAMES )
+def test_131_wildcard_exports_existence( module_qname ):
     ''' Wildcard exports are attributes of package module. '''
-    module = cache_import_module( module_name )
+    module = cache_import_module( module_qname )
     exports = frozenset( module.__all__ )
     assert exports == exports & module.__dict__.keys( )
 
 
-@pytest.mark.parametrize( 'module_name', module_names )
-def test_132_wildcard_exports_visibility( module_name ):
+@pytest.mark.parametrize( 'module_qname', MODULES_QNAMES )
+def test_132_wildcard_exports_visibility( module_qname ):
     ''' Wildcard exports are in package module attributes directory. '''
-    module = cache_import_module( module_name )
+    module = cache_import_module( module_qname )
     exports = frozenset( module.__all__ )
     assert exports == exports & frozenset( dir( module ) )

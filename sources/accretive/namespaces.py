@@ -26,10 +26,9 @@ from . import objects as _objects
 
 
 class Namespace( _objects.Object ):
-    ''' Simple accretive namespace.
+    ''' Enforces namespace attributes accretion.
 
-        An accretive namespace only accepts new attributes; attempts to alter
-        or delete existing attributes result in errors.
+        Cannot reassign or delete attributes after they are assigned.
     '''
 
     def __init__( self, *iterables, **nomargs ):
@@ -39,20 +38,9 @@ class Namespace( _objects.Object ):
     def __repr__( self ):
         return "{fqname}( {contents} )".format(
             fqname = __.discover_fqname( self ),
-            contents = ', '.join( map(
-                lambda entry: f"{entry[0]} = {entry[1]!r}",
-                super( ).__getattribute__( '__dict__' ).items( ) ) ) )
-
-
-class ConcealerNamespace( __.ConcealerExtension, Namespace ):
-    ''' Accretive namespace with attribute concealment.
-
-        Cannot reassign or delete attributes after they are assigned.
-
-        By default, only lists public attributes. Additional attributes can be
-        added to the listing by providing an '_attribute_visibility_includes_'
-        attribute on a subclass.
-    '''
+            contents = ', '.join( tuple(
+                f"{key} = {value!r}" for key, value
+                in super( ).__getattribute__( '__dict__' ).items( ) ) ) )
 
 
 __all__ = __.discover_public_attributes( globals( ) )

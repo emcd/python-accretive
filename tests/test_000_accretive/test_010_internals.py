@@ -25,14 +25,21 @@
 
 import pytest
 
-from . import cache_import_module, package_name
+from . import PACKAGE_NAME, cache_import_module
 
 
-module_name = '__'
-module = cache_import_module( module_name )
+module_qname = f"{PACKAGE_NAME}.__"
+module = cache_import_module( module_qname )
 module_attribute_names = (
-    'ConcealerExtension', 'discover_fqname', 'discover_public_attributes',
+    'ClassConcealerExtension',
+    'ConcealerExtension',
+    'discover_fqname',
+    'discover_public_attributes',
+    'is_python_identifier',
 )
+
+
+# TODO: Test new attributes.
 
 
 def test_010_concealer_extension_instantiation( ):
@@ -62,8 +69,7 @@ def test_020_fqname_discovery( ):
         == module.discover_fqname( module.ConcealerExtension ) )
     obj = module.ConcealerExtension( )
     assert (
-        f"{package_name}.{module_name}.ConcealerExtension"
-        == module.discover_fqname( obj ) )
+        f"{module_qname}.ConcealerExtension" == module.discover_fqname( obj ) )
 
 
 @pytest.mark.parametrize(

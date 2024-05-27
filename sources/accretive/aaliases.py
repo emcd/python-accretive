@@ -28,28 +28,14 @@
 
 
 from . import __
-from .classes import (
-    ABCFactory as acabcmeta,
-    Class as actype,
-    ConcealerABCFactory as hacabcmeta,
-    ConcealerClass as hactype,
-)
+from .classes import ABCFactory as acabcmeta, Class as actype
 from .dictionaries import (
     Dictionary as acdict,
     ProducerDictionary as acdefaultdict,
 )
-from .modules import (
-    ConcealerModule as hacmodule,
-    Module as acmodule,
-)
-from .namespaces import (
-    ConcealerNamespace as hacnamespace,
-    Namespace as acnamespace,
-)
-from .objects import (
-    ConcealerObject as hacobject,
-    Object as acobject,
-)
+from .modules import Module as acmodule
+from .namespaces import Namespace as acnamespace
+from .objects import Object as acobject
 
 
 __all__ = __.discover_public_attributes( globals( ) )

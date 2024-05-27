@@ -18,40 +18,35 @@
 #============================================================================#
 
 
-''' Accretive data structures.
-
-    Accretive data structures can grow but never shrink. Once something is
-    added to them, it cannot be altered or removed. They are particularly
-    useful for registrations, collected during initialization, which then must
-    be part of guaranteed state during later runtime. '''
-
-# ruff: noqa: F401,F403
+''' Accretive metaclasses with attribute concealment. '''
 
 
-from . import __
-from . import aaliases
-from . import classes
-from . import concealment
-from . import dictionaries
-from . import exceptions
-from . import modules
-from . import namespaces
-from . import objects
-from . import qaliases
+from .. import __
+from .. import classes as _classes
 
-from .classes import *
-from .dictionaries import *
-from .modules import *
-from .namespaces import *
-from .objects import *
+
+class Class( __.ClassConcealerExtension, _classes.Class ):
+    ''' Enforces class attributes accretion and concealment.
+
+        Cannot reassign or delete class attributes after they are assigned.
+
+        By default, only lists public class attributes. Additional attributes
+        can be added to the listing by providing a
+        ``_class_attribute_visibility_includes_`` attribute on a
+        subclass.
+    '''
+
+
+class ABCFactory( __.ClassConcealerExtension, _classes.ABCFactory ):
+    ''' Enforces class attributes accretion and concealment.
+
+        Cannot reassign or delete class attributes after they are assigned.
+
+        By default, only lists public class attributes. Additional attributes
+        can be added to the listing by providing a
+        ``_class_attribute_visibility_includes_`` attribute on a
+        subclass.
+    '''
 
 
 __all__ = __.discover_public_attributes( globals( ) )
-__version__ = '1.0a202405121610'
-
-
-# TODO: Use 'complete.modules.reclassify_modules' on all packages.
-modules.reclassify_modules( globals( ) )
-_attribute_visibility_includes_ = frozenset( ( '__version__', ) )
-# TODO: Use 'complete.modules.Module' as package module class.
-__.modules[ __package__ ].__class__ = modules.Module

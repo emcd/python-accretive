@@ -31,25 +31,14 @@ from . import __
 from .classes import (
     ABCFactory as AccretiveABCFactory,
     Class as AccretiveClass,
-    ConcealerABCFactory as AccretiveConcealerABCFactory,
-    ConcealerClass as AccretiveConcealerClass,
 )
 from .dictionaries import (
     Dictionary as AccretiveDictionary,
     ProducerDictionary as AccretiveProducerDictionary,
 )
-from .modules import (
-    ConcealerModule as AccretiveConcealerModule,
-    Module as AccretiveModule,
-)
-from .namespaces import (
-    ConcealerNamespace as AccretiveConcealerNamespace,
-    Namespace as AccretiveNamespace,
-)
-from .objects import (
-    ConcealerObject as AccretiveConcealerObject,
-    Object as AccretiveObject,
-)
+from .modules import Module as AccretiveModule
+from .namespaces import Namespace as AccretiveNamespace
+from .objects import Object as AccretiveObject
 
 
 __all__ = __.discover_public_attributes( globals( ) )

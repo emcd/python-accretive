@@ -18,22 +18,21 @@
 #============================================================================#
 
 
-''' Accretive data structures.
+''' Accretive data structures with attribute concealment.
 
-    Accretive data structures can grow but never shrink. Once something is
-    added to them, it cannot be altered or removed. They are particularly
-    useful for registrations, collected during initialization, which then must
-    be part of guaranteed state during later runtime. '''
+    Concealed attributes do not appear in listings via the :py:func:`dir`
+    builtin function. By default, only attributes names, which do not start
+    with ``_`` are made visible, but additional attributes can be included if
+    they are listed on a particular class attribute that the concealer honors.
+'''
 
 # ruff: noqa: F401,F403
 
 
-from . import __
+from .. import __
 from . import aaliases
 from . import classes
-from . import concealment
 from . import dictionaries
-from . import exceptions
 from . import modules
 from . import namespaces
 from . import objects
@@ -47,11 +46,3 @@ from .objects import *
 
 
 __all__ = __.discover_public_attributes( globals( ) )
-__version__ = '1.0a202405121610'
-
-
-# TODO: Use 'complete.modules.reclassify_modules' on all packages.
-modules.reclassify_modules( globals( ) )
-_attribute_visibility_includes_ = frozenset( ( '__version__', ) )
-# TODO: Use 'complete.modules.Module' as package module class.
-__.modules[ __package__ ].__class__ = modules.Module

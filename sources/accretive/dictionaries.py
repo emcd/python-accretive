@@ -26,25 +26,21 @@ from . import classes as _classes
 from . import objects as _objects
 
 
-class _CoreDictionary( # type: ignore
-    __.CoreDictionary, metaclass = _classes.ConcealerClass
+class _Dictionary( # type: ignore
+    __.CoreDictionary, metaclass = _classes.Class
 ): pass
 
 
-class Dictionary(
-    _objects.ConcealerObject, __.AbstractDictionary,
-    metaclass = _classes.ConcealerABCFactory,
-):
-    ''' Simple accretive dictionary.
+class Dictionary( _objects.Object, __.AbstractDictionary ):
+    ''' Enforces dictionary entries accretion.
 
-        An accretive dictionary only accepts new entries; attempts to alter or
-        delete existing entries result in errors.
+        Cannot alter or remove existing entries.
     '''
 
     __slots__ = ( '_data_', )
 
     def __init__( self, *iterables, **entries ):
-        self._data_ = _CoreDictionary( *iterables, **entries )
+        self._data_ = _Dictionary( *iterables, **entries )
         super( ).__init__( )
 
     def __iter__( self ): return iter( self._data_ )
@@ -57,6 +53,8 @@ class Dictionary(
             contents = str( self._data_ ) )
 
     def __str__( self ): return str( self._data_ )
+
+    def __contains__( self, key ): return key in self._data_
 
     def __delitem__( self, key ):
         from .exceptions import IndelibleEntryError
@@ -77,23 +75,25 @@ class Dictionary(
         self._data_.update( *iterables, **entries )
         return self
 
+    # TODO: Directly implement other methods for efficiency.
+
 
 class ProducerDictionary( Dictionary ):
     ''' Accretive dictionary which produces values for missing entries.
 
-        Accretive equivalent to 'collections.defaultdict'.
+        Very similar to 'collections.defaultdict'.
     '''
 
-    __slots__ = ( '_producer', )
+    __slots__ = ( '_producer_', )
 
     def __init__( self, producer ):
         # TODO: Validate producer argument.
-        self._producer = producer
+        self._producer_ = producer
         super( ).__init__( )
 
     def __getitem__( self, key ):
         if key not in self:
-            value = self._producer( )
+            value = self._producer_( )
             self[ key ] = value
         else: value = super( ).__getitem__( key )
         return value

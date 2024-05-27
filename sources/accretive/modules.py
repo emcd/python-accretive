@@ -22,36 +22,20 @@
 
 
 from . import __
-from . import classes as _classes
 from . import objects as _objects
 
 
-class Module(
-    _objects.Object, __.Module,
-    metaclass = _classes.ConcealerClass,
-):
+class Module( _objects.Object, __.Module ):
     ''' Enforces module attributes accretion.
 
-        Cannot reassign or delete attributes after they are assigned.
+        Cannot reassign or delete module attributes after they are assigned.
     '''
 
 
-class ConcealerModule( __.ConcealerExtension, Module ):
-    ''' Enforces module attributes accretion and concealment.
-
-        Cannot reassign or delete attributes after they are assigned.
-
-        By default, only lists public attributes. Additional attributes can be
-        added to the listing by providing an '_attribute_visibility_includes_'
-        attribute on a subclass.
-    '''
-
-
-def reclassify_modules( attributes, to_class = ConcealerModule ):
+def reclassify_modules( attributes, to_class = Module ):
     ''' Reclassifies modules in dictionary with custom module type.
 
-        Custom module type ensures immutable attributes
-        and restricts visibility of attributes.
+        Default custom module type enforces module attributes accretion.
     '''
     for attribute in attributes.values( ):
         if not isinstance( attribute, __.Module ): continue
