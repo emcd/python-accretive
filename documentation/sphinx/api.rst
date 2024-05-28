@@ -75,3 +75,30 @@ Module ``accretive.concealment.qaliases``
 .. automodule:: accretive.concealment.qaliases
    :imported-members:
    :noindex:
+
+
+Subpackage ``accretive.complete``
+===============================================================================
+
+
+Module ``accretive.complete``
+-------------------------------------------------------------------------------
+
+.. automodule:: accretive.complete
+   :imported-members:
+
+
+Module ``accretive.complete.aaliases``
+-------------------------------------------------------------------------------
+
+.. automodule:: accretive.complete.aaliases
+   :imported-members:
+   :noindex:
+
+
+Module ``accretive.complete.qaliases``
+-------------------------------------------------------------------------------
+
+.. automodule:: accretive.complete.qaliases
+   :imported-members:
+   :noindex:

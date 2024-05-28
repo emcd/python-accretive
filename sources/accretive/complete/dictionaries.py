@@ -18,41 +18,38 @@
 #============================================================================#
 
 
-''' Accretive data structures.
-
-    Accretive data structures can grow but never shrink. Once something is
-    added to them, it cannot be altered or removed. They are particularly
-    useful for registrations, collected during initialization, which then must
-    be part of guaranteed state during later runtime. '''
-
-# ruff: noqa: F401,F403
+''' Protected accretive dictionaries with attributes concealment. '''
 
 
-from . import __
-from . import aaliases
-from . import classes
-from . import complete
-from . import concealment
-from . import dictionaries
-from . import exceptions
-from . import modules
-from . import namespaces
-from . import objects
-from . import qaliases
+from .. import __
+from .. import dictionaries as _dictionaries
+from . import classes as _classes
 
-from .classes import *
-from .dictionaries import *
-from .modules import *
-from .namespaces import *
-from .objects import *
+
+class Dictionary(
+    __.ConcealerExtension, _dictionaries.Dictionary,
+    metaclass = _classes.ABCFactory
+):
+    ''' Simple accretive dictionary.
+
+        Cannot alter or remove existing entries.
+
+        Class attributes protected against mutation and deletion.
+    '''
+
+
+class ProducerDictionary(
+    __.ConcealerExtension, _dictionaries.ProducerDictionary,
+    metaclass = _classes.ABCFactory
+):
+    ''' Accretive dictionary which produces values for missing entries.
+
+        Cannot alter or remove existing entries.
+
+        Accretive equivalent to 'collections.defaultdict'.
+
+        Class attributes protected against mutation and deletion.
+    '''
 
 
 __all__ = __.discover_public_attributes( globals( ) )
-__version__ = '1.0a202405121610'
-
-
-complete.modules.reclassify_modules( globals( ) )
-for _module in ( complete, concealment, ):
-    complete.modules.reclassify_modules( vars( _module ) )
-_attribute_visibility_includes_ = frozenset( ( '__version__', ) )
-__.modules[ __package__ ].__class__ = complete.modules.Module

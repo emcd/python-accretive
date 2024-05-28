@@ -30,7 +30,7 @@ PACKAGE_NAME = 'accretive'
 PACKAGES_NAMES = (
     PACKAGE_NAME,
     *(  f"{PACKAGE_NAME}.{name}" for name
-        in ( 'concealment', ) )
+        in ( 'concealment', 'complete' ) )
 )
 CONCEALMENT_PACKAGES_NAMES = tuple(
     f"{PACKAGE_NAME}.{name}" for name in ( 'concealment', 'complete', ) )

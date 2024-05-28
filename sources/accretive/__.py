@@ -31,6 +31,7 @@ from collections.abc import (
     Collection as AbstractCollection,
     Mapping as AbstractDictionary,
 )
+from functools import partial as partial_function
 from sys import modules
 from types import ModuleType as Module
 
@@ -139,6 +140,14 @@ def discover_public_attributes( attributes ):
 def is_python_identifier( obj ):
     ''' Is object a string which is a valid Python identifier? '''
     return isinstance( obj, str ) and obj.isidentifier( )
+
+
+def reclassify_modules( attributes, to_class ):
+    ''' Reclassifies modules in dictionary with custom module type. '''
+    for attribute in attributes.values( ):
+        if not isinstance( attribute, Module ): continue
+        if isinstance( attribute, to_class ): continue
+        attribute.__class__ = to_class
 
 
 __all__ = ( )

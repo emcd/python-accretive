@@ -36,4 +36,8 @@ class Module( __.ConcealerExtension, _modules.Module ):
     '''
 
 
+reclassify_modules = __.partial_function(
+    __.reclassify_modules, to_class = Module )
+
+
 __all__ = __.discover_public_attributes( globals( ) )

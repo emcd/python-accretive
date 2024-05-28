@@ -32,15 +32,8 @@ class Module( _objects.Object, __.Module ):
     '''
 
 
-def reclassify_modules( attributes, to_class = Module ):
-    ''' Reclassifies modules in dictionary with custom module type.
-
-        Default custom module type enforces module attributes accretion.
-    '''
-    for attribute in attributes.values( ):
-        if not isinstance( attribute, __.Module ): continue
-        if isinstance( attribute, to_class ): continue
-        attribute.__class__ = to_class
+reclassify_modules = __.partial_function(
+    __.reclassify_modules, to_class = Module )
 
 
 __all__ = __.discover_public_attributes( globals( ) )
