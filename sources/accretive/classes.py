@@ -30,6 +30,12 @@ class Class( type ):
         Cannot reassign or delete class attributes after they are assigned.
     '''
 
+    def __new__(
+        factory, name, bases, namespace, docstring = None, **nomargs
+    ):
+        if docstring: namespace[ '__doc__' ] = docstring
+        return super( ).__new__( factory, name, bases, namespace, **nomargs )
+
     def __delattr__( class_, name ):
         from .exceptions import IndelibleAttributeError
         raise IndelibleAttributeError( name )
@@ -41,10 +47,7 @@ class Class( type ):
 
 
 class ABCFactory( Class, __.ABCFactory ):
-    ''' Enforces class attributes accretion.
-
-        Cannot reassign or delete class attributes after they are assigned.
-    '''
+    ''' Please see :py:class:`accretive.classes.Class`. '''
 
     def __setattr__( class_, name, value ):
         # pylint: disable=magic-value-comparison
@@ -53,6 +56,8 @@ class ABCFactory( Class, __.ABCFactory ):
             return
         # pylint: enable=magic-value-comparison
         super( ).__setattr__( name, value )
+
+ABCFactory.__doc__ = Class.__doc__ # TODO: Add ABCFactory notes.
 
 
 __all__ = __.discover_public_attributes( globals( ) )
