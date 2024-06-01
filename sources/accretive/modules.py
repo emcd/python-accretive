@@ -26,10 +26,10 @@ from . import objects as _objects
 
 
 class Module( _objects.Object, __.Module ):
-    ''' Enforces module attributes accretion.
+    ''' Produces accretive modules. '''
 
-        Cannot reassign or delete module attributes after they are assigned.
-    '''
+Module.__doc__ = __.generate_docstring(
+    Module, 'description of module', 'module attributes accretion' )
 
 
 reclassify_modules = __.partial_function(

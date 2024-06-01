@@ -16,26 +16,28 @@
    |                                                                          |
    +--------------------------------------------------------------------------+
 
-
-.. include:: ../../README.rst
-
-
-Table of Contents
+Subpackage ``accretive.complete``
 ===============================================================================
 
-.. toctree::
-   :maxdepth: 2
 
-   api/index
-   contribution
-   license
+Module ``accretive.complete``
+-------------------------------------------------------------------------------
 
-.. todo:: Link changelog.
+.. automodule:: accretive.complete
+   :imported-members:
 
 
-Indices
-===============================================================================
+Module ``accretive.complete.aaliases``
+-------------------------------------------------------------------------------
 
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
+.. automodule:: accretive.complete.aaliases
+   :imported-members:
+   :noindex:
+
+
+Module ``accretive.complete.qaliases``
+-------------------------------------------------------------------------------
+
+.. automodule:: accretive.complete.qaliases
+   :imported-members:
+   :noindex:

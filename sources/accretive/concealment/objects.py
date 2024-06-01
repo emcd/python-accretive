@@ -26,14 +26,10 @@ from .. import objects as _objects
 
 
 class Object( __.ConcealerExtension, _objects.Object ):
-    ''' Enforces object attributes accretion and concealment.
+    ''' Produces accretive objects with attributes concealment. '''
 
-        Cannot reassign or delete attributes after they are assigned.
-
-        By default, only lists public attributes. Additional attributes can be
-        added to the listing by providing an
-        ``_attribute_visibility_includes_`` attribute on a subclass.
-    '''
+Object.__doc__ = __.generate_docstring(
+    _objects.Object, 'instance attributes concealment' )
 
 
 __all__ = __.discover_public_attributes( globals( ) )

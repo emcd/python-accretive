@@ -16,7 +16,6 @@
    |                                                                          |
    +--------------------------------------------------------------------------+
 
-
 Package ``accretive``
 ===============================================================================
 
@@ -26,12 +25,6 @@ Module ``accretive``
 
 .. automodule:: accretive
    :imported-members:
-
-
-Module ``accretive.exceptions``
--------------------------------------------------------------------------------
-
-.. automodule:: accretive.exceptions
 
 
 Module ``accretive.aaliases``
@@ -46,59 +39,5 @@ Module ``accretive.qaliases``
 -------------------------------------------------------------------------------
 
 .. automodule:: accretive.qaliases
-   :imported-members:
-   :noindex:
-
-
-Subpackage ``accretive.concealment``
-===============================================================================
-
-
-Module ``accretive.concealment``
--------------------------------------------------------------------------------
-
-.. automodule:: accretive.concealment
-   :imported-members:
-
-
-Module ``accretive.concealment.aaliases``
--------------------------------------------------------------------------------
-
-.. automodule:: accretive.concealment.aaliases
-   :imported-members:
-   :noindex:
-
-
-Module ``accretive.concealment.qaliases``
--------------------------------------------------------------------------------
-
-.. automodule:: accretive.concealment.qaliases
-   :imported-members:
-   :noindex:
-
-
-Subpackage ``accretive.complete``
-===============================================================================
-
-
-Module ``accretive.complete``
--------------------------------------------------------------------------------
-
-.. automodule:: accretive.complete
-   :imported-members:
-
-
-Module ``accretive.complete.aaliases``
--------------------------------------------------------------------------------
-
-.. automodule:: accretive.complete.aaliases
-   :imported-members:
-   :noindex:
-
-
-Module ``accretive.complete.qaliases``
--------------------------------------------------------------------------------
-
-.. automodule:: accretive.complete.qaliases
    :imported-members:
    :noindex:

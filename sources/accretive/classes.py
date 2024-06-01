@@ -25,10 +25,7 @@ from . import __
 
 
 class Class( type ):
-    ''' Enforces class attributes accretion.
-
-        Cannot reassign or delete class attributes after they are assigned.
-    '''
+    ''' Produces accretive classes. '''
 
     def __new__(
         factory, name, bases, namespace, docstring = None, **nomargs
@@ -45,19 +42,24 @@ class Class( type ):
         if hasattr( class_, name ): raise ImmutableAttributeError( name )
         super( ).__setattr__( name, value )
 
+Class.__doc__ = __.generate_docstring(
+    Class, 'class attributes accretion' )
+
 
 class ABCFactory( Class, __.ABCFactory ):
-    ''' Please see :py:class:`accretive.classes.Class`. '''
+    ''' Produces accretive abstract base classes (ABC). '''
 
     def __setattr__( class_, name, value ):
-        # pylint: disable=magic-value-comparison
-        if '__abstractmethods__' == name or name.startswith( '_abc_' ):
+        # Bypass accretion machinery for ABC magic attributes.
+        if ( # pylint: disable=magic-value-comparison
+            '__abstractmethods__' == name or name.startswith( '_abc_' )
+        ):
             __.ABCFactory.__setattr__( class_, name, value )
             return
-        # pylint: enable=magic-value-comparison
         super( ).__setattr__( name, value )
 
-ABCFactory.__doc__ = Class.__doc__ # TODO: Add ABCFactory notes.
+ABCFactory.__doc__ = __.generate_docstring(
+    ABCFactory, 'class attributes accretion', 'abc attributes exemption' )
 
 
 __all__ = __.discover_public_attributes( globals( ) )

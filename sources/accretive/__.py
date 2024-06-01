@@ -32,8 +32,12 @@ from collections.abc import (
     Mapping as AbstractDictionary,
 )
 from functools import partial as partial_function
+from inspect import cleandoc as clean_docstring
 from sys import modules
-from types import ModuleType as Module
+from types import (
+    MappingProxyType as DictionaryProxy,
+    ModuleType as Module,
+)
 
 
 class ClassConcealerExtension( type ):
@@ -135,6 +139,100 @@ def discover_public_attributes( attributes ):
         name for name, attribute in attributes.items( )
         if  not name.startswith( '_' )
             and ( isclass( attribute ) or isfunction( attribute ) ) ) )
+
+
+_docstring_fragments = DictionaryProxy( {
+    fragment_id: clean_docstring( fragment ) for fragment_id, fragment
+    in {
+
+        'abc attributes exemption': '''
+Derived from and compatible with :py:class:`abc.ABCMeta`. The
+``__abstractmethods__`` class attribute and the class attributes, whose names
+start with ``_abc_``, are exempt from the accretion mechanism so that the
+internal method abstraction machinery can function correctly.
+''',
+
+        'class attributes accretion': '''
+Prevents reassignment or deletion of class attributes after they have been
+assigned. Only assignment of new class attributes is permitted.
+''',
+
+        'class attributes concealment': '''
+By default, all class attributes, whose names do not start with ``_``, are
+returned from an invocation of :py:func:`dir`. Additional class attributes can
+be returned, if the ``_class_attribute_visibility_includes_`` attribute is
+provided on a subclass.
+''',
+
+        'description of module': '''
+This class is derived from :py:class:`types.ModuleType` and is suitable for use
+as a Python module class.
+''',
+
+        'description of namespace': '''
+A namespace is an object, whose attributes can be determined from iterables and
+keyword arguments, at initialization time. The string representation of the
+namespace object reflects its current instance attributes. Modeled after
+:py:class:`types.SimpleNamespace`.
+''',
+
+        'dictionary entries accretion': '''
+Prevents alteration or removal of dictionary entries after they have been
+added. Only addition of new dictionary entries is permitted.
+''',
+
+        'dictionary entries production': '''
+When an attempt to access a missing entry is made, then the entry is added with
+a default value. Modeled after :py:class:`collections.defaultdict`.
+''',
+
+        'instance attributes accretion': '''
+Prevents reassignment or deletion of instance attributes after they have been
+assigned. Only assignment of new instance attributes is permitted.
+''',
+
+        'instance attributes concealment': '''
+By default, all instance attributes, whose names do not start with ``_``, are
+returned from an invocation of :py:func:`dir`. Additional instance attributes
+can be returned, if the ``_attribute_visibility_includes_`` attribute is
+provided on a subclass.
+''',
+
+        'module attributes accretion': '''
+Prevents reassignment or deletion of module attributes after they have been
+assigned. Only assignment of new module attributes is permitted.
+''',
+
+        'module attributes concealment': '''
+By default, all module attributes, whose names do not start with ``_``, are
+returned from an invocation of :py:func:`dir`. Additional module attributes
+can be returned, if the ``_attribute_visibility_includes_`` attribute is
+provided on a subclass.
+''',
+
+        'protection of class': '''
+Enforcement of attributes accretion on this class, itself, is in effect.
+''',
+
+        'protection of class factory class': '''
+Enforcement of attributes accretion on this metaclass, itself, is in effect.
+''',
+
+        'protection of module class': '''
+Enforcement of attributes accretion on this module class, itself, is in effect.
+''',
+
+    }.items( )
+} )
+def generate_docstring( *fragment_ids ):
+    ''' Sews together docstring fragments into clean docstring. '''
+    from inspect import getdoc, isclass
+    fragments = [ ]
+    for fragment_id in fragment_ids:
+        if isclass( fragment_id ): fragment = getdoc( fragment_id )
+        else: fragment = _docstring_fragments[ fragment_id ]
+        fragments.append( fragment )
+    return '\n\n'.join( fragments )
 
 
 def is_python_identifier( obj ):

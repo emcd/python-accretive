@@ -28,18 +28,14 @@ from . import classes as _classes
 
 class Namespace(
     __.ConcealerExtension, _namespaces.Namespace,
-    metaclass = _classes.Class
+    metaclass = _classes.Class,
+    docstring = __.generate_docstring(
+        _namespaces.Namespace,
+        'instance attributes concealment',
+        'protection of class',
+    )
 ):
-    ''' Enforces namespace attributes accretion and concealment.
-
-        Cannot reassign or delete attributes after they are assigned.
-
-        By default, only lists public attributes. Additional attributes can be
-        added to the listing by providing an
-        ``_attribute_visibility_includes_`` attribute on a subclass.
-
-        Class attributes protected against mutation and deletion.
-    '''
+    ''' Produces accretive namespace objects with attributes concealment. '''
 
 
 __all__ = __.discover_public_attributes( globals( ) )

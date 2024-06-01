@@ -37,10 +37,7 @@ class _Dictionary( # type: ignore
 
 
 class Object:
-    ''' Enforces object attributes accretion.
-
-        Cannot reassign or delete attributes after they are assigned.
-    '''
+    ''' Produces accretive objects. '''
 
     __slots__ = ( '__dict__', )
 
@@ -64,6 +61,9 @@ class Object:
             from .exceptions import ImmutableAttributeError
             raise ImmutableAttributeError( name )
         super( ).__setattr__( name, value )
+
+Object.__doc__ = __.generate_docstring(
+    Object, 'instance attributes accretion' )
 
 
 __all__ = __.discover_public_attributes( globals( ) )

@@ -16,26 +16,7 @@
    |                                                                          |
    +--------------------------------------------------------------------------+
 
-
-.. include:: ../../README.rst
-
-
-Table of Contents
+Module ``accretive.exceptions``
 ===============================================================================
 
-.. toctree::
-   :maxdepth: 2
-
-   api/index
-   contribution
-   license
-
-.. todo:: Link changelog.
-
-
-Indices
-===============================================================================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
+.. automodule:: accretive.exceptions

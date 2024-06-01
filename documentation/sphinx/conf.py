@@ -74,6 +74,7 @@ nitpick_ignore = [
     ( 'py:class', "a set-like object providing a view on D's keys" ),
     ( 'py:class', "an object providing a view on D's values" ),
     ( 'py:class', "functools.partial" ),
+    ( 'py:class', "mappingproxy" ),
     ( 'py:class', "module" ),
     ( 'py:class',
       "v, remove specified key and return the corresponding value." )

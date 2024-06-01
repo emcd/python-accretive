@@ -28,18 +28,14 @@ from . import classes as _classes
 
 class Module(
     __.ConcealerExtension, _modules.Module,
-    metaclass = _classes.Class
+    metaclass = _classes.Class,
+    docstring = __.generate_docstring(
+        _modules.Module,
+        'module attributes concealment',
+        'protection of module class',
+    )
 ):
-    ''' Enforces module attributes accretion and concealment.
-
-        Cannot reassign or delete module attributes after they are assigned.
-
-        By default, only lists public attributes. Additional attributes can be
-        added to the listing by providing an
-        ``_attribute_visibility_includes_`` attribute on a subclass.
-
-        Class attributes protected against mutation and deletion.
-    '''
+    ''' Produces accretive modules with attributes concealment. '''
 
 
 reclassify_modules = __.partial_function(

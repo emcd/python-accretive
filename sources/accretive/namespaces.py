@@ -26,14 +26,12 @@ from . import objects as _objects
 
 
 class Namespace( _objects.Object ):
-    ''' Enforces namespace attributes accretion.
+    ''' Produces accretive namespace objects. '''
 
-        Cannot reassign or delete attributes after they are assigned.
-    '''
-
-    def __init__( self, *iterables, **nomargs ):
+    def __init__( self, *iterables, **attributes ):
         super( ).__init__( )
-        super( ).__getattribute__( '__dict__' ).update( *iterables, **nomargs )
+        super( ).__getattribute__( '__dict__' ).update(
+            *iterables, **attributes )
 
     def __repr__( self ):
         return "{fqname}( {contents} )".format(
@@ -41,6 +39,9 @@ class Namespace( _objects.Object ):
             contents = ', '.join( tuple(
                 f"{key} = {value!r}" for key, value
                 in super( ).__getattribute__( '__dict__' ).items( ) ) ) )
+
+Namespace.__doc__ = __.generate_docstring(
+    Namespace, 'description of namespace', 'instance attributes accretion' )
 
 
 __all__ = __.discover_public_attributes( globals( ) )

@@ -27,36 +27,26 @@ from .. import classes as _classes
 
 class Class(
     __.ClassConcealerExtension, _classes.Class,
-    metaclass = _classes.Class
+    metaclass = _classes.Class,
+    docstring = __.generate_docstring(
+        _classes.Class,
+        'class attributes concealment',
+        'protection of class factory class',
+    )
 ):
-    ''' Enforces class attributes accretion and concealment.
-
-        Cannot reassign or delete class attributes after they are assigned.
-
-        By default, only lists public class attributes. Additional attributes
-        can be added to the listing by providing a
-        ``_class_attribute_visibility_includes_`` attribute on a
-        subclass.
-
-        Class attributes are protected against mutation and deletion.
-    '''
+    ''' Produces accretive classes with attributes concealment. '''
 
 
 class ABCFactory(
     __.ClassConcealerExtension, _classes.ABCFactory,
-    metaclass = _classes.Class
+    metaclass = _classes.Class,
+    docstring = __.generate_docstring(
+        _classes.ABCFactory,
+        'class attributes concealment',
+        'protection of class factory class',
+    )
 ):
-    ''' Enforces class attributes accretion and concealment.
-
-        Cannot reassign or delete class attributes after they are assigned.
-
-        By default, only lists public class attributes. Additional attributes
-        can be added to the listing by providing a
-        ``_class_attribute_visibility_includes_`` attribute on a
-        subclass.
-
-        Class attributes are protected against mutation and deletion.
-    '''
+    ''' Produces accretive ABCs with attributes concealment. '''
 
 
 __all__ = __.discover_public_attributes( globals( ) )

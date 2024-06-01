@@ -32,10 +32,7 @@ class _Dictionary( # type: ignore
 
 
 class Dictionary( _objects.Object, __.AbstractDictionary ):
-    ''' Enforces dictionary entries accretion.
-
-        Cannot alter or remove existing entries.
-    '''
+    ''' Accretive dictionary. '''
 
     __slots__ = ( '_data_', )
 
@@ -77,12 +74,15 @@ class Dictionary( _objects.Object, __.AbstractDictionary ):
 
     # TODO: Directly implement other methods for efficiency.
 
+Dictionary.__doc__ = __.generate_docstring(
+    Dictionary,
+    'dictionary entries accretion',
+    'instance attributes accretion',
+)
+
 
 class ProducerDictionary( Dictionary ):
-    ''' Accretive dictionary which produces values for missing entries.
-
-        Very similar to 'collections.defaultdict'.
-    '''
+    ''' Accretive dictionary with default value for missing entries. '''
 
     __slots__ = ( '_producer_', )
 
@@ -97,6 +97,13 @@ class ProducerDictionary( Dictionary ):
             self[ key ] = value
         else: value = super( ).__getitem__( key )
         return value
+
+ProducerDictionary.__doc__ = __.generate_docstring(
+    ProducerDictionary,
+    'dictionary entries accretion',
+    'dictionary entries production',
+    'instance attributes accretion',
+)
 
 
 __all__ = __.discover_public_attributes( globals( ) )

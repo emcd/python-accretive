@@ -25,23 +25,22 @@ from .. import __
 from .. import dictionaries as _dictionaries
 
 
-class Dictionary( __.ConcealerExtension, _dictionaries.Dictionary ):
-    ''' Simple accretive dictionary.
+class Dictionary(
+    __.ConcealerExtension,_dictionaries.Dictionary
+):
+    ''' Accretive dictionary. '''
 
-        Cannot alter or remove existing entries.
-    '''
+Dictionary.__doc__ = __.generate_docstring(
+    _dictionaries.Dictionary, 'instance attributes concealment' )
 
 
 class ProducerDictionary(
-    __.ConcealerExtension,
-    _dictionaries.ProducerDictionary
+    __.ConcealerExtension, _dictionaries.ProducerDictionary
 ):
-    ''' Accretive dictionary which produces values for missing entries.
+    ''' Accretive dictionary with default value for missing entries. '''
 
-        Cannot alter or remove existing entries.
-
-        Accretive equivalent to 'collections.defaultdict'.
-    '''
+ProducerDictionary.__doc__ = __.generate_docstring(
+    _dictionaries.ProducerDictionary, 'instance attributes concealment' )
 
 
 __all__ = __.discover_public_attributes( globals( ) )

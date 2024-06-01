@@ -28,28 +28,26 @@ from . import classes as _classes
 
 class Dictionary(
     __.ConcealerExtension, _dictionaries.Dictionary,
-    metaclass = _classes.ABCFactory
+    metaclass = _classes.ABCFactory,
+    docstring = __.generate_docstring(
+        _dictionaries.Dictionary,
+        'instance attributes concealment',
+        'protection of class',
+    )
 ):
-    ''' Simple accretive dictionary.
-
-        Cannot alter or remove existing entries.
-
-        Class attributes protected against mutation and deletion.
-    '''
+    ''' Accretive dictionary. '''
 
 
 class ProducerDictionary(
     __.ConcealerExtension, _dictionaries.ProducerDictionary,
-    metaclass = _classes.ABCFactory
+    metaclass = _classes.ABCFactory,
+    docstring = __.generate_docstring(
+        _dictionaries.ProducerDictionary,
+        'instance attributes concealment',
+        'protection of class',
+    )
 ):
-    ''' Accretive dictionary which produces values for missing entries.
-
-        Cannot alter or remove existing entries.
-
-        Accretive equivalent to 'collections.defaultdict'.
-
-        Class attributes protected against mutation and deletion.
-    '''
+    ''' Accretive dictionary with default values for missing entries. '''
 
 
 __all__ = __.discover_public_attributes( globals( ) )

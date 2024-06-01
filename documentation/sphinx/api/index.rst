@@ -17,25 +17,16 @@
    +--------------------------------------------------------------------------+
 
 
-.. include:: ../../README.rst
-
-
-Table of Contents
-===============================================================================
+*******************************************************************************
+Application Programming Interface (API)
+*******************************************************************************
 
 .. toctree::
    :maxdepth: 2
 
-   api/index
-   contribution
-   license
+   base
+   exceptions
+   concealment
+   complete
 
-.. todo:: Link changelog.
-
-
-Indices
-===============================================================================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
+.. todo:: protection subpackage

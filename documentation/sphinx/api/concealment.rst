@@ -16,26 +16,28 @@
    |                                                                          |
    +--------------------------------------------------------------------------+
 
-
-.. include:: ../../README.rst
-
-
-Table of Contents
+Subpackage ``accretive.concealment``
 ===============================================================================
 
-.. toctree::
-   :maxdepth: 2
 
-   api/index
-   contribution
-   license
+Module ``accretive.concealment``
+-------------------------------------------------------------------------------
 
-.. todo:: Link changelog.
+.. automodule:: accretive.concealment
+   :imported-members:
 
 
-Indices
-===============================================================================
+Module ``accretive.concealment.aaliases``
+-------------------------------------------------------------------------------
 
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
+.. automodule:: accretive.concealment.aaliases
+   :imported-members:
+   :noindex:
+
+
+Module ``accretive.concealment.qaliases``
+-------------------------------------------------------------------------------
+
+.. automodule:: accretive.concealment.qaliases
+   :imported-members:
+   :noindex:
