@@ -18,42 +18,24 @@
 #============================================================================#
 
 
-''' Accretive data structures.
+''' Abbreviated aliases to accretive data structures.
 
-    Accretive data structures can grow but never shrink. Once something is
-    added to them, it cannot be altered or removed. They are particularly
-    useful for registrations, collected during initialization, which then must
-    be part of guaranteed state during later runtime. '''
+    Similar to Python builtins.
+'''
 
-# ruff: noqa: F401,F403
+# ruff: noqa: F401
+# pylint: disable=unused-import
 
 
-from . import __
-from . import aaliases
-from . import classes
-from . import complete
-from . import concealment
-from . import dictionaries
-from . import exceptions
-from . import modules
-from . import namespaces
-from . import objects
-from . import protection
-from . import qaliases
-
-from .classes import *
-from .dictionaries import *
-from .modules import *
-from .namespaces import *
-from .objects import *
+from .. import __
+from .classes import ABCFactory as acabcmeta, Class as actype
+from .dictionaries import (
+    Dictionary as acdict,
+    ProducerDictionary as acdefaultdict,
+)
+from .modules import Module as acmodule
+from .namespaces import Namespace as acnamespace
+from .objects import Object as acobject
 
 
 __all__ = __.discover_public_attributes( globals( ) )
-__version__ = '1.0a202405121610'
-
-
-complete.modules.reclassify_modules( globals( ) )
-for _module in ( complete, concealment, protection, ):
-    complete.modules.reclassify_modules( vars( _module ) )
-_attribute_visibility_includes_ = frozenset( ( '__version__', ) )
-__.modules[ __package__ ].__class__ = complete.modules.Module

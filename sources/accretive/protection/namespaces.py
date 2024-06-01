@@ -18,42 +18,21 @@
 #============================================================================#
 
 
-''' Accretive data structures.
-
-    Accretive data structures can grow but never shrink. Once something is
-    added to them, it cannot be altered or removed. They are particularly
-    useful for registrations, collected during initialization, which then must
-    be part of guaranteed state during later runtime. '''
-
-# ruff: noqa: F401,F403
+''' Protected accretive namespaces. '''
 
 
-from . import __
-from . import aaliases
-from . import classes
-from . import complete
-from . import concealment
-from . import dictionaries
-from . import exceptions
-from . import modules
-from . import namespaces
-from . import objects
-from . import protection
-from . import qaliases
+from .. import __
+from .. import namespaces as _namespaces
+from . import classes as _classes
 
-from .classes import *
-from .dictionaries import *
-from .modules import *
-from .namespaces import *
-from .objects import *
+
+class Namespace(
+    _namespaces.Namespace,
+    metaclass = _classes.Class,
+    docstring = __.generate_docstring(
+        _namespaces.Namespace, 'protection of class' )
+):
+    ''' Produces accretive namespace objects. '''
 
 
 __all__ = __.discover_public_attributes( globals( ) )
-__version__ = '1.0a202405121610'
-
-
-complete.modules.reclassify_modules( globals( ) )
-for _module in ( complete, concealment, protection, ):
-    complete.modules.reclassify_modules( vars( _module ) )
-_attribute_visibility_includes_ = frozenset( ( '__version__', ) )
-__.modules[ __package__ ].__class__ = complete.modules.Module

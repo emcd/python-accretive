@@ -16,16 +16,28 @@
    |                                                                          |
    +--------------------------------------------------------------------------+
 
+Subpackage ``accretive.protection``
+===============================================================================
 
-*******************************************************************************
-Application Programming Interface (API)
-*******************************************************************************
 
-.. toctree::
-   :maxdepth: 2
+Module ``accretive.protection``
+-------------------------------------------------------------------------------
 
-   base
-   exceptions
-   concealment
-   protection
-   complete
+.. automodule:: accretive.protection
+   :imported-members:
+
+
+Module ``accretive.protection.aaliases``
+-------------------------------------------------------------------------------
+
+.. automodule:: accretive.protection.aaliases
+   :imported-members:
+   :noindex:
+
+
+Module ``accretive.protection.qaliases``
+-------------------------------------------------------------------------------
+
+.. automodule:: accretive.protection.qaliases
+   :imported-members:
+   :noindex:
