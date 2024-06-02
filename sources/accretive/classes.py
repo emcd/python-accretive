@@ -40,7 +40,11 @@ class Class( type ):
     def __setattr__( class_, name, value ):
         from .exceptions import IndelibleAttributeError
         if hasattr( class_, name ): raise IndelibleAttributeError( name )
-        super( ).__setattr__( name, value )
+        # Note: CPython cell class is not set in all circumstances.
+        #       When it is, then we use two-argument form.
+        #       Else, we use three-argument form.
+        try: super( ).__setattr__( name, value )
+        except TypeError: super( ).__setattr__( class_, name, value )
 
 Class.__doc__ = __.generate_docstring(
     Class, 'class attributes accretion' )

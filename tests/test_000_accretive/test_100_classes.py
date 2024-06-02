@@ -31,6 +31,7 @@ from . import (
     CONCEALMENT_PACKAGES_NAMES,
     MODULES_QNAMES,
     PACKAGE_NAME,
+    PROTECTION_PACKAGES_NAMES,
     cache_import_module,
 )
 
@@ -40,6 +41,15 @@ THESE_MODULE_QNAMES = tuple(
 THESE_CONCEALMENT_MODULE_QNAMES = tuple(
     name for name in THESE_MODULE_QNAMES
     if name.startswith( CONCEALMENT_PACKAGES_NAMES ) )
+THESE_NONCONCEALMENT_MODULE_QNAMES = tuple(
+    name for name in THESE_MODULE_QNAMES
+    if not name.startswith( CONCEALMENT_PACKAGES_NAMES ) )
+THESE_PROTECTION_MODULE_QNAMES = tuple(
+    name for name in THESE_MODULE_QNAMES
+    if name.startswith( PROTECTION_PACKAGES_NAMES ) )
+THESE_NONPROTECTION_MODULE_QNAMES = tuple(
+    name for name in THESE_MODULE_QNAMES
+    if not name.startswith( PROTECTION_PACKAGES_NAMES ) )
 ABC_FACTORIES_NAMES = ( 'ABCFactory', )
 THESE_CLASSES_NAMES = ( 'Class', *ABC_FACTORIES_NAMES, )
 
@@ -113,7 +123,70 @@ def test_110_attribute_concealment( module_qname, class_name ):
     assert '_private' in dir( Object )
 
 
-# TODO: Test non-concealment.
+@pytest.mark.parametrize(
+    'module_qname, class_name',
+    product( THESE_NONCONCEALMENT_MODULE_QNAMES, THESE_CLASSES_NAMES )
+)
+def test_111_attribute_nonconcealment( module_qname, class_name ):
+    ''' Class does not conceal attributes. '''
+    module = cache_import_module( module_qname )
+    class_factory_class = getattr( module, class_name )
+
+    class Object( metaclass = class_factory_class ):
+        ''' test '''
+        _class_attribute_visibility_includes_ = frozenset( ( '_private', ) )
+
+    assert '_class_attribute_visibility_includes_' in dir( Object )
+    Object.public = 42
+    assert 'public' in dir( Object )
+    Object._nonpublic = 3.1415926535
+    assert '_nonpublic' in dir( Object )
+    assert '_private' not in dir( Object )
+    Object._private = 'foo'
+    assert '_private' in dir( Object )
+
+
+@pytest.mark.parametrize(
+    'module_qname, class_name',
+    product( THESE_PROTECTION_MODULE_QNAMES, THESE_CLASSES_NAMES )
+)
+def test_150_class_attribute_protection( module_qname, class_name ):
+    ''' Class attributes are protected. '''
+    module = cache_import_module( module_qname )
+    class_factory_class = getattr( module, class_name )
+
+    with pytest.raises( exceptions.IndelibleAttributeError ):
+        class_factory_class.__setattr__ = None
+    with pytest.raises( exceptions.IndelibleAttributeError ):
+        del class_factory_class.__setattr__
+    class_factory_class.foo = 42
+    with pytest.raises( exceptions.IndelibleAttributeError ):
+        class_factory_class.foo = -1
+    with pytest.raises( exceptions.IndelibleAttributeError ):
+        del class_factory_class.foo
+
+
+@pytest.mark.parametrize(
+    'module_qname, class_name',
+    product( THESE_NONPROTECTION_MODULE_QNAMES, THESE_CLASSES_NAMES )
+)
+def test_151_class_attribute_nonprotection( module_qname, class_name ):
+    ''' Class attributes are not protected. '''
+    module = cache_import_module( module_qname )
+    class_factory_class = getattr( module, class_name )
+
+    setter = class_factory_class.__setattr__
+    class_factory_class.__setattr__ = None
+    assert None is class_factory_class.__setattr__
+    del class_factory_class.__setattr__
+    assert None is not class_factory_class.__setattr__
+    class_factory_class.__settattr__ = setter
+    class_factory_class.foo = 42
+    assert 42 == class_factory_class.foo
+    class_factory_class.foo = -1
+    assert -1 == class_factory_class.foo
+    del class_factory_class.foo
+    assert not hasattr( class_factory_class, 'foo' )
 
 
 @pytest.mark.parametrize(
