@@ -32,7 +32,7 @@ class Namespace(
     docstring = __.generate_docstring(
         _namespaces.Namespace, 'protection of class' )
 ):
-    ''' Produces accretive namespace objects. '''
+    ''' Accretive namespaces. '''
 
 
 __all__ = __.discover_public_attributes( globals( ) )

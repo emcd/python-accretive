@@ -18,7 +18,7 @@
 #============================================================================#
 
 
-''' Protected accretive metaclasses with attribute concealment. '''
+''' Protected accretive classes with attribute concealment. '''
 
 
 from .. import __
@@ -34,7 +34,7 @@ class Class(
         'protection of class factory class',
     )
 ):
-    ''' Produces accretive classes with attributes concealment. '''
+    ''' Accretive classes. '''
 
 
 class ABCFactory(
@@ -46,7 +46,7 @@ class ABCFactory(
         'protection of class factory class',
     )
 ):
-    ''' Produces accretive ABCs with attributes concealment. '''
+    ''' Accretive abstract base classes (ABC). '''
 
 
 __all__ = __.discover_public_attributes( globals( ) )

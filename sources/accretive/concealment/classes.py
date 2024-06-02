@@ -18,7 +18,7 @@
 #============================================================================#
 
 
-''' Accretive metaclasses with attribute concealment. '''
+''' Accretive classes with attribute concealment. '''
 
 
 from .. import __
@@ -26,14 +26,14 @@ from .. import classes as _classes
 
 
 class Class( __.ClassConcealerExtension, _classes.Class ):
-    ''' Produces accretive classes with attributes concealment. '''
+    ''' Accretive classes. '''
 
 Class.__doc__ = __.generate_docstring(
     _classes.Class, 'class attributes concealment' )
 
 
 class ABCFactory( __.ClassConcealerExtension, _classes.ABCFactory ):
-    ''' Produces accretive ABCs with attributes concealment. '''
+    ''' Accretive abstract base classes (ABC). '''
 
 ABCFactory.__doc__ = __.generate_docstring(
     _classes.ABCFactory, 'class attributes concealment' )

@@ -26,7 +26,7 @@ from . import objects as _objects
 
 
 class Namespace( _objects.Object ):
-    ''' Produces accretive namespace objects. '''
+    ''' Accretive namespaces. '''
 
     def __init__( self, *iterables, **attributes ):
         super( ).__init__( )

@@ -22,11 +22,19 @@
 
 
 from . import __
-from . import objects as _objects
 
 
-class Module( _objects.Object, __.Module ):
-    ''' Produces accretive modules. '''
+class Module( __.Module ):
+    ''' Accretive modules. '''
+
+    def __delattr__( self, name ):
+        from .exceptions import IndelibleAttributeError
+        raise IndelibleAttributeError( name )
+
+    def __setattr__( self, name, value ):
+        from .exceptions import IndelibleAttributeError
+        if hasattr( self, name ): raise IndelibleAttributeError( name )
+        super( ).__setattr__( name, value )
 
 Module.__doc__ = __.generate_docstring(
     Module, 'description of module', 'module attributes accretion' )

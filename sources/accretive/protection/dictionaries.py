@@ -36,7 +36,7 @@ class Dictionary(
 
 
 class ProducerDictionary(
-    __.ConcealerExtension, _dictionaries.ProducerDictionary,
+    _dictionaries.ProducerDictionary,
     metaclass = _classes.ABCFactory,
     docstring = __.generate_docstring(
         _dictionaries.ProducerDictionary, 'protection of class' )

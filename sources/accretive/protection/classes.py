@@ -18,7 +18,7 @@
 #============================================================================#
 
 
-''' Protected accretive metaclasses. '''
+''' Protected accretive classes. '''
 
 
 from .. import __
@@ -31,7 +31,7 @@ class Class(
     docstring = __.generate_docstring(
         _classes.Class, 'protection of class factory class' )
 ):
-    ''' Produces accretive classes. '''
+    ''' Accretive classes. '''
 
 
 class ABCFactory(
@@ -40,7 +40,7 @@ class ABCFactory(
     docstring = __.generate_docstring(
         _classes.ABCFactory, 'protection of class factory class' )
 ):
-    ''' Produces accretive ABCs. '''
+    ''' Accretive abstract base classes (ABC). '''
 
 
 __all__ = __.discover_public_attributes( globals( ) )

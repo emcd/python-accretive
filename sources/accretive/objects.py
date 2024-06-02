@@ -31,7 +31,7 @@ class _Dictionary( # type: ignore
 
 
 class Object:
-    ''' Produces accretive objects. '''
+    ''' Accretive objects. '''
 
     __slots__ = ( '__dict__', )
 

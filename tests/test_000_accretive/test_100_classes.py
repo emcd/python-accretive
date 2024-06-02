@@ -52,7 +52,11 @@ THESE_NONPROTECTION_MODULE_QNAMES = tuple(
     if not name.startswith( PROTECTION_PACKAGES_NAMES ) )
 ABC_FACTORIES_NAMES = ( 'ABCFactory', )
 THESE_CLASSES_NAMES = ( 'Class', *ABC_FACTORIES_NAMES, )
+NONABC_FACTORIES_NAMES = tuple(
+    name for name in THESE_CLASSES_NAMES
+    if name not in ABC_FACTORIES_NAMES )
 
+base = cache_import_module( f"{PACKAGE_NAME}.__" )
 exceptions = cache_import_module( f"{PACKAGE_NAME}.exceptions" )
 
 
@@ -76,7 +80,7 @@ def test_100_instantiation( module_qname, class_name ):
     product( THESE_MODULE_QNAMES, THESE_CLASSES_NAMES )
 )
 def test_101_accretion( module_qname, class_name ):
-    ''' Class accretes. '''
+    ''' Class accretes attributes. '''
     module = cache_import_module( module_qname )
     class_factory_class = getattr( module, class_name )
 
@@ -98,6 +102,23 @@ def test_101_accretion( module_qname, class_name ):
     with pytest.raises( exceptions.IndelibleAttributeError ):
         del Object.accreted_attr
     assert 'foo' == Object.accreted_attr
+
+
+@pytest.mark.parametrize(
+    'module_qname, class_name',
+    product( THESE_MODULE_QNAMES, THESE_CLASSES_NAMES )
+)
+def test_102_docstring_assignment( module_qname, class_name ):
+    ''' Class has dynamically-assigned docstring. '''
+    module = cache_import_module( module_qname )
+    class_factory_class = getattr( module, class_name )
+
+    class Object( metaclass = class_factory_class, docstring = 'dynamic' ):
+        ''' test '''
+        attr = 42
+
+    assert 'test' != Object.__doc__
+    assert 'dynamic' == Object.__doc__
 
 
 @pytest.mark.parametrize(
@@ -154,7 +175,6 @@ def test_150_class_attribute_protection( module_qname, class_name ):
     ''' Class attributes are protected. '''
     module = cache_import_module( module_qname )
     class_factory_class = getattr( module, class_name )
-
     with pytest.raises( exceptions.IndelibleAttributeError ):
         class_factory_class.__setattr__ = None
     with pytest.raises( exceptions.IndelibleAttributeError ):
@@ -164,6 +184,8 @@ def test_150_class_attribute_protection( module_qname, class_name ):
         class_factory_class.foo = -1
     with pytest.raises( exceptions.IndelibleAttributeError ):
         del class_factory_class.foo
+    # Cleanup.
+    type.__delattr__( class_factory_class, 'foo' )
 
 
 @pytest.mark.parametrize(
@@ -174,13 +196,9 @@ def test_151_class_attribute_nonprotection( module_qname, class_name ):
     ''' Class attributes are not protected. '''
     module = cache_import_module( module_qname )
     class_factory_class = getattr( module, class_name )
-
-    setter = class_factory_class.__setattr__
-    class_factory_class.__setattr__ = None
-    assert None is class_factory_class.__setattr__
-    del class_factory_class.__setattr__
-    assert None is not class_factory_class.__setattr__
-    class_factory_class.__settattr__ = setter
+    # Note: Do not mess with '__delattr__' or '__setattr__' as part of testing.
+    #       The functions on the class are restored as descriptor wrappers.
+    #       This breaks resolution of these class methods.
     class_factory_class.foo = 42
     assert 42 == class_factory_class.foo
     class_factory_class.foo = -1
@@ -195,20 +213,154 @@ def test_151_class_attribute_nonprotection( module_qname, class_name ):
 )
 def test_200_abc_mutation_allowance( module_qname, class_name ):
     ''' Class allows mutation of ABC machinery. '''
-    from abc import abstractmethod
+    from collections.abc import Mapping
     module = cache_import_module( module_qname )
     class_factory_class = getattr( module, class_name )
 
-    class AbstractObject( metaclass = class_factory_class ):
+    class Object( metaclass = class_factory_class ):
         ''' test '''
-        @abstractmethod
-        def method( self ):
+
+    class Dict( # pylint: disable=abstract-method,unused-variable
+        Object, Mapping
+    ):
+        ''' test '''
+
+    assert hasattr( Object, '__abstractmethods__' )
+    assert hasattr( Object, '_abc_impl' )
+
+
+@pytest.mark.parametrize(
+    'module_qname, class_name',
+    product( THESE_MODULE_QNAMES, NONABC_FACTORIES_NAMES )
+)
+def test_201_abc_mutation_prevention( module_qname, class_name ):
+    ''' Class prevents mutation of ABC machinery. '''
+    from abc import ABCMeta
+    from collections.abc import Mapping
+    module = cache_import_module( module_qname )
+    class_factory_class = getattr( module, class_name )
+
+    class Class( class_factory_class, ABCMeta ):
+        ''' test '''
+
+    class Object( metaclass = Class ):
+        ''' test '''
+
+    with pytest.raises( exceptions.IndelibleAttributeError ):
+
+        class Dict( # pylint: disable=abstract-method,unused-variable
+            Object, Mapping
+        ):
             ''' test '''
-            raise NotImplementedError
 
-    class ConcereteObject( AbstractObject ): # pylint: disable=unused-variable
-        ''' test '''
-        def method( self ): return 42
 
-    assert hasattr( AbstractObject, '__abstractmethods__' )
-    assert hasattr( AbstractObject, '_abc_impl' )
+# TODO? String representations.
+
+
+@pytest.mark.parametrize(
+    'module_qname, class_name',
+    product( THESE_MODULE_QNAMES, THESE_CLASSES_NAMES )
+)
+def test_900_docstring_sanity( module_qname, class_name ):
+    ''' Class has valid docstring. '''
+    module = cache_import_module( module_qname )
+    class_factory_class = getattr( module, class_name )
+    assert hasattr( class_factory_class, '__doc__' )
+    assert isinstance( class_factory_class.__doc__, str )
+    assert class_factory_class.__doc__
+
+
+@pytest.mark.parametrize(
+    'module_qname, class_name',
+    product( THESE_MODULE_QNAMES, THESE_CLASSES_NAMES )
+)
+def test_901_docstring_describes_cfc( module_qname, class_name ):
+    ''' Class docstring describes class factory class. '''
+    module = cache_import_module( module_qname )
+    class_factory_class = getattr( module, class_name )
+    fragment = base.generate_docstring( 'description of class factory class' )
+    assert fragment in class_factory_class.__doc__
+
+
+@pytest.mark.parametrize(
+    'module_qname, class_name',
+    product( THESE_MODULE_QNAMES, THESE_CLASSES_NAMES )
+)
+def test_902_docstring_mentions_accretion( module_qname, class_name ):
+    ''' Class docstring mentions accretion. '''
+    module = cache_import_module( module_qname )
+    class_factory_class = getattr( module, class_name )
+    fragment = base.generate_docstring( 'class attributes accretion' )
+    assert fragment in class_factory_class.__doc__
+
+
+@pytest.mark.parametrize(
+    'module_qname, class_name',
+    product( THESE_CONCEALMENT_MODULE_QNAMES, THESE_CLASSES_NAMES )
+)
+def test_910_docstring_mentions_concealment( module_qname, class_name ):
+    ''' Class docstring mentions concealment. '''
+    module = cache_import_module( module_qname )
+    class_factory_class = getattr( module, class_name )
+    fragment = base.generate_docstring( 'class attributes concealment' )
+    assert fragment in class_factory_class.__doc__
+
+
+@pytest.mark.parametrize(
+    'module_qname, class_name',
+    product( THESE_NONCONCEALMENT_MODULE_QNAMES, THESE_CLASSES_NAMES )
+)
+def test_911_docstring_not_mentions_concealment( module_qname, class_name ):
+    ''' Class docstring does not mention concealment. '''
+    module = cache_import_module( module_qname )
+    class_factory_class = getattr( module, class_name )
+    fragment = base.generate_docstring( 'class attributes concealment' )
+    assert fragment not in class_factory_class.__doc__
+
+
+@pytest.mark.parametrize(
+    'module_qname, class_name',
+    product( THESE_PROTECTION_MODULE_QNAMES, THESE_CLASSES_NAMES )
+)
+def test_930_docstring_mentions_protection( module_qname, class_name ):
+    ''' Class docstring mentions protection. '''
+    module = cache_import_module( module_qname )
+    class_factory_class = getattr( module, class_name )
+    fragment = base.generate_docstring( 'protection of class factory class' )
+    assert fragment in class_factory_class.__doc__
+
+
+@pytest.mark.parametrize(
+    'module_qname, class_name',
+    product( THESE_NONPROTECTION_MODULE_QNAMES, THESE_CLASSES_NAMES )
+)
+def test_931_docstring_not_mentions_protection( module_qname, class_name ):
+    ''' Class docstring does not mention protection. '''
+    module = cache_import_module( module_qname )
+    class_factory_class = getattr( module, class_name )
+    fragment = base.generate_docstring( 'protection of class factory class' )
+    assert fragment not in class_factory_class.__doc__
+
+
+@pytest.mark.parametrize(
+    'module_qname, class_name',
+    product( THESE_MODULE_QNAMES, ABC_FACTORIES_NAMES )
+)
+def test_950_docstring_mentions_abc_exemption( module_qname, class_name ):
+    ''' Class docstring mentions ABC attributes exemption. '''
+    module = cache_import_module( module_qname )
+    class_factory_class = getattr( module, class_name )
+    fragment = base.generate_docstring( 'abc attributes exemption' )
+    assert fragment in class_factory_class.__doc__
+
+
+@pytest.mark.parametrize(
+    'module_qname, class_name',
+    product( THESE_MODULE_QNAMES, NONABC_FACTORIES_NAMES )
+)
+def test_951_docstring_not_mentions_abc_exemption( module_qname, class_name ):
+    ''' Class docstring does not mention ABC attributes exemption. '''
+    module = cache_import_module( module_qname )
+    class_factory_class = getattr( module, class_name )
+    fragment = base.generate_docstring( 'abc attributes exemption' )
+    assert fragment not in class_factory_class.__doc__

@@ -35,7 +35,7 @@ class Module(
         'protection of module class',
     )
 ):
-    ''' Produces accretive modules with attributes concealment. '''
+    ''' Accretive modules. '''
 
 
 reclassify_modules = __.partial_function(

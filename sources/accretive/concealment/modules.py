@@ -26,7 +26,7 @@ from .. import modules as _modules
 
 
 class Module( __.ConcealerExtension, _modules.Module ):
-    ''' Produces accretive modules with attributes concealment. '''
+    ''' Accretive modules. '''
 
 Module.__doc__ = __.generate_docstring(
     _modules.Module, 'module attributes concealment' )

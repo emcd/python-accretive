@@ -26,7 +26,7 @@ from .. import namespaces as _namespaces
 
 
 class Namespace( __.ConcealerExtension, _namespaces.Namespace ):
-    ''' Produces namespace objects with attributes concealment. '''
+    ''' Accretive namespaces. '''
 
 Namespace.__doc__ = __.generate_docstring(
     _namespaces.Namespace, 'instance attributes concealment' )

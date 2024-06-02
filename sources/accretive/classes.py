@@ -18,14 +18,14 @@
 #============================================================================#
 
 
-''' Accretive metaclasses. '''
+''' Accretive classes. '''
 
 
 from . import __
 
 
 class Class( type ):
-    ''' Produces accretive classes. '''
+    ''' Accretive classes. '''
 
     def __new__(
         factory, name, bases, namespace, docstring = None, **nomargs
@@ -47,11 +47,14 @@ class Class( type ):
         except TypeError: super( ).__setattr__( class_, name, value )
 
 Class.__doc__ = __.generate_docstring(
-    Class, 'class attributes accretion' )
+    Class,
+    'description of class factory class',
+    'class attributes accretion'
+)
 
 
 class ABCFactory( Class, __.ABCFactory ):
-    ''' Produces accretive abstract base classes (ABC). '''
+    ''' Accretive abstract base classes (ABC). '''
 
     def __setattr__( class_, name, value ):
         # Bypass accretion machinery for ABC magic attributes.
@@ -63,7 +66,11 @@ class ABCFactory( Class, __.ABCFactory ):
         super( ).__setattr__( name, value )
 
 ABCFactory.__doc__ = __.generate_docstring(
-    ABCFactory, 'class attributes accretion', 'abc attributes exemption' )
+    ABCFactory,
+    'description of class factory class',
+    'class attributes accretion',
+    'abc attributes exemption',
+)
 
 
 __all__ = __.discover_public_attributes( globals( ) )

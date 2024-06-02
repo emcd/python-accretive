@@ -172,9 +172,15 @@ be returned, if the ``_class_attribute_visibility_includes_`` attribute is
 provided on a subclass.
 ''',
 
+        'description of class factory class': '''
+Derived from :py:class:`type`, this is a metaclass. A metaclass is a class
+factory class. I.e., it is a class that produces other classes as its
+instances.
+''',
+
         'description of module': '''
-This class is derived from :py:class:`types.ModuleType` and is suitable for use
-as a Python module class.
+Derived from :py:class:`types.ModuleType`, this class is suitable for use as a
+Python module class.
 ''',
 
         'description of namespace': '''

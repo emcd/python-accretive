@@ -32,7 +32,7 @@ class Object(
     docstring = __.generate_docstring(
         _objects.Object, 'protection of class' )
 ):
-    ''' Produces accretive objects. '''
+    ''' Accretive objects. '''
 
 
 __all__ = __.discover_public_attributes( globals( ) )

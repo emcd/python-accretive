@@ -26,7 +26,7 @@ from .. import objects as _objects
 
 
 class Object( __.ConcealerExtension, _objects.Object ):
-    ''' Produces accretive objects with attributes concealment. '''
+    ''' Accretive objects. '''
 
 Object.__doc__ = __.generate_docstring(
     _objects.Object, 'instance attributes concealment' )

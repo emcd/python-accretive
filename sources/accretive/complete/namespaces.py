@@ -35,7 +35,7 @@ class Namespace(
         'protection of class',
     )
 ):
-    ''' Produces accretive namespace objects with attributes concealment. '''
+    ''' Accretive namespaces. '''
 
 
 __all__ = __.discover_public_attributes( globals( ) )

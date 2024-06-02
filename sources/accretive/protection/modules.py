@@ -32,7 +32,7 @@ class Module(
     docstring = __.generate_docstring(
         _modules.Module, 'protection of module class' )
 ):
-    ''' Produces accretive modules. '''
+    ''' Accretive modules. '''
 
 
 reclassify_modules = __.partial_function(

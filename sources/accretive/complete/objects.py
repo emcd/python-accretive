@@ -35,7 +35,7 @@ class Object(
         'protection of class',
     )
 ):
-    ''' Produces accretive objects with attributes concealment. '''
+    ''' Accretive objects. '''
 
 
 __all__ = __.discover_public_attributes( globals( ) )
