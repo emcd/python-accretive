@@ -38,8 +38,8 @@ class Class( type ):
         raise IndelibleAttributeError( name )
 
     def __setattr__( class_, name, value ):
-        from .exceptions import ImmutableAttributeError
-        if hasattr( class_, name ): raise ImmutableAttributeError( name )
+        from .exceptions import IndelibleAttributeError
+        if hasattr( class_, name ): raise IndelibleAttributeError( name )
         super( ).__setattr__( name, value )
 
 Class.__doc__ = __.generate_docstring(

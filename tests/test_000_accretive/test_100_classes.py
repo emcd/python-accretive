@@ -74,7 +74,7 @@ def test_101_accretion( module_qname, class_name ):
         ''' test '''
         attr = 42
 
-    with pytest.raises( exceptions.ImmutableAttributeError ):
+    with pytest.raises( exceptions.IndelibleAttributeError ):
         Object.attr = -1
     assert 42 == Object.attr
     with pytest.raises( exceptions.IndelibleAttributeError ):
@@ -82,7 +82,7 @@ def test_101_accretion( module_qname, class_name ):
     assert 42 == Object.attr
     Object.accreted_attr = 'foo'
     assert 'foo' == Object.accreted_attr
-    with pytest.raises( exceptions.ImmutableAttributeError ):
+    with pytest.raises( exceptions.IndelibleAttributeError ):
         Object.accreted_attr = 'bar'
     assert 'foo' == Object.accreted_attr
     with pytest.raises( exceptions.IndelibleAttributeError ):

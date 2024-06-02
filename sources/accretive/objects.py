@@ -27,13 +27,7 @@ from . import classes as _classes
 
 class _Dictionary( # type: ignore
     __.CoreDictionary, metaclass = _classes.Class
-):
-
-    def __setitem__( self, key, value ):
-        from .exceptions import EntryIndicatorValidationFailure
-        if not __.is_python_identifier( key ):
-            raise EntryIndicatorValidationFailure( key )
-        super( ).__setitem__( key, value )
+): pass
 
 
 class Object:
@@ -54,12 +48,9 @@ class Object:
         raise IndelibleAttributeError( name )
 
     def __setattr__( self, name, value ):
-        if not __.is_python_identifier( name ):
-            from .exceptions import IllegalAttributeNameError
-            raise IllegalAttributeNameError( name )
         if hasattr( self, name ):
-            from .exceptions import ImmutableAttributeError
-            raise ImmutableAttributeError( name )
+            from .exceptions import IndelibleAttributeError
+            raise IndelibleAttributeError( name )
         super( ).__setattr__( name, value )
 
 Object.__doc__ = __.generate_docstring(

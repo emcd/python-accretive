@@ -40,6 +40,9 @@ from types import (
 )
 
 
+_no_value = object( )
+
+
 class ClassConcealerExtension( type ):
     ''' Conceals class attributes according to some criteria.
 
@@ -82,31 +85,36 @@ class CoreDictionary( ConcealerExtension, dict ):
         super( ).__init__( )
         self.update( *iterables, **entries )
 
-    def __getattribute__( self, name ):
-        from .exceptions import AbsentAttributeError
-        # Mask off mutable methods from parent class.
-        if name in ( 'clear', 'pop', 'popitem' ):
-            raise AbsentAttributeError( name )
-        return super( ).__getattribute__( name )
-
     def __delitem__( self, key ):
         from .exceptions import IndelibleEntryError
         raise IndelibleEntryError( key )
 
-    def __getitem__( self, key ):
-        from .exceptions import AbsentEntryError
-        if key not in self: raise AbsentEntryError( key )
-        return super( ).__getitem__( key )
-
     def __setitem__( self, key, value ):
-        from .exceptions import ImmutableEntryError
-        if key in self: raise ImmutableEntryError( key )
+        from .exceptions import IndelibleEntryError
+        if key in self: raise IndelibleEntryError( key )
         super( ).__setitem__( key, value )
         return self
+
+    def clear( self ):
+        ''' Raises exception. Cannot clear indelible entries. '''
+        from .exceptions import InvalidOperationError
+        raise InvalidOperationError( 'clear' )
 
     def copy( self ):
         ''' Provides fresh copy of dictionary. '''
         return type( self )( self )
+
+    def pop( # pylint: disable=unused-argument
+        self, key, default = _no_value
+    ):
+        ''' Raises exception. Cannot pop indelible entry. '''
+        from .exceptions import InvalidOperationError
+        raise InvalidOperationError( 'pop' )
+
+    def popitem( self ):
+        ''' Raises exception. Cannot pop indelible entry. '''
+        from .exceptions import InvalidOperationError
+        raise InvalidOperationError( 'popitem' )
 
     def update( self, *iterables, **entries ):
         ''' Adds new entries as a batch. '''

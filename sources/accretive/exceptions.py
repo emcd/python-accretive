@@ -39,60 +39,27 @@ class Omniexception(
         ( '__cause__', '__context__', ) )
 
 
-class AbsentAttributeError( Omniexception, AttributeError ):
-    ''' Attempt to access absent attribute. '''
-
-    def __init__( self, name ):
-        super( ).__init__( f"Cannot access missing attribute {name!r}." )
-
-
-class AbsentEntryError( Omniexception, KeyError ):
-    ''' Attempt to access absent dictionary entry. '''
-
-    def __init__( self, indicator ):
-        super( ).__init__( f"Cannot access missing entry for {indicator!r}." )
-
-
-class EntryIndicatorValidationFailure( Omniexception, KeyError, ValueError ):
-    ''' Failure to validate dictionary entry indicator. '''
-
-    def __init__( self, indicator ):
-        super( ).__init__( f"Entry validation failed for key {indicator!r}." )
-
-
-class IllegalAttributeNameError( Omniexception, AttributeError, TypeError ):
-    ''' Attempt to assign attribute with illegal name. '''
-
-    def __init__( self, name ):
-        super( ).__init__( f"Cannot assign attribute with name {name!r}." )
-
-
-class ImmutableAttributeError( Omniexception, AttributeError, TypeError ):
-    ''' Attempt to reassign immutable attribute. '''
-
-    def __init__( self, name ):
-        super( ).__init__( f"Cannot alter existing attribute {name!r}." )
-
-
-class ImmutableEntryError( Omniexception, TypeError ):
-    ''' Attempt to update immutable dictionary entry. '''
-
-    def __init__( self, indicator ):
-        super( ).__init__( f"Cannot alter exsting entry for {indicator!r}." )
-
-
 class IndelibleAttributeError( Omniexception, AttributeError, TypeError ):
-    ''' Attempt to delete indelible attribute. '''
+    ''' Attempt to reassign or delete indelible attribute. '''
 
     def __init__( self, name ):
-        super( ).__init__( f"Cannot remove existing attribute {name!r}." )
+        super( ).__init__(
+            f"Cannot reassign or delete existing attribute {name!r}." )
 
 
 class IndelibleEntryError( Omniexception, TypeError ):
-    ''' Attempt to remove indelible dictionary entry. '''
+    ''' Attempt to update or remove indelible dictionary entry. '''
 
     def __init__( self, indicator ):
-        super( ).__init__( f"Cannot remove existing entry for {indicator!r}." )
+        super( ).__init__(
+            f"Cannot update or remove existing entry for {indicator!r}." )
+
+
+class InvalidOperationError( Omniexception, RuntimeError, TypeError ):
+    ''' Attempt to perform invalid operation. '''
+
+    def __init__( self, name ):
+        super( ).__init__( f"Cannot perform operation {name!r}." )
 
 
 __all__ = __.discover_public_attributes( globals( ) )
