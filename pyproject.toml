@@ -81,8 +81,12 @@ packagers = [
   # TODO: Sign packages.
 ]
 testers = [
+  'coverage erase',
   'coverage run',
-  # TODO: Report coverage.
+  'coverage combine',
+  'coverage report',
+  'coverage html',
+  'coverage xml',
 ]
 make-all = [
   'linters',
