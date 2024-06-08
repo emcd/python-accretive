@@ -33,9 +33,11 @@ module = cache_import_module( module_qname )
 module_attribute_names = (
     'ClassConcealerExtension',
     'ConcealerExtension',
+    'CoreDictionary',
     'discover_fqname',
     'discover_public_attributes',
-    'is_python_identifier',
+    'generate_docstring',
+    'reclassify_modules',
 )
 
 

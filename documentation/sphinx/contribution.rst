@@ -94,5 +94,23 @@ Shell
 Internal Development Interface
 ===============================================================================
 
+
+Module ``accretive.__``
+-------------------------------------------------------------------------------
+
 .. automodule:: accretive.__
+   :ignore-module-all: true
+
+
+Module ``accretive._annotations``
+-------------------------------------------------------------------------------
+
+.. automodule:: accretive._annotations
+   :ignore-module-all: true
+
+
+Module ``accretive._docstrings``
+-------------------------------------------------------------------------------
+
+.. automodule:: accretive._docstrings
    :ignore-module-all: true

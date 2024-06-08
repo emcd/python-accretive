@@ -9,7 +9,9 @@ dynamic = [ 'version' ]
 license = 'Apache-2.0'
 readme = { 'file' = 'README.rst', 'content-type' = 'text/x-rst' }
 requires-python = '>= 3.8'
-dependencies = [ ]
+dependencies = [
+  'typing_extensions',
+]
 # TODO: classifiers: https://pypi.org/classifiers
 # TODO: keywords
 # TODO: [project.urls]
