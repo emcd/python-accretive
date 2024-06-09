@@ -86,8 +86,8 @@ class Dictionary( _objects.Object ): # pylint: disable=eq-without-hash
             Return default value if the entry does not exist.
             If no default value is supplied, then ``None`` is returned.
         '''
-        nomargs = { } if _no_default is default else dict( default = default )
-        return self._data_.get( key, **nomargs )
+        if _no_default is default: return self._data_.get( key )
+        return self._data_.get( key, default )
 
     def update( self, *iterables, **entries ):
         ''' Adds new entries as a batch. '''
@@ -122,10 +122,16 @@ class ProducerDictionary( Dictionary ):
 
     __slots__ = ( '_producer_', )
 
-    def __init__( self, producer ):
+    def __init__( self, producer, /, *iterables, **entries ):
         # TODO: Validate producer argument.
         self._producer_ = producer
-        super( ).__init__( )
+        super( ).__init__( *iterables, **entries )
+
+    def __repr__( self ):
+        return "{fqname}( {producer}, {contents} )".format(
+            fqname = __.discover_fqname( self ),
+            producer = self._producer_,
+            contents = str( self._data_ ) )
 
     def __getitem__( self, key ):
         if key not in self:
@@ -133,6 +139,11 @@ class ProducerDictionary( Dictionary ):
             self[ key ] = value
         else: value = super( ).__getitem__( key )
         return value
+
+    def copy( self ):
+        ''' Provides fresh copy of dictionary. '''
+        dictionary = type( self )( self._producer_ )
+        return dictionary.update( self )
 
 ProducerDictionary.__doc__ = __.generate_docstring(
     ProducerDictionary,

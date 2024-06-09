@@ -89,6 +89,18 @@ def test_101_accretion( module_qname, class_name ):
 
 @pytest.mark.parametrize(
     'module_qname, class_name',
+    product( THESE_MODULE_QNAMES, THESE_CLASSES_NAMES )
+)
+def test_102_string_representation( module_qname, class_name ):
+    ''' Object has expected string representations. '''
+    module = cache_import_module( module_qname )
+    factory = getattr( module, class_name )
+    obj = factory( )
+    assert base.discover_fqname( obj ) in repr( obj )
+
+
+@pytest.mark.parametrize(
+    'module_qname, class_name',
     product( THESE_CONCEALMENT_MODULE_QNAMES, THESE_CLASSES_NAMES )
 )
 def test_110_attribute_concealment( module_qname, class_name ):

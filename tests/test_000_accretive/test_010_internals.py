@@ -44,12 +44,11 @@ MODULE_ATTRIBUTE_NAMES = (
     'reclassify_modules',
 )
 
-_core_dictionary_posargs = (
-    ( ( 'foo', 1 ), ( 'bar', 2 ) ), { 'unicorn': True } )
-_core_dictionary_nomargs = DictionaryProxy( dict( orb = False ) )
-
 exceptions = cache_import_module( f"{PACKAGE_NAME}.exceptions" )
 module = cache_import_module( MODULE_QNAME )
+
+dictionary_posargs = ( ( ( 'foo', 1 ), ( 'bar', 2 ) ), { 'unicorn': True } )
+dictionary_nomargs = DictionaryProxy( dict( orb = False ) )
 
 
 @pytest.mark.parametrize( 'class_name', CONCEALER_EXTENSIONS_NAMES )
@@ -95,7 +94,7 @@ def test_200_core_dictionary_instantiation( ):
     factory = module.CoreDictionary
     dct1 = factory( )
     assert isinstance( dct1, factory )
-    dct2 = factory( *_core_dictionary_posargs, **_core_dictionary_nomargs )
+    dct2 = factory( *dictionary_posargs, **dictionary_nomargs )
     assert isinstance( dct2, factory )
     assert 1 == dct2[ 'foo' ]
     assert 2 == dct2[ 'bar' ]
@@ -108,7 +107,7 @@ def test_200_core_dictionary_instantiation( ):
 def test_201_core_dictionary_duplication( ):
     ''' Dictionary is duplicable. '''
     factory = module.CoreDictionary
-    odct = factory( *_core_dictionary_posargs, **_core_dictionary_nomargs )
+    odct = factory( *dictionary_posargs, **dictionary_nomargs )
     ddct = odct.copy( )
     assert odct == ddct
     odct[ 'baz' ] = 42
@@ -118,7 +117,7 @@ def test_201_core_dictionary_duplication( ):
 def test_210_core_dictionary_entry_accretion( ):
     ''' Dictionary accretes entries. '''
     factory = module.CoreDictionary
-    dct = factory( *_core_dictionary_posargs, **_core_dictionary_nomargs )
+    dct = factory( *dictionary_posargs, **dictionary_nomargs )
     with pytest.raises( exceptions.IndelibleEntryError ):
         dct[ 'foo' ] = 42
     with pytest.raises( exceptions.IndelibleEntryError ):
@@ -134,7 +133,7 @@ def test_211_core_dictionary_entry_accretion_via_update( ):
     ''' Dictionary accretes entries via update. '''
     factory = module.CoreDictionary
     dct = factory( )
-    dct.update( *_core_dictionary_posargs, **_core_dictionary_nomargs )
+    dct.update( *dictionary_posargs, **dictionary_nomargs )
     with pytest.raises( exceptions.IndelibleEntryError ):
         dct[ 'foo' ] = 42
     with pytest.raises( exceptions.IndelibleEntryError ):
@@ -149,7 +148,7 @@ def test_211_core_dictionary_entry_accretion_via_update( ):
 def test_220_core_dictionary_operation_prevention( ):
     ''' Dictionary cannot perform entry deletions and mutations. '''
     factory = module.CoreDictionary
-    dct = factory( *_core_dictionary_posargs, **_core_dictionary_nomargs )
+    dct = factory( *dictionary_posargs, **dictionary_nomargs )
     with pytest.raises( exceptions.InvalidOperationError ):
         dct.clear( )
     with pytest.raises( exceptions.InvalidOperationError ):
