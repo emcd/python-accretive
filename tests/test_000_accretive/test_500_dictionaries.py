@@ -387,6 +387,18 @@ def test_230_dictionary_entry_optional_retrieval( module_qname, class_name ):
     'module_qname, class_name',
     product( THESE_MODULE_QNAMES, THESE_CLASSES_NAMES )
 )
+def test_230_subclasses_abc_dictionary( module_qname, class_name ):
+    ''' Subclasses 'collections.abc.Mapping'. '''
+    from collections.abc import Mapping as AbstractDictionary
+    module = cache_import_module( module_qname )
+    factory = getattr( module, class_name )
+    issubclass( factory, AbstractDictionary )
+
+
+@pytest.mark.parametrize(
+    'module_qname, class_name',
+    product( THESE_MODULE_QNAMES, THESE_CLASSES_NAMES )
+)
 def test_900_docstring_sanity( module_qname, class_name ):
     ''' Class has valid docstring. '''
     module = cache_import_module( module_qname )
