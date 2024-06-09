@@ -31,7 +31,10 @@ class _Dictionary( # type: ignore
 ): pass
 
 
-class Dictionary( _objects.Object, __.AbstractDictionary ):
+_no_default = object( )
+
+
+class Dictionary( _objects.Object ): # pylint: disable=eq-without-hash
     ''' Accretive dictionary. '''
 
     __slots__ = ( '_data_', )
@@ -63,22 +66,55 @@ class Dictionary( _objects.Object, __.AbstractDictionary ):
         self._data_[ key ] = value
         return self
 
+    def __eq__( self, other ):
+        if isinstance( other, __.AbstractDictionary ):
+            return self._data_ == other
+        return NotImplemented
+
+    def __ne__( self, other ):
+        if isinstance( other, __.AbstractDictionary ):
+            return self._data_ != other
+        return NotImplemented
+
     def copy( self ):
         ''' Provides fresh copy of dictionary. '''
         return type( self )( self )
+
+    def get( self, key, default = _no_default ):
+        ''' Retrieves entry associated with key, if it exists.
+
+            Return default value if the entry does not exist.
+            If no default value is supplied, then ``None`` is returned.
+        '''
+        nomargs = { } if _no_default is default else dict( default = default )
+        return self._data_.get( key, **nomargs )
 
     def update( self, *iterables, **entries ):
         ''' Adds new entries as a batch. '''
         self._data_.update( *iterables, **entries )
         return self
 
-    # TODO: Directly implement other methods for efficiency.
+    def keys( self ):
+        ''' Provides iterable view over dictionary keys. '''
+        return self._data_.keys( )
+
+    def items( self ):
+        ''' Provides iterable view over dictionary items. '''
+        return self._data_.items( )
+
+    def values( self ):
+        ''' Provides iterable view over dictionary values. '''
+        return self._data_.values( )
 
 Dictionary.__doc__ = __.generate_docstring(
     Dictionary,
     'dictionary entries accretion',
     'instance attributes accretion',
 )
+# Register as subclass of AbstractDictionary rather than use it as mixin.
+# We directly implement, for the sake of efficiency, the methods which the
+# mixin would provide.
+__.AbstractDictionary.register( Dictionary )
 
 
 class ProducerDictionary( Dictionary ):

@@ -26,7 +26,7 @@ from .. import dictionaries as _dictionaries
 
 
 class Dictionary(
-    __.ConcealerExtension,_dictionaries.Dictionary
+    __.ConcealerExtension, _dictionaries.Dictionary
 ):
     ''' Accretive dictionary. '''
 

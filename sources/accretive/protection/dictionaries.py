@@ -28,7 +28,7 @@ from . import classes as _classes
 
 class Dictionary(
     _dictionaries.Dictionary,
-    metaclass = _classes.ABCFactory,
+    metaclass = _classes.Class,
     docstring = __.generate_docstring(
         _dictionaries.Dictionary, 'protection of class' )
 ):
@@ -37,7 +37,7 @@ class Dictionary(
 
 class ProducerDictionary(
     _dictionaries.ProducerDictionary,
-    metaclass = _classes.ABCFactory,
+    metaclass = _classes.Class,
     docstring = __.generate_docstring(
         _dictionaries.ProducerDictionary, 'protection of class' )
 ):

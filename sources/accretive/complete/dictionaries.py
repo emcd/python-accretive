@@ -28,7 +28,7 @@ from . import classes as _classes
 
 class Dictionary(
     __.ConcealerExtension, _dictionaries.Dictionary,
-    metaclass = _classes.ABCFactory,
+    metaclass = _classes.Class,
     docstring = __.generate_docstring(
         _dictionaries.Dictionary,
         'instance attributes concealment',
@@ -40,7 +40,7 @@ class Dictionary(
 
 class ProducerDictionary(
     __.ConcealerExtension, _dictionaries.ProducerDictionary,
-    metaclass = _classes.ABCFactory,
+    metaclass = _classes.Class,
     docstring = __.generate_docstring(
         _dictionaries.ProducerDictionary,
         'instance attributes concealment',
