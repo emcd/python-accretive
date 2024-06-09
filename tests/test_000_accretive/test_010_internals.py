@@ -23,10 +23,6 @@
 # pylint: disable=magic-value-comparison,protected-access
 
 
-# TODO: Test 'generate_docstring'.
-# TODO: Test 'reclassify_modules'.
-
-
 import pytest
 
 from types import MappingProxyType as DictionaryProxy
@@ -192,3 +188,53 @@ def test_300_fqname_discovery( ):
 def test_400_public_attribute_discovery( provided, expected ):
     ''' Public attributes are discovered from dictionary. '''
     assert expected == module.discover_public_attributes( provided )
+
+
+def test_500_docstring_generation_argument_acceptance( ):
+    ''' Docstring generator errors on invalid arguments. '''
+    class Foo: pass # pylint: disable=missing-class-docstring
+    with pytest.raises( KeyError ):
+        module.generate_docstring( 1 )
+    with pytest.raises( KeyError ):
+        module.generate_docstring( '8-bit theater' )
+    with pytest.raises( TypeError ):
+        module.generate_docstring( Foo )
+    assert module.generate_docstring( 'instance attributes accretion' )
+
+
+def test_501_docstring_generation_validity( ):
+    ''' Generated docstrings are correctly formatted. '''
+    from inspect import getdoc
+
+    class Foo:
+        ''' headline
+
+            additional information
+        '''
+
+    docstring_generated = (
+        module.generate_docstring( Foo, 'class attributes accretion' ) )
+    docstring_expected = '\n\n'.join( (
+        getdoc( Foo ),
+        module.generate_docstring( 'class attributes accretion' ) ) )
+    assert docstring_expected == docstring_generated
+
+
+def test_600_module_reclassification( ):
+    ''' Modules are correctly reclassified. '''
+    from types import ModuleType as Module
+    m1 = Module( 'm1' )
+    m2 = Module( 'm2' )
+
+    class FooModule( Module ):
+        ''' test '''
+
+    m3 = FooModule( 'm3' )
+    attrs = { 'bar': 42, 'orb': True, 'm1': m1, 'm2': m2, 'm3': m3 }
+    assert not isinstance( m1, FooModule )
+    assert not isinstance( m2, FooModule )
+    assert isinstance( m3, FooModule )
+    module.reclassify_modules( attrs, FooModule )
+    assert isinstance( m1, FooModule )
+    assert isinstance( m2, FooModule )
+    assert isinstance( m3, FooModule )
