@@ -23,16 +23,24 @@
 # pylint: disable=magic-value-comparison,protected-access
 
 
+# TODO: Test 'generate_docstring'.
+# TODO: Test 'reclassify_modules'.
+
+
 import pytest
+
+from types import MappingProxyType as DictionaryProxy
 
 from . import PACKAGE_NAME, cache_import_module
 
 
-module_qname = f"{PACKAGE_NAME}.__"
-module = cache_import_module( module_qname )
-module_attribute_names = (
+MODULE_QNAME = f"{PACKAGE_NAME}.__"
+CONCEALER_EXTENSIONS_NAMES = (
     'ClassConcealerExtension',
     'ConcealerExtension',
+)
+MODULE_ATTRIBUTE_NAMES = (
+    *CONCEALER_EXTENSIONS_NAMES,
     'CoreDictionary',
     'discover_fqname',
     'discover_public_attributes',
@@ -40,30 +48,125 @@ module_attribute_names = (
     'reclassify_modules',
 )
 
+_core_dictionary_posargs = (
+    ( ( 'foo', 1 ), ( 'bar', 2 ) ), { 'unicorn': True } )
+_core_dictionary_nomargs = DictionaryProxy( dict( orb = False ) )
 
-# TODO: Test new attributes.
-
-
-def test_010_concealer_extension_instantiation( ):
-    ''' Class 'ConcealerExtension' instantiates. '''
-    obj = module.ConcealerExtension( )
-    assert isinstance( obj, module.ConcealerExtension )
+exceptions = cache_import_module( f"{PACKAGE_NAME}.exceptions" )
+module = cache_import_module( MODULE_QNAME )
 
 
-def test_011_concealer_extension_attribute_concealment( ):
-    ''' Class 'ConcealerExtension' conceals attributes. '''
-    obj = module.ConcealerExtension( )
+@pytest.mark.parametrize( 'class_name', CONCEALER_EXTENSIONS_NAMES )
+def test_100_concealer_extension_instantiation( class_name ):
+    ''' Class instantiantes. '''
+    factory = getattr( module, class_name )
+    posargs = ( 'Object', ( ), { } ) if issubclass( factory, type ) else ( )
+    obj = factory( *posargs )
+    assert isinstance( obj, factory )
+
+
+@pytest.mark.parametrize( 'class_name', CONCEALER_EXTENSIONS_NAMES )
+def test_102_concealer_extension_attribute_concealment( class_name ):
+    ''' Class conceals attributes. '''
+    factory = getattr( module, class_name )
+    posargs = ( 'Object', ( ), { } ) if issubclass( factory, type ) else ( )
+    concealer_name = (
+        '_class_attribute_visibility_includes_'
+        if issubclass( factory, type )
+        else '_attribute_visibility_includes_' )
+    obj = factory( *posargs )
     assert not dir( obj )
     obj.public = 42
     assert 'public' in dir( obj )
     obj._nonpublic = 3.1415926535
     assert '_nonpublic' not in dir( obj )
-    obj._attribute_visibility_includes_ = frozenset( ( '_nonpublic', ) )
+    setattr( obj, concealer_name, frozenset( ( '_nonpublic', ) ) )
     assert '_nonpublic' in dir( obj )
-    assert '_attribute_visibility_includes_' not in dir( obj )
+    assert concealer_name not in dir( obj )
 
 
-def test_020_fqname_discovery( ):
+def test_103_class_concealer_extension_creates_classes( ):
+    ''' Class factory class instances are classes. '''
+    from inspect import isclass
+    factory = module.ClassConcealerExtension
+    assert issubclass( factory, type )
+    obj = factory( 'Object', ( ), { } )
+    assert isclass( obj )
+
+
+def test_200_core_dictionary_instantiation( ):
+    ''' Class instantiates. '''
+    factory = module.CoreDictionary
+    dct1 = factory( )
+    assert isinstance( dct1, factory )
+    dct2 = factory( *_core_dictionary_posargs, **_core_dictionary_nomargs )
+    assert isinstance( dct2, factory )
+    assert 1 == dct2[ 'foo' ]
+    assert 2 == dct2[ 'bar' ]
+    assert dct2[ 'unicorn' ]
+    assert not dct2[ 'orb' ]
+    assert ( 'foo', 'bar', 'unicorn', 'orb' ) == tuple( dct2.keys( ) )
+    assert ( 1, 2, True, False ) == tuple( dct2.values( ) )
+
+
+def test_201_core_dictionary_duplication( ):
+    ''' Dictionary is duplicable. '''
+    factory = module.CoreDictionary
+    odct = factory( *_core_dictionary_posargs, **_core_dictionary_nomargs )
+    ddct = odct.copy( )
+    assert odct == ddct
+    odct[ 'baz' ] = 42
+    assert odct != ddct
+
+
+def test_210_core_dictionary_entry_accretion( ):
+    ''' Dictionary accretes entries. '''
+    factory = module.CoreDictionary
+    dct = factory( *_core_dictionary_posargs, **_core_dictionary_nomargs )
+    with pytest.raises( exceptions.IndelibleEntryError ):
+        dct[ 'foo' ] = 42
+    with pytest.raises( exceptions.IndelibleEntryError ):
+        del dct[ 'foo' ]
+    dct[ 'baz' ] = 3.1415926535
+    with pytest.raises( exceptions.IndelibleEntryError ):
+        dct[ 'baz' ] = -1
+    with pytest.raises( exceptions.IndelibleEntryError ):
+        del dct[ 'baz' ]
+
+
+def test_211_core_dictionary_entry_accretion_via_update( ):
+    ''' Dictionary accretes entries via update. '''
+    factory = module.CoreDictionary
+    dct = factory( )
+    dct.update( *_core_dictionary_posargs, **_core_dictionary_nomargs )
+    with pytest.raises( exceptions.IndelibleEntryError ):
+        dct[ 'foo' ] = 42
+    with pytest.raises( exceptions.IndelibleEntryError ):
+        del dct[ 'foo' ]
+    dct[ 'baz' ] = 3.1415926535
+    with pytest.raises( exceptions.IndelibleEntryError ):
+        dct[ 'baz' ] = -1
+    with pytest.raises( exceptions.IndelibleEntryError ):
+        del dct[ 'baz' ]
+
+
+def test_220_core_dictionary_operation_prevention( ):
+    ''' Dictionary cannot perform entry deletions and mutations. '''
+    factory = module.CoreDictionary
+    dct = factory( *_core_dictionary_posargs, **_core_dictionary_nomargs )
+    with pytest.raises( exceptions.InvalidOperationError ):
+        dct.clear( )
+    with pytest.raises( exceptions.InvalidOperationError ):
+        dct.pop( 'foo' )
+    with pytest.raises( exceptions.InvalidOperationError ):
+        dct.pop( 'foo', default = -1 )
+    with pytest.raises( exceptions.InvalidOperationError ):
+        dct.pop( 'baz' )
+    with pytest.raises( exceptions.InvalidOperationError ):
+        dct.popitem( )
+
+
+def test_300_fqname_discovery( ):
     ''' Fully-qualified name of object is discovered. '''
     assert 'builtins.NoneType' == module.discover_fqname( None )
     assert (
@@ -71,7 +174,7 @@ def test_020_fqname_discovery( ):
         == module.discover_fqname( module.ConcealerExtension ) )
     obj = module.ConcealerExtension( )
     assert (
-        f"{module_qname}.ConcealerExtension" == module.discover_fqname( obj ) )
+        f"{MODULE_QNAME}.ConcealerExtension" == module.discover_fqname( obj ) )
 
 
 @pytest.mark.parametrize(
@@ -81,11 +184,11 @@ def test_020_fqname_discovery( ):
         ( { '_foo': cache_import_module }, ( ) ),
         (
             { name: getattr( module, name )
-              for name in module_attribute_names },
-            module_attribute_names
+              for name in MODULE_ATTRIBUTE_NAMES },
+            MODULE_ATTRIBUTE_NAMES
         ),
     )
 )
-def test_030_public_attribute_discovery( provided, expected ):
+def test_400_public_attribute_discovery( provided, expected ):
     ''' Public attributes are discovered from dictionary. '''
     assert expected == module.discover_public_attributes( provided )
