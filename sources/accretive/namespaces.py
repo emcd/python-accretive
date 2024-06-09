@@ -34,11 +34,12 @@ class Namespace( _objects.Object ):
             *iterables, **attributes )
 
     def __repr__( self ):
-        return "{fqname}( {contents} )".format(
-            fqname = __.discover_fqname( self ),
-            contents = ', '.join( tuple(
-                f"{key} = {value!r}" for key, value
-                in super( ).__getattribute__( '__dict__' ).items( ) ) ) )
+        attributes = ', '.join( tuple(
+            f"{key} = {value!r}" for key, value
+            in super( ).__getattribute__( '__dict__' ).items( ) ) )
+        fqname = __.discover_fqname( self )
+        if not attributes: return f"{fqname}( )"
+        return f"{fqname}( {attributes} )"
 
 Namespace.__doc__ = __.generate_docstring(
     Namespace, 'description of namespace', 'instance attributes accretion' )
