@@ -38,6 +38,7 @@ CONCEALER_EXTENSIONS_NAMES = (
 MODULE_ATTRIBUTE_NAMES = (
     *CONCEALER_EXTENSIONS_NAMES,
     'CoreDictionary',
+    'Docstring',
     'discover_fqname',
     'discover_public_attributes',
     'generate_docstring',
@@ -196,9 +197,10 @@ def test_500_docstring_generation_argument_acceptance( ):
         module.generate_docstring( 1 )
     with pytest.raises( KeyError ):
         module.generate_docstring( '8-bit theater' )
-    with pytest.raises( TypeError ):
+    with pytest.raises( AttributeError ):
         module.generate_docstring( Foo )
     assert module.generate_docstring( 'instance attributes accretion' )
+    assert module.generate_docstring( module.Docstring( 'foo bar' ) )
 
 
 def test_501_docstring_generation_validity( ):
@@ -211,10 +213,13 @@ def test_501_docstring_generation_validity( ):
             additional information
         '''
 
-    docstring_generated = (
-        module.generate_docstring( Foo, 'class attributes accretion' ) )
+    docstring_generated = module.generate_docstring(
+        Foo,
+        module.Docstring( 'foo bar' ),
+        'class attributes accretion' )
     docstring_expected = '\n\n'.join( (
         getdoc( Foo ),
+        'foo bar',
         module.generate_docstring( 'class attributes accretion' ) ) )
     assert docstring_expected == docstring_generated
 

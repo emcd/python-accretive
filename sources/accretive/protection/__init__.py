@@ -18,10 +18,7 @@
 #============================================================================#
 
 
-''' Protected accretive data structures.
-
-    Class attributes are protected against mutation and deletion.
-'''
+''' Protected accretive data structures. '''
 
 # ruff: noqa: F401,F403
 
@@ -40,6 +37,12 @@ from .dictionaries import *
 from .modules import *
 from .namespaces import *
 from .objects import *
+
+
+__doc__ = __.generate_docstring(
+    __.Docstring( __doc__ ),
+    'subpackage behavior: attributes accretion',
+    'subpackage behavior: protection of classes' )
 
 
 __all__ = __.discover_public_attributes( globals( ) )

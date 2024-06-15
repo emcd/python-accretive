@@ -18,15 +18,7 @@
 #============================================================================#
 
 
-''' Protected accretive data structures with attribute concealment.
-
-    Concealed attributes do not appear in listings via the :py:func:`dir`
-    builtin function. By default, only attributes names, which do not start
-    with ``_`` are made visible, but additional attributes can be included if
-    they are listed on a particular class attribute that the concealer honors.
-
-    Class attributes are protected against mutation and deletion.
-'''
+''' Protected accretive data structures with attributes concealment. '''
 
 # ruff: noqa: F401,F403
 
@@ -45,6 +37,13 @@ from .dictionaries import *
 from .modules import *
 from .namespaces import *
 from .objects import *
+
+
+__doc__ = __.generate_docstring(
+    __.Docstring( __doc__ ),
+    'subpackage behavior: attributes accretion',
+    'subpackage behavior: attributes concealment',
+    'subpackage behavior: protection of classes' )
 
 
 __all__ = __.discover_public_attributes( globals( ) )

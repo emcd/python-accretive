@@ -18,12 +18,7 @@
 #============================================================================#
 
 
-''' Accretive data structures.
-
-    Accretive data structures can grow but never shrink. Once something is
-    added to them, it cannot be altered or removed. They are particularly
-    useful for registrations, collected during initialization, which then must
-    be part of guaranteed state during later runtime. '''
+''' Accretive data structures. '''
 
 # ruff: noqa: F401,F403
 
@@ -48,12 +43,28 @@ from .namespaces import *
 from .objects import *
 
 
+_subpackages = ( concealment, protection, complete )
+
+
+__doc__ = __.generate_docstring(
+    __.Docstring( __doc__ ),
+    'subpackage behavior: attributes accretion',
+    __.Docstring(
+        'Subpackages with variants of the data structures are available:' ),
+    __.Docstring( '\n\n'.join(
+        "* :py:mod:`{name}`: {headline}".format(
+            name = package.__package__,
+            headline = (
+                package.__doc__ or '' ).split( '\n', maxsplit = 1 )[ 0 ] )
+        for package in _subpackages ) ) )
+
+
 __all__ = __.discover_public_attributes( globals( ) )
 __version__ = '1.0a202405121610'
 
 
 complete.modules.reclassify_modules( globals( ) )
-for _module in ( complete, concealment, protection, ):
-    complete.modules.reclassify_modules( vars( _module ) )
+for _subpackage in _subpackages:
+    complete.modules.reclassify_modules( vars( _subpackage ) )
 _attribute_visibility_includes_ = frozenset( ( '__version__', ) )
 __.modules[ __package__ ].__class__ = complete.modules.Module

@@ -131,6 +131,10 @@ class CoreDictionary( ConcealerExtension, dict ):
         return self
 
 
+class Docstring( str ):
+    ''' Dedicated docstring container. '''
+
+
 def discover_fqname( obj ):
     ''' Discovers fully-qualified name for class of instance. '''
     class_ = type( obj )
@@ -151,13 +155,14 @@ def discover_public_attributes( attributes ):
 
 def generate_docstring( *fragment_ids ):
     ''' Sews together docstring fragments into clean docstring. '''
-    from inspect import getdoc, isclass
+    from inspect import cleandoc, getdoc, isclass
     from ._docstrings import TABLE
     fragments = [ ]
     for fragment_id in fragment_ids:
         if isclass( fragment_id ): fragment = getdoc( fragment_id )
+        elif isinstance( fragment_id, Docstring ): fragment = fragment_id
         else: fragment = TABLE[ fragment_id ]
-        fragments.append( fragment )
+        fragments.append( cleandoc( fragment ) )
     return '\n\n'.join( fragments )
 
 
