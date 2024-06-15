@@ -22,11 +22,73 @@
 Contribution
 *******************************************************************************
 
-Contribution to this project is welcome!
+Contribution to this project is welcome! However, it must follow the code of
+conduct for the project.
 
-.. todo:: Code of Conduct.
+Code of Conduct
+===============================================================================
 
-Here are some ways that you can help:
+Please act in the spirit of respect for others, whether you are asking
+questions, providing feedback, or answering questions. Volunteerism by real
+human beings powers much of the open source available for you to use; these
+real human beings have real emotional states that can be affected by how you
+interact with them.
+
+Beyond acting in a general spirit of respect for others, here are some specific
+considerations:
+
+* When asking a question, please consider the `Stack Overflow guidelines on how
+  to ask a good question <https://stackoverflow.com/help/how-to-ask>`_.
+
+* When answering a question, please consider the `Stack Overflow guidelines on
+  how to write a good answer <https://stackoverflow.com/help/how-to-answer>`_.
+
+  * Note that responses, such as "don't do that" should be avoided, however, as
+    they can be perceived as condescending or inflammatory. And, they will also
+    make you look worse if you are proven wrong.
+
+  * Recommend, rather than command. Please do not be bossy or imperious.
+
+* Respect that people have differences of opinion and that every design or
+  implementation choice carries a trade-off and numerous costs. There is seldom
+  a right answer.
+
+* Please keep unstructured critique to a minimum. If you have solid ideas with
+  which you want to experiment, make a fork and see how they work in practice.
+
+* Any spamming, trolling, flaming, baiting, or other attention-stealing
+  behavior is not welcome.
+
+* Avoid flirting with offensive or sensitive issues, particularly if they are
+  off-topic. This all too often leads to unnecessary fights, hurt feelings, and
+  damaged trust.
+
+* Do not create noise with "+1" or "me too" comments in issue tracker threads.
+
+  * Please only add substantive comments that will further advance the
+    understanding of an issue.
+
+  * If you wish to upvote a comment, then please use an appropriate reacji on
+    that comment without writing anything in the thread.
+
+Part of the above list was inspired by the following sources, which are worth
+reading in their own right:
+
+* `Python Software Foundation Code of Conduct
+  <https://policies.python.org/python.org/code-of-conduct/>`_ (in particular,
+  the ``Our Community`` and ``Our Standards: Inappropriate Behavior`` sections)
+
+* `Rust Code of Conduct <https://www.rust-lang.org/policies/code-of-conduct>`_
+
+* `How to Ask Questions the Smart Way
+  <http://www.catb.org/~esr/faqs/smart-questions.html>`_ (note that some of the
+  showcased responses to "stupid questions" may not be acceptable)
+
+.. note:: Please do not contact the authors of the above documents
+          for anything related to this project.
+
+Ways to Contribute
+===============================================================================
 
 .. todo:: Link to issue tracker.
 
