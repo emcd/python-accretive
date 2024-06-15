@@ -77,7 +77,7 @@ nitpick_ignore = [
     ( 'py:class', "mappingproxy" ),
     ( 'py:class', "module" ),
     ( 'py:class',
-      "v, remove specified key and return the corresponding value." )
+      "v, remove specified key and return the corresponding value." ),
 ]
 
 # -- Options for linkcheck builder -------------------------------------------

@@ -29,50 +29,44 @@ Code of Conduct
 ===============================================================================
 
 Please act in the spirit of respect for others, whether you are asking
-questions, providing feedback, or answering questions. Volunteerism by real
-human beings powers much of the open source available for you to use; these
-real human beings have real emotional states that can be affected by how you
-interact with them.
+questions, providing feedback, or answering questions. Volunteers power much of
+the open source available for you to use, and they have real emotional states
+that can be affected by your interactions.
 
-Beyond acting in a general spirit of respect for others, here are some specific
-considerations:
+Specific Considerations
+-------------------------------------------------------------------------------
 
-* When asking a question, please consider the `Stack Overflow guidelines on how
-  to ask a good question <https://stackoverflow.com/help/how-to-ask>`_.
+* **Asking Questions**: Follow the `Stack Overflow guidelines on how to ask a
+  good question <https://stackoverflow.com/help/how-to-ask>`_.
 
-* When answering a question, please consider the `Stack Overflow guidelines on
-  how to write a good answer <https://stackoverflow.com/help/how-to-answer>`_.
+* **Answering Questions**: Follow the `Stack Overflow guidelines on how to
+  write a good answer <https://stackoverflow.com/help/how-to-answer>`_.
+  However, avoid responses like "don't do that," as they can be perceived as
+  condescending.  Recommend rather than command.
 
-  * Note that responses, such as "don't do that" should be avoided, however, as
-    they can be perceived as condescending or inflammatory. And, they will also
-    make you look worse if you are proven wrong.
+* **Differences of Opinion**: Understand that people will have differences of
+  opinion and that every design or implementation choice carries trade-offs and
+  costs. There is seldom a right answer.
 
-  * Recommend, rather than command. Please do not be bossy or imperious.
+* **Constructive Critique**: Keep unstructured critique to a minimum. If you
+  have solid ideas experiment with them in a fork.
 
-* Respect that people have differences of opinion and that every design or
-  implementation choice carries a trade-off and numerous costs. There is seldom
-  a right answer.
+* **No Disruptive Behavior**: Any spamming, trolling, flaming, baiting, or
+  other attention-stealing behavior is not welcome.
 
-* Please keep unstructured critique to a minimum. If you have solid ideas with
-  which you want to experiment, make a fork and see how they work in practice.
+* **Avoid Sensitive Issues**: Do not engage in offensive or sensitive topics,
+  particularly if they are off-topic. This can lead to unnecessary fights, hurt
+  feelings, and damaged trust.
 
-* Any spamming, trolling, flaming, baiting, or other attention-stealing
-  behavior is not welcome.
+* **Avoid Noise**: Do not create noise with "+1" or "me too" comments. Add only
+  substantive comments that advance the understanding of an issue. Use
+  appropriate reaction mechanisms to upvote comments.
 
-* Avoid flirting with offensive or sensitive issues, particularly if they are
-  off-topic. This all too often leads to unnecessary fights, hurt feelings, and
-  damaged trust.
+Inspirations
+-------------------------------------------------------------------------------
 
-* Do not create noise with "+1" or "me too" comments in issue tracker threads.
-
-  * Please only add substantive comments that will further advance the
-    understanding of an issue.
-
-  * If you wish to upvote a comment, then please use an appropriate reacji on
-    that comment without writing anything in the thread.
-
-Part of the above list was inspired by the following sources, which are worth
-reading in their own right:
+This code of conduct is inspired, in part, by the following sources, which are
+worth reading:
 
 * `Python Software Foundation Code of Conduct
   <https://policies.python.org/python.org/code-of-conduct/>`_ (in particular,
@@ -168,7 +162,6 @@ Module ``accretive._annotations``
 -------------------------------------------------------------------------------
 
 .. automodule:: accretive._annotations
-   :ignore-module-all: true
 
 
 Module ``accretive._docstrings``
