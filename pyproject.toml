@@ -64,6 +64,7 @@ dependencies = [
   'sphinx',
   'sphinx-copybutton',
   'sphinx-inline-tabs',
+  'towncrier',
 ]
 [tool.hatch.envs.develop.env-vars]
 HYPOTHESIS_STORAGE_DIRECTORY = '.auxiliary/caches/hypothesis'
@@ -250,3 +251,9 @@ cache-dir = '.auxiliary/caches/ruff'
 ignore = [
   'E701', # Multiple statements on one line
 ]
+
+[tool.towncrier]
+directory = 'documentation/towncrier'
+filename = 'changelog.rst'
+package = 'accretive'
+package_dir = 'sources'
