@@ -44,6 +44,9 @@ Specific Considerations
   However, avoid responses like "don't do that," as they can be perceived as
   condescending.  Recommend rather than command.
 
+* **No Egotism**: Argue by facts and reason, not by appeals to authority or
+  perceived popular opinion.
+
 * **Differences of Opinion**: Understand that people will have differences of
   opinion and that every design or implementation choice carries trade-offs and
   costs. There is seldom a right answer.
