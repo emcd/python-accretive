@@ -32,10 +32,12 @@ initialized, but should have immutable state, once initialized. In general,
 they are a good compromise between the safety of immutability and the
 convenience of incremental initialization.
 
-In addition to accretive dictionaries and namespaces, this package also
-provides accretive classes, modules, and objects. Subpackages provide variants
-of all of these with some additional behaviors or constraints, such as the
-concealment of non-public attributes and the accretion of class attributes.
+In addition to accretive **dictionaries** (including dictionaries with *default
+entries*) and **namespaces**, this package also provides accretive **classes**
+(including *abstract base classes*), **modules**, and **objects**. Subpackages
+provide variants of all of these with some additional behaviors or constraints,
+such as the *concealment* of non-public attributes and the *protection* of
+class attributes.
 
 
 Examples
@@ -45,49 +47,68 @@ Examples
 Accretive Namespace
 -------------------------------------------------------------------------------
 
-.. code-block:: python
+An accretive namespace, similar to ``types.SimpleNamespace``, is available.
+This namespace can be initialized from multiple iterables and from keyword
+arguments. (Keyword arguments shown below; see documentation for more detail.)
 
-  >>> from accretive import Namespace
-  >>> ns = Namespace( apples = 12, bananas = 6, cherries = 42 )
-  >>> ns
-  accretive.namespaces.Namespace( apples = 12, bananas = 6, cherries = 42 )
-  >>> ns.blueberries = 96
-  >>> ns.strawberries = 24
-  >>> ns
-  accretive.namespaces.Namespace( apples = 12, bananas = 6, cherries = 42, blueberries = 96, strawberries = 24 )
-  >>> del ns.apples
-  Traceback (most recent call last):
-  ...
-  accretive.exceptions.IndelibleAttributeError: Cannot reassign or delete existing attribute 'apples'.
-  >>> ns.apples = 14
-  Traceback (most recent call last):
-  ...
-  accretive.exceptions.IndelibleAttributeError: Cannot reassign or delete existing attribute 'apples'.
-  >>> ns
-  accretive.namespaces.Namespace( apples = 12, bananas = 6, cherries = 42, blueberries = 96, strawberries = 24 )
+.. doctest:: readme-namespace
+
+    >>> from accretive import Namespace
+    >>> ns = Namespace( apples = 12, bananas = 6, cherries = 42 )
+    >>> ns
+    accretive.namespaces.Namespace( apples = 12, bananas = 6, cherries = 42 )
+    >>> ns.blueberries = 96
+    >>> ns.strawberries = 24
+    >>> ns
+    accretive.namespaces.Namespace( apples = 12, bananas = 6, cherries = 42, blueberries = 96, strawberries = 24 )
+
+However, since it is accretive, existing attributes cannot be deleted or
+reassigned.
+
+.. doctest:: readme-namespace
+
+    >>> del ns.apples
+    Traceback (most recent call last):
+    ...
+    accretive.exceptions.IndelibleAttributeError: Cannot reassign or delete existing attribute 'apples'.
+    >>> ns.apples = 14
+    Traceback (most recent call last):
+    ...
+    accretive.exceptions.IndelibleAttributeError: Cannot reassign or delete existing attribute 'apples'.
+    >>> ns
+    accretive.namespaces.Namespace( apples = 12, bananas = 6, cherries = 42, blueberries = 96, strawberries = 24 )
 
 
 Accretive Dictionary
 -------------------------------------------------------------------------------
 
-.. code-block:: python
+An accretive dictionary, similar to ``dict``, is available. This dictionary can
+be initialized from multiple iterables and from keyword arguments. (Keyword
+arguments shown below; see documentation for more detail.)
 
-  >>> from accretive import Dictionary
-  >>> dct = Dictionary( apples = 12, bananas = 6, cherries = 42 )
-  >>> dct
-  accretive.dictionaries.Dictionary( {'apples': 12, 'bananas': 6, 'cherries': 42} )
-  >>> dct.update( blueberries = 96, strawberries = 24 )
-  accretive.dictionaries.Dictionary( {'apples': 12, 'bananas': 6, 'cherries': 42, 'blueberries': 96, 'strawberries': 24} )
-  >>> del dct[ 'bananas' ]
-  Traceback (most recent call last):
-  ...
-  accretive.exceptions.IndelibleEntryError: Cannot update or remove existing entry for 'bananas'.
-  >>> dct[ 'bananas' ] = 11
-  Traceback (most recent call last):
-  ...
-  accretive.exceptions.IndelibleEntryError: Cannot update or remove existing entry for 'bananas'.
-  >>> dct
-  accretive.dictionaries.Dictionary( {'apples': 12, 'bananas': 6, 'cherries': 42, 'blueberries': 96, 'strawberries': 24} )
+.. doctest:: readme-dictionary
+
+    >>> from accretive import Dictionary
+    >>> dct = Dictionary( apples = 12, bananas = 6, cherries = 42 )
+    >>> dct
+    accretive.dictionaries.Dictionary( {'apples': 12, 'bananas': 6, 'cherries': 42} )
+    >>> dct.update( blueberries = 96, strawberries = 24 )
+    accretive.dictionaries.Dictionary( {'apples': 12, 'bananas': 6, 'cherries': 42, 'blueberries': 96, 'strawberries': 24} )
+
+However, since it is accretive, existing entries cannot be removed or altered.
+
+.. doctest:: readme-dictionary
+
+    >>> del dct[ 'bananas' ]
+    Traceback (most recent call last):
+    ...
+    accretive.exceptions.IndelibleEntryError: Cannot update or remove existing entry for 'bananas'.
+    >>> dct[ 'bananas' ] = 11
+    Traceback (most recent call last):
+    ...
+    accretive.exceptions.IndelibleEntryError: Cannot update or remove existing entry for 'bananas'.
+    >>> dct
+    accretive.dictionaries.Dictionary( {'apples': 12, 'bananas': 6, 'cherries': 42, 'blueberries': 96, 'strawberries': 24} )
 
 
 Installation
@@ -95,4 +116,4 @@ Installation
 
 ::
 
-      pip install accretive
+    pip install accretive

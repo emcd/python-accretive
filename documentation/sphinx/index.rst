@@ -26,6 +26,7 @@ Table of Contents
 .. toctree::
    :maxdepth: 2
 
+   examples/index
    api/index
    contribution
    license
