@@ -24,10 +24,27 @@
 # pylint: disable=unused-import
 
 
+from typing import Any
+
 from typing_extensions import (
-    Annotated,
+    Annotated as Annotation,
+    Dict,           # TODO: Python 3.9: collections.abc.Mapping
     Doc,
+    Hashable,       # TODO: Python 3.9: collections.abc.Hashable
+    Iterable,       # TODO: Python 3.9: collections.abc.Iterable
+    Iterator,       # TODO: Python 3.9: collections.abc.Iterator
+    Optional,
+    Self,
+    Tuple,          # TODO: Python 3.9: collections.abc.Sequence
+    TypeAlias,
+    Union,          # TODO: Python 3.10: bitwise-OR operator ('|')
 )
+
+
+DictionaryArgument: TypeAlias = Union[
+    Dict[ Hashable, Any ],
+    Iterable[ Tuple[ Hashable, Any] ],
+]
 
 
 __all__ = ( )

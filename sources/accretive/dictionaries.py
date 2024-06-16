@@ -39,7 +39,24 @@ class Dictionary( _objects.Object ): # pylint: disable=eq-without-hash
 
     __slots__ = ( '_data_', )
 
-    def __init__( self, *iterables, **entries ):
+    _data_: _Dictionary
+
+    def __init__(
+        self,
+        *iterables: __.a.Annotation[
+            __.a.DictionaryArgument,
+            __.a.Doc(
+                'Zero or more dictionaries or iterables, over key-value '
+                'pairs, from which to initialize the dictionary data. '
+                'Duplicate keys will result in an error.' )
+        ],
+        **entries: __.a.Annotation[
+            __.a.Any,
+            __.a.Doc(
+                'Zero or more keyword arguments from which to initialize '
+                'the dictionary data.' )
+        ]
+    ) -> None:
         self._data_ = _Dictionary( *iterables, **entries )
         super( ).__init__( )
 

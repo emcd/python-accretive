@@ -111,11 +111,16 @@ autodoc_default_options = {
     'undoc-members': True,
 }
 
+#autodoc_typehints = 'description'
+
 # -- Options for intersphinx extension ---------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/extensions/intersphinx.html#configuration
 
 intersphinx_mapping = {
-    'python': ('https://docs.python.org/3', None),
+    'python': (
+        'https://docs.python.org/3', None),
+    'typing_extensions': (
+        'https://typing-extensions.readthedocs.io/en/latest', None),
 }
 
 # -- Options for todo extension ----------------------------------------------

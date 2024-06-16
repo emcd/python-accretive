@@ -24,8 +24,6 @@
 # pylint: disable=unused-import
 
 
-import typing as typ
-
 from abc import ABCMeta as ABCFactory
 from collections.abc import (
     Collection as AbstractCollection,
@@ -38,6 +36,8 @@ from types import (
     MappingProxyType as DictionaryProxy,
     ModuleType as Module,
 )
+
+from . import _annotations as a
 
 
 _no_value = object( )
