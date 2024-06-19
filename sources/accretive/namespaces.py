@@ -22,18 +22,23 @@
 
 
 from . import __
+from . import _annotations as _a
 from . import objects as _objects
 
 
 class Namespace( _objects.Object ):
     ''' Accretive namespaces. '''
 
-    def __init__( self, *iterables, **attributes ):
+    def __init__(
+        self,
+        *iterables: _a.DictionaryPositionalArgument,
+        **attributes: _a.DictionaryNominativeArgument
+    ) -> None:
         super( ).__init__( )
         super( ).__getattribute__( '__dict__' ).update(
             *iterables, **attributes )
 
-    def __repr__( self ):
+    def __repr__( self ) -> str:
         attributes = ', '.join( tuple(
             f"{key} = {value!r}" for key, value
             in super( ).__getattribute__( '__dict__' ).items( ) ) )

@@ -21,30 +21,41 @@
 ''' Accretive classes. '''
 
 
+from __future__ import annotations
+
 from . import __
+from . import _annotations as _a
 
 
 class Class( type ):
     ''' Accretive classes. '''
 
     def __new__(
-        factory, name, bases, namespace, docstring = None, **nomargs
-    ):
+        factory: _a.Type[ type ],
+        name: str,
+        bases: _a.Tuple[ type, ... ],
+        namespace: _a.MutableMapping[ str, _a.Any ],
+        docstring: _a.Optional[ str ] = None,
+        **nomargs: _a.Any
+    ) -> Class:
         if docstring: namespace[ '__doc__' ] = docstring
-        return super( ).__new__( factory, name, bases, namespace, **nomargs )
+        return super( ).__new__( # type: ignore[misc]
+            factory, name, bases, namespace, **nomargs )
 
-    def __delattr__( class_, name ):
+    def __delattr__( class_, name: str ) -> None:
         from .exceptions import IndelibleAttributeError
         raise IndelibleAttributeError( name )
 
-    def __setattr__( class_, name, value ):
+    def __setattr__( class_, name: str, value: _a.Any ) -> None:
         from .exceptions import IndelibleAttributeError
         if hasattr( class_, name ): raise IndelibleAttributeError( name )
         # Note: CPython cell class is not set in all circumstances.
         #       When it is, then we use two-argument form.
         #       Else, we use three-argument form.
         try: super( ).__setattr__( name, value )
-        except TypeError: super( ).__setattr__( class_, name, value )
+        except TypeError:
+            super( ).__setattr__( # type: ignore[call-arg]
+                class_, name, value ) # type: ignore[arg-type]
 
 Class.__doc__ = __.generate_docstring(
     Class,
@@ -56,7 +67,7 @@ Class.__doc__ = __.generate_docstring(
 class ABCFactory( Class, __.ABCFactory ):
     ''' Accretive abstract base classes (ABC). '''
 
-    def __setattr__( class_, name, value ):
+    def __setattr__( class_, name: str, value: _a.Any ) -> None:
         # Bypass accretion machinery for ABC magic attributes.
         if ( # pylint: disable=magic-value-comparison
             '__abstractmethods__' == name or name.startswith( '_abc_' )

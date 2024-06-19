@@ -197,8 +197,7 @@ def test_500_docstring_generation_argument_acceptance( ):
         module.generate_docstring( 1 )
     with pytest.raises( KeyError ):
         module.generate_docstring( '8-bit theater' )
-    with pytest.raises( AttributeError ):
-        module.generate_docstring( Foo )
+    assert not module.generate_docstring( Foo )
     assert module.generate_docstring( 'instance attributes accretion' )
     assert module.generate_docstring( module.Docstring( 'foo bar' ) )
 

@@ -22,6 +22,7 @@
 
 
 from . import __
+from . import _annotations as _a
 from . import classes as _classes
 
 
@@ -35,19 +36,19 @@ class Object:
 
     __slots__ = ( '__dict__', )
 
-    def __init__( self, *posargs, **nomargs ):
+    def __init__( self, *posargs: _a.Any, **nomargs: _a.Any ) -> None:
         super( ).__setattr__( '__dict__', _Dictionary( ) )
         # Pass all arguments down MRO chain without consuming any.
         super( ).__init__( *posargs, **nomargs )
 
-    def __repr__( self ):
+    def __repr__( self ) -> str:
         return "{fqname}( )".format( fqname = __.discover_fqname( self ) )
 
-    def __delattr__( self, name ):
+    def __delattr__( self, name: str ) -> None:
         from .exceptions import IndelibleAttributeError
         raise IndelibleAttributeError( name )
 
-    def __setattr__( self, name, value ):
+    def __setattr__( self, name: str, value: _a.Any ) -> None:
         if hasattr( self, name ):
             from .exceptions import IndelibleAttributeError
             raise IndelibleAttributeError( name )

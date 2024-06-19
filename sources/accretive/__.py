@@ -37,7 +37,7 @@ from types import (
     ModuleType as Module,
 )
 
-from . import _annotations as a
+from . import _annotations as _a
 
 
 _no_value = object( )
@@ -51,7 +51,7 @@ class ClassConcealerExtension( type ):
 
     _class_attribute_visibility_includes_: AbstractCollection = frozenset( )
 
-    def __dir__( class_ ):
+    def __dir__( class_ ) -> _a.Tuple[ str, ... ]:
         return tuple( sorted(
             name for name in super( ).__dir__( )
             if  not name.startswith( '_' )
@@ -66,7 +66,7 @@ class ConcealerExtension:
 
     _attribute_visibility_includes_: AbstractCollection = frozenset( )
 
-    def __dir__( self ):
+    def __dir__( self ) -> _a.Tuple[ str, ... ]:
         return tuple( sorted(
             name for name in super( ).__dir__( )
             if  not name.startswith( '_' )
@@ -81,42 +81,49 @@ class CoreDictionary( ConcealerExtension, dict ):
         Prevents attempts to mutate dictionary via inherited interface.
     '''
 
-    def __init__( self, *iterables, **entries ):
+    def __init__(
+        self,
+        *iterables: _a.DictionaryPositionalArgument,
+        **entries: _a.DictionaryNominativeArgument
+    ):
         super( ).__init__( )
         self.update( *iterables, **entries )
 
-    def __delitem__( self, key ):
+    def __delitem__( self, key: _a.Hashable ) -> None:
         from .exceptions import IndelibleEntryError
         raise IndelibleEntryError( key )
 
-    def __setitem__( self, key, value ):
+    def __setitem__( self, key: _a.Hashable, value: _a.Any ) -> None:
         from .exceptions import IndelibleEntryError
         if key in self: raise IndelibleEntryError( key )
         super( ).__setitem__( key, value )
-        return self
 
-    def clear( self ):
+    def clear( self ) -> _a.Never:
         ''' Raises exception. Cannot clear indelible entries. '''
         from .exceptions import InvalidOperationError
         raise InvalidOperationError( 'clear' )
 
-    def copy( self ):
+    def copy( self ) -> _a.Self:
         ''' Provides fresh copy of dictionary. '''
         return type( self )( self )
 
     def pop( # pylint: disable=unused-argument
-        self, key, default = _no_value
-    ):
+        self, key: _a.Hashable, default: _a.Any = _no_value
+    ) -> _a.Never:
         ''' Raises exception. Cannot pop indelible entry. '''
         from .exceptions import InvalidOperationError
         raise InvalidOperationError( 'pop' )
 
-    def popitem( self ):
+    def popitem( self ) -> _a.Never:
         ''' Raises exception. Cannot pop indelible entry. '''
         from .exceptions import InvalidOperationError
         raise InvalidOperationError( 'popitem' )
 
-    def update( self, *iterables, **entries ):
+    def update( # type: ignore[override]
+        self,
+        *iterables: _a.DictionaryPositionalArgument,
+        **entries: _a.DictionaryNominativeArgument
+    ) -> _a.Self:
         ''' Adds new entries as a batch. '''
         from itertools import chain
         # Add values in order received, enforcing no alteration.
@@ -135,13 +142,15 @@ class Docstring( str ):
     ''' Dedicated docstring container. '''
 
 
-def discover_fqname( obj ):
+def discover_fqname( obj: _a.Any ) -> str:
     ''' Discovers fully-qualified name for class of instance. '''
     class_ = type( obj )
     return f"{class_.__module__}.{class_.__qualname__}"
 
 
-def discover_public_attributes( attributes ):
+def discover_public_attributes(
+    attributes: _a.Mapping[ str, _a.Any ]
+) -> _a.Tuple[ str, ... ]:
     ''' Discovers public attributes of certain types from dictionary.
 
         By default, classes and functions are discovered.
@@ -153,20 +162,25 @@ def discover_public_attributes( attributes ):
             and ( isclass( attribute ) or isfunction( attribute ) ) ) )
 
 
-def generate_docstring( *fragment_ids ):
+def generate_docstring(
+    *fragment_ids: _a.Union[ _a.Type, Docstring, str ]
+) -> str:
     ''' Sews together docstring fragments into clean docstring. '''
     from inspect import cleandoc, getdoc, isclass
     from ._docstrings import TABLE
     fragments = [ ]
     for fragment_id in fragment_ids:
-        if isclass( fragment_id ): fragment = getdoc( fragment_id )
+        if isclass( fragment_id ): fragment = getdoc( fragment_id ) or ''
         elif isinstance( fragment_id, Docstring ): fragment = fragment_id
-        else: fragment = TABLE[ fragment_id ]
+        else: fragment = TABLE[ fragment_id ] # type: ignore[index]
         fragments.append( cleandoc( fragment ) )
     return '\n\n'.join( fragments )
 
 
-def reclassify_modules( attributes, to_class ):
+def reclassify_modules(
+    attributes: _a.Mapping[ str, _a.Any ],
+    to_class: _a.Type[ Module ]
+) -> None:
     ''' Reclassifies modules in dictionary with custom module type. '''
     for attribute in attributes.values( ):
         if not isinstance( attribute, Module ): continue

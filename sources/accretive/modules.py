@@ -22,16 +22,17 @@
 
 
 from . import __
+from . import _annotations as _a
 
 
 class Module( __.Module ):
     ''' Accretive modules. '''
 
-    def __delattr__( self, name ):
+    def __delattr__( self, name: str ) -> None:
         from .exceptions import IndelibleAttributeError
         raise IndelibleAttributeError( name )
 
-    def __setattr__( self, name, value ):
+    def __setattr__( self, name: str, value: _a.Any ) -> None:
         from .exceptions import IndelibleAttributeError
         if hasattr( self, name ): raise IndelibleAttributeError( name )
         super( ).__setattr__( name, value )
@@ -40,7 +41,7 @@ Module.__doc__ = __.generate_docstring(
     Module, 'description of module', 'module attributes accretion' )
 
 
-reclassify_modules = __.partial_function(
+reclassify_modules: _a.ModuleReclassifier = __.partial_function(
     __.reclassify_modules, to_class = Module )
 
 
