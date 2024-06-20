@@ -113,6 +113,30 @@ def test_102_string_representation( module_qname, class_name ):
 
 @pytest.mark.parametrize(
     'module_qname, class_name',
+    product( THESE_MODULE_QNAMES, THESE_CLASSES_NAMES )
+)
+def test_105_dictionary_equality( module_qname, class_name ):
+    ''' Dictionary is equivalent to another dictionary with same values. '''
+    from types import SimpleNamespace
+    module = cache_import_module( module_qname )
+    factory = getattr( module, class_name )
+    ns1 = factory( foo = 1, bar = 2 )
+    ns2 = factory( ns1.__dict__ )
+    ns3 = SimpleNamespace( **ns1.__dict__ )
+    assert ns1 == ns2
+    assert ns2 == ns1
+    assert ns1 == ns3
+    assert ns3 == ns1
+    assert not ( ns1 == -1 ) # pylint: disable=superfluous-parens
+    assert ns1 != -1
+    assert ns1 != ( )
+    ns2.baz = 43
+    assert ns1 != ns2
+    assert ns2 != ns1
+
+
+@pytest.mark.parametrize(
+    'module_qname, class_name',
     product( THESE_CONCEALMENT_MODULE_QNAMES, THESE_CLASSES_NAMES )
 )
 def test_110_attribute_concealment( module_qname, class_name ):

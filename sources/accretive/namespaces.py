@@ -26,7 +26,7 @@ from . import _annotations as _a
 from . import objects as _objects
 
 
-class Namespace( _objects.Object ):
+class Namespace( _objects.Object ): # pylint: disable=eq-without-hash
     ''' Accretive namespaces. '''
 
     def __init__(
@@ -45,6 +45,18 @@ class Namespace( _objects.Object ):
         fqname = __.discover_fqname( self )
         if not attributes: return f"{fqname}( )"
         return f"{fqname}( {attributes} )"
+
+    def __eq__( self, other: _a.Any ) -> _a.ComparisonResult:
+        mydict = super( ).__getattribute__( '__dict__' )
+        if isinstance( other, ( Namespace, __.SimpleNamespace ) ):
+            return mydict == other.__dict__ # type: ignore[no-any-return]
+        return NotImplemented
+
+    def __ne__( self, other: _a.Any ) -> _a.ComparisonResult:
+        mydict = super( ).__getattribute__( '__dict__' )
+        if isinstance( other, ( Namespace, __.SimpleNamespace ) ):
+            return mydict != other.__dict__ # type: ignore[no-any-return]
+        return NotImplemented
 
 Namespace.__doc__ = __.generate_docstring(
     Namespace, 'description of namespace', 'instance attributes accretion' )

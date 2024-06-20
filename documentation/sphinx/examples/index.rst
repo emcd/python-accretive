@@ -25,3 +25,4 @@ Examples
    :maxdepth: 2
 
    dictionaries
+   namespaces

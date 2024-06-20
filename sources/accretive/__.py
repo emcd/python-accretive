@@ -32,6 +32,7 @@ from sys import modules
 from types import (
     MappingProxyType as DictionaryProxy,
     ModuleType as Module,
+    SimpleNamespace,
 )
 
 from . import _annotations as _a
