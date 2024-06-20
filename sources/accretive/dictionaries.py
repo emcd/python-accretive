@@ -89,12 +89,12 @@ class Dictionary( _objects.Object ): # pylint: disable=eq-without-hash
 
     def copy( self ) -> _a.Self:
         ''' Provides fresh copy of dictionary. '''
-        return type( self )( self ) # type: ignore[arg-type]
+        return type( self )( self )
 
     def get(
         self, key: _a.Hashable, default: _a.Any = _no_value
     ) -> _a.Annotation[
-        _a.Optional[ _a.Any ],
+        _a.Any,
         _a.Doc(
             'Value of entry, if it exists. '
             'Else, supplied default value or ``None``.' )
@@ -169,7 +169,7 @@ class ProducerDictionary( Dictionary ):
     def copy( self ) -> _a.Self:
         ''' Provides fresh copy of dictionary. '''
         dictionary = type( self )( self._producer_ )
-        return dictionary.update( self ) # type: ignore[arg-type]
+        return dictionary.update( self )
 
 ProducerDictionary.__doc__ = __.generate_docstring(
     ProducerDictionary,

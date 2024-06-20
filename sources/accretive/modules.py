@@ -25,7 +25,7 @@ from . import __
 from . import _annotations as _a
 
 
-class Module( __.Module ):
+class Module( __.Module ): # type: ignore[misc]
     ''' Accretive modules. '''
 
     def __delattr__( self, name: str ) -> None:

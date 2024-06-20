@@ -35,12 +35,13 @@ class Class( type ):
         name: str,
         bases: _a.Tuple[ type, ... ],
         namespace: _a.MutableMapping[ str, _a.Any ],
-        docstring: _a.Optional[ str ] = None,
+        docstring: str = None,
         **nomargs: _a.Any
     ) -> Class:
         if docstring: namespace[ '__doc__' ] = docstring
-        return super( ).__new__( # type: ignore[misc]
-            factory, name, bases, namespace, **nomargs )
+        return _a.cast(
+            Class,
+            super( ).__new__( factory, name, bases, namespace, **nomargs ) )
 
     def __delattr__( class_, name: str ) -> None:
         from .exceptions import IndelibleAttributeError
@@ -64,7 +65,7 @@ Class.__doc__ = __.generate_docstring(
 )
 
 
-class ABCFactory( Class, __.ABCFactory ):
+class ABCFactory( Class, __.ABCFactory ): # type: ignore[misc]
     ''' Accretive abstract base classes (ABC). '''
 
     def __setattr__( class_, name: str, value: _a.Any ) -> None:

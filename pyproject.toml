@@ -117,6 +117,10 @@ path = 'sources/accretive/__init__.py'
 
 [tool.mypy]
 cache_dir = '.auxiliary/caches/mypy'
+disable_error_code = [ 'attr-defined', 'name-defined' ]
+implicit_optional = true
+pretty = true
+strict = true
 
 # https://pylint.pycqa.org/en/latest/user_guide/configuration/index.html
 [tool.pylint.main]
@@ -215,7 +219,7 @@ never-returning-functions = [ 'sys.exit', 'argparse.parse_error' ]
 [tool.pylint.reports]
 msg-template = '{path} {line:3d},{column:2d} [{symbol}] {msg}'
 output-format = 'colorized'
-reports = true
+reports = false
 score = true
 [tool.pylint.similarities]
 ignore-comments = true

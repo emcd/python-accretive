@@ -7,10 +7,11 @@
         https://jareddillard.com/blog/common-ways-to-customize-sphinx-themes.html
 '''
 
+# pylint: disable=consider-using-namedtuple-or-dataclass
 # ruff: noqa: E402,F401
 
 
-def _prepare( ):
+def _prepare( ) -> dict: # type: ignore[type-arg]
     from pathlib import Path
     from sys import path as module_discovery_locations
     from tomli import load  # TODO: Python 3.11: tomllib
@@ -21,7 +22,9 @@ def _prepare( ):
         return load( project_file )
 
 
-def _calculate_copyright_notice( information, copyright_holder ):
+def _calculate_copyright_notice(
+    information: dict, copyright_holder: str # type: ignore[type-arg]
+) -> str:
     from datetime import datetime as DateTime
     first_year = information[ 'tool' ][ 'SELF' ][ 'year-of-origin' ]
     now_year = DateTime.utcnow( ).year

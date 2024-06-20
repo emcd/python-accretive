@@ -22,6 +22,7 @@
 
 
 from . import __ # pylint: disable=cyclic-import
+from . import _annotations as _a
 from . import classes as _classes # pylint: disable=cyclic-import
 from . import objects as _objects # pylint: disable=cyclic-import
 
@@ -35,14 +36,14 @@ class Omniexception(
 ):
     ''' Base for exceptions raised by package API. '''
 
-    _attribute_visibility_includes_ = frozenset(
-        ( '__cause__', '__context__', ) )
+    _attribute_visibility_includes_: _a.Collection[ str ] = (
+        frozenset( ( '__cause__', '__context__', ) ) )
 
 
 class IndelibleAttributeError( Omniexception, AttributeError, TypeError ):
     ''' Attempt to reassign or delete indelible attribute. '''
 
-    def __init__( self, name ):
+    def __init__( self, name: str ) -> None:
         super( ).__init__(
             f"Cannot reassign or delete existing attribute {name!r}." )
 
@@ -50,7 +51,7 @@ class IndelibleAttributeError( Omniexception, AttributeError, TypeError ):
 class IndelibleEntryError( Omniexception, TypeError ):
     ''' Attempt to update or remove indelible dictionary entry. '''
 
-    def __init__( self, indicator ):
+    def __init__( self, indicator: _a.Any ) -> None:
         super( ).__init__(
             f"Cannot update or remove existing entry for {indicator!r}." )
 
@@ -58,7 +59,7 @@ class IndelibleEntryError( Omniexception, TypeError ):
 class InvalidOperationError( Omniexception, RuntimeError, TypeError ):
     ''' Attempt to perform invalid operation. '''
 
-    def __init__( self, name ):
+    def __init__( self, name: str ) -> None:
         super( ).__init__( f"Cannot perform operation {name!r}." )
 
 

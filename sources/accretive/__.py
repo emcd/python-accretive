@@ -25,10 +25,7 @@
 
 
 from abc import ABCMeta as ABCFactory
-from collections.abc import (
-    Collection as AbstractCollection,
-    Mapping as AbstractDictionary,
-)
+from collections.abc import Mapping as AbstractDictionary
 from functools import partial as partial_function
 from inspect import cleandoc as clean_docstring
 from sys import modules
@@ -49,7 +46,7 @@ class ClassConcealerExtension( type ):
         By default, public attributes are displayed.
     '''
 
-    _class_attribute_visibility_includes_: AbstractCollection = frozenset( )
+    _class_attribute_visibility_includes_: _a.Collection[ str ] = frozenset( )
 
     def __dir__( class_ ) -> _a.Tuple[ str, ... ]:
         return tuple( sorted(
@@ -64,7 +61,7 @@ class ConcealerExtension:
         By default, public attributes are displayed.
     '''
 
-    _attribute_visibility_includes_: AbstractCollection = frozenset( )
+    _attribute_visibility_includes_: _a.Collection[ str ] = frozenset( )
 
     def __dir__( self ) -> _a.Tuple[ str, ... ]:
         return tuple( sorted(
@@ -73,7 +70,7 @@ class ConcealerExtension:
                 or name in self._attribute_visibility_includes_ ) )
 
 
-class CoreDictionary( ConcealerExtension, dict ):
+class CoreDictionary( ConcealerExtension, dict ): # type: ignore[type-arg]
     ''' Accretive subclass of :py:class:`dict`.
 
         Can be used as an instance dictionary.
@@ -172,7 +169,7 @@ def generate_docstring(
     for fragment_id in fragment_ids:
         if isclass( fragment_id ): fragment = getdoc( fragment_id ) or ''
         elif isinstance( fragment_id, Docstring ): fragment = fragment_id
-        else: fragment = TABLE[ fragment_id ] # type: ignore[index]
+        else: fragment = TABLE[ fragment_id ]
         fragments.append( cleandoc( fragment ) )
     return '\n\n'.join( fragments )
 

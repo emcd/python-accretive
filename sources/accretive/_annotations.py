@@ -30,6 +30,8 @@ from typing import Any  # Note: To suppress Sphinx warning.
 from typing_extensions import (
     Annotated as Annotation,
     Callable,
+    Collection,     # TODO: Python 3.9: collections.abc.Collection
+    Dict,           # TODO: Python 3.9: dict
     Doc,
     Hashable,       # TODO: Python 3.9: collections.abc.Hashable
     ItemsView,      # TODO: Python 3.9: collections.abc.ItemsView
@@ -39,13 +41,13 @@ from typing_extensions import (
     Mapping,        # TODO: Python 3.9: collections.abc.Mapping
     MutableMapping, # TODO: Python 3.9: collections.abc.MutableMapping
     Never,
-    Optional,       # TODO? Python 3.10: bitwise-OR with None
     Self,
     Tuple,          # TODO: Python 3.9: collections.abc.Sequence
     Type,           # TODO: Python 3.9: type
     TypeAlias,
     Union,          # TODO: Python 3.10: bitwise-OR operator ('|')
     ValuesView,     # TODO: Python 3.9: collections.abc.ValuesView
+    cast,
 )
 
 
