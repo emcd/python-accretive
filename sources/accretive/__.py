@@ -150,13 +150,11 @@ def discover_public_attributes(
 ) -> _a.Tuple[ str, ... ]:
     ''' Discovers public attributes of certain types from dictionary.
 
-        By default, classes and functions are discovered.
+        By default, callables, including classes, are discovered.
     '''
-    from inspect import isclass, isfunction
     return tuple( sorted(
         name for name, attribute in attributes.items( )
-        if  not name.startswith( '_' )
-            and ( isclass( attribute ) or isfunction( attribute ) ) ) )
+        if not name.startswith( '_' ) and callable( attribute ) ) )
 
 
 def generate_docstring(

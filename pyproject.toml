@@ -92,6 +92,7 @@ docsgen = [
      documentation/sphinx .auxiliary/artifacts/sphinx-html''',
 ]
 linters = [
+  'mypy sources',
   'pylint sources documentation tests',
 ]
 packagers = [
@@ -102,7 +103,7 @@ testers = [
   'coverage erase',
   'coverage run',
   'coverage combine',
-  'coverage report',
+  'coverage report --skip-covered',
   'coverage html',
   'coverage xml',
 ]
