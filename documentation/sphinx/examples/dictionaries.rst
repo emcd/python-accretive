@@ -20,29 +20,177 @@
 Simple Dictionary
 ===============================================================================
 
+Simple accretive dictionaries have an interface nearly equivalent to
+:py:class:`dict`. Because of their accretive nature, they can be useful as
+registries for extensions, handlers, and plugins, such that something that is
+registered is guaranteed to remain registered throughout the lifetime of the
+registry.
+
+.. doctest:: Dictionary
+
+    >>> from accretive import Dictionary
+
+Let us illustrate this use case by first defining some handlers to register.
+
+.. doctest:: Dictionary
+
+    >>> def csv_reader( stream ): pass
+    ...
+    >>> def env_reader( stream ): pass
+    ...
+    >>> def hcl_reader( stream ): pass
+    ...
+    >>> def ini_reader( stream ): pass
+    ...
+    >>> def json_reader( stream ): pass
+    ...
+    >>> def toml_reader( stream ): pass
+    ...
+    >>> def xml_reader( stream ): pass
+    ...
+    >>> def yaml_reader( stream ): pass
+    ...
+
+Initialization
+-------------------------------------------------------------------------------
+
+Simple dictionaries can be initialized from zero or more other dictionaries
+or iterables over key-value pairs and zero or more keyword arguments.
+
+.. doctest:: Dictionary
+
+    >>> readers = Dictionary( { 'csv': csv_reader }, ( ( 'json', json_reader ), ( 'xml', xml_reader ) ), yaml = yaml_reader )
+    >>> readers
+    accretive.dictionaries.Dictionary( {'csv': <function csv_reader at 0x...>, 'json': <function json_reader at 0x...>, 'xml': <function xml_reader at 0x...>, 'yaml': <function yaml_reader at 0x...>} )
+
+Immutability
+-------------------------------------------------------------------------------
+
+Existing entries cannot be altered.
+
+.. doctest:: Dictionary
+
+    >>> readers[ 'xml' ] = toml_reader
+    Traceback (most recent call last):
+    ...
+    accretive.exceptions.IndelibleEntryError: Cannot update or remove existing entry for 'xml'.
+
+Or removed.
+
+.. doctest:: Dictionary
+
+    >>> del readers[ 'xml' ]
+    Traceback (most recent call last):
+    ...
+    accretive.exceptions.IndelibleEntryError: Cannot update or remove existing entry for 'xml'.
+
+(Seems like XML is here to stay.)
+
+Updates
+-------------------------------------------------------------------------------
+
+However, new entries can be added individually or in bulk. Bulk entry is via
+the ``update`` method.
+
+.. doctest:: Dictionary
+
+    >>> readers.update( ( ( 'env', env_reader ), ( 'hcl', hcl_reader ) ), { 'ini': ini_reader }, toml = toml_reader )
+    accretive.dictionaries.Dictionary( {'csv': <function csv_reader at 0x...>, 'json': <function json_reader at 0x...>, 'xml': <function xml_reader at 0x...>, 'yaml': <function yaml_reader at 0x...>, 'env': <function env_reader at 0x...>, 'hcl': <function hcl_reader at 0x...>, 'ini': <function ini_reader at 0x...>, 'toml': <function toml_reader at 0x...>} )
+
+.. note::
+
+    The ``update`` method returns the dictionary itself. This is different than
+    the behavior of :py:class:`dict`, which returns ``None`` instead. Returning
+    the dictionary is a more useful behavior, since it allows for call chaining
+    as a fluent setter.
+
+Copies
+-------------------------------------------------------------------------------
+
+Copies can be made of simple dictionaries.
+
+.. doctest:: Dictionary
+
+    >>> dct1 = Dictionary( answer = 42 )
+    >>> dct2 = dct1.copy( )
+
+Comparison
+-------------------------------------------------------------------------------
+
+The copies are equivalent to their originals.
+
+.. doctest:: Dictionary
+
+    >>> dct1 == dct2
+    True
+
+And to instances of other registered subclasses of
+:py:class:`collections.abc.Mapping` which have equivalent data.
+
+.. doctest:: Dictionary
+
+    >>> dct2 == { 'answer': 42 }
+    True
+
+Modifying a copy causes it to become non-equivalent, as expected.
+
+.. doctest:: Dictionary
+
+    >>> dct2[ 'question' ] = 'is reality a quine of itself?'
+    >>> dct1 == dct2
+    False
+    >>> dct2 != { 'answer': 42 }
+    True
+
+Access of Absent Entries
+-------------------------------------------------------------------------------
+
+As with :py:class:`dict`, a missing entry will raise a :py:exc:`KeyError`.
+
+.. doctest:: Dictionary
+
+    >>> dct1[ 'question' ]
+    Traceback (most recent call last):
+    KeyError: 'question'
+
+And, like :py:class:`dict`, the ``get`` method allows for "soft" accesses which
+provide a default value if an entry is missing.
+
+.. doctest:: Dictionary
+
+    >>> dct1.get( 'question' )
+    >>> dct1.get( 'question', 'what is the meaning of life?' )
+    'what is the meaning of life?'
+
+Views
+-------------------------------------------------------------------------------
+
+The usual methods for producing views on items, keys, and values exist.
+
+.. doctest:: Dictionary
+
+    >>> tuple( readers.keys( ) )
+    ('csv', 'json', 'xml', 'yaml', 'env', 'hcl', 'ini', 'toml')
+    >>> tuple( readers.items( ) ) == tuple( zip( readers.keys( ), readers.values( ) ) )
+    True
 
 Producer Dictionary
 ===============================================================================
+
+Producer dictionaries have an interface nearly equivalent to
+:py:class:`collections.defaultdict`. The first argument to the initializer for
+a producer dictionary must be a callable which can be invoked with no
+arguments. This callable is used to create entries that are absent at lookup
+time. Any additional arguments beyond the first one are treated the same as for
+the simple dictionary. Most of their behaviors are the same as for the simple
+dictionary, except as noted below.
 
 .. doctest:: ProducerDictionary
 
     >>> from accretive import ProducerDictionary
 
-Producer dictionaries are nearly equivalent to
-:py:class:`collections.defaultdict`. The first argument to the initializer for
-a producer dictionary must be a callable which can be invoked with no
-arguments. This callable is used to create entries that are absent at lookup
-time.
-
-.. doctest:: ProducerDictionary
-
-    >>> ddct = ProducerDictionary( list )
-    >>> ddct
-    accretive.dictionaries.ProducerDictionary( <class 'list'>, {} )
-    >>> ddct[ 'abc' ]
-    []
-    >>> ddct
-    accretive.dictionaries.ProducerDictionary( <class 'list'>, {'abc': []} )
+Initialization
+-------------------------------------------------------------------------------
 
 A common use case is to automatically initialize a mutable data structure, such
 as a :py:class:`list`, and add elements or entries to it by merely referencing
@@ -51,43 +199,33 @@ the entry first.
 
 .. doctest:: ProducerDictionary
 
-    >>> ddct[ 'def' ].append( 42 )
-    >>> ddct
-    accretive.dictionaries.ProducerDictionary( <class 'list'>, {'abc': [], 'def': [42]} )
+    >>> watch_lists = ProducerDictionary( list )
+    >>> watch_lists
+    accretive.dictionaries.ProducerDictionary( <class 'list'>, {} )
 
-Of course, entries can be explicitly added the same way as a simple dictionary.
-
-.. doctest:: ProducerDictionary
-
-    >>> ddct[ 'foo' ] = 'bar'
-    >>> ddct
-    accretive.dictionaries.ProducerDictionary( <class 'list'>, {'abc': [], 'def': [42], 'foo': 'bar'} )
-
-A producer dictionary can also be initialized from multiple iterators, as well
-as keyword arguments. The first argument must, of course, be the producer.
+Production of Absent Entries
+-------------------------------------------------------------------------------
 
 .. doctest:: ProducerDictionary
 
-    >>> other_ddct = ProducerDictionary( set, { 'red': True }, ( ( 'size', '2XLT' ), ), cotton = True )
-    >>> other_ddct
-    accretive.dictionaries.ProducerDictionary( <class 'set'>, {'red': True, 'size': '2XLT', 'cotton': True} )
-    >>> other_ddct[ 'inspectors' ].add( 42 )
+    >>> watch_lists[ 'FBI: Most Wanted' ]
+    []
+    >>> watch_lists
+    accretive.dictionaries.ProducerDictionary( <class 'list'>, {'FBI: Most Wanted': []} )
+    >>> watch_lists[ 'Santa Claus: Naughty' ].append( 'Calvin' )
+    >>> watch_lists
+    accretive.dictionaries.ProducerDictionary( <class 'list'>, {'FBI: Most Wanted': [], 'Santa Claus: Naughty': ['Calvin']} )
 
-As this is an accretive data structure, entries cannot be removed or altered,
-once they have been added.
+Updates
+-------------------------------------------------------------------------------
 
 .. doctest:: ProducerDictionary
 
-    >>> del ddct[ 'abc' ]
-    Traceback (most recent call last):
-    ...
-    accretive.exceptions.IndelibleEntryError: Cannot update or remove existing entry for 'abc'.
-    >>> ddct[ 'abc' ] = -1
-    Traceback (most recent call last):
-    ...
-    accretive.exceptions.IndelibleEntryError: Cannot update or remove existing entry for 'abc'.
-    >>> ddct
-    accretive.dictionaries.ProducerDictionary( <class 'list'>, {'abc': [], 'def': [42], 'foo': 'bar'} )
+    >>> watch_lists.update( { 'US Commerce: Do Not Call': [ 'me' ] }, Tasks = set( ) )
+    accretive.dictionaries.ProducerDictionary( <class 'list'>, {'FBI: Most Wanted': [], 'Santa Claus: Naughty': ['Calvin'], 'US Commerce: Do Not Call': ['me'], 'Tasks': set()} )
+
+Access of Absent Entries
+-------------------------------------------------------------------------------
 
 The ``get`` method behaves the same as it does on the simple dictionary. I.e.,
 it does not implcitly create new entries in a producer dictionary. This is the
@@ -95,23 +233,14 @@ same behavior as :py:class:`collections.defaultdict`.
 
 .. doctest:: ProducerDictionary
 
-    >>> ddct.get( 'fizz' )
-    >>> 'fizz' in ddct
-    False
-    >>> ddct.get( 'fizz', 1 )
-    1
-    >>> 'fizz' in ddct
-    False
+    >>> watch_lists.get( 'TSA: No Fly' )
+    >>> watch_lists.get( 'TSA: No Fly', 'Richard Reid' )
+    'Richard Reid'
+    >>> watch_lists
+    accretive.dictionaries.ProducerDictionary( <class 'list'>, {'FBI: Most Wanted': [], 'Santa Claus: Naughty': ['Calvin'], 'US Commerce: Do Not Call': ['me'], 'Tasks': set()} )
 
-The ``update`` method can take multiple iterables as positional arguments, as
-well as keyword arguments. The iterables must either be sequences of key-value
-pairs or else registered sublclasses of :py:class:`collections.abc.Mapping`.
-The method returns the dictionary itself (rather than ``None``).
-
-.. doctest:: ProducerDictionary
-
-    >>> ddct.update( { 'ghi': 3 }, ( ( 'jkl', 3 ), ), mno = True )
-    accretive.dictionaries.ProducerDictionary( <class 'list'>, {'abc': [], 'def': [42], 'foo': 'bar', 'ghi': 3, 'jkl': 3, 'mno': True} )
+Copies
+-------------------------------------------------------------------------------
 
 The ``copy`` method creates a new producer dictionary, which is initialized
 with the same producer and data as the dictionary on which the method is
@@ -119,13 +248,15 @@ invoked.
 
 .. doctest:: ProducerDictionary
 
-    >>> type( ddct )
-    <class 'accretive.dictionaries.ProducerDictionary'>
-    >>> new_ddct = ddct.copy( )
-    >>> type( new_ddct )
-    <class 'accretive.dictionaries.ProducerDictionary'>
-    >>> ddct == new_ddct
-    True
+    >>> ddct1 = ProducerDictionary( lambda: 42, { 'foo': 1, 'bar': 2 }, orb = True )
+    >>> ddct1
+    accretive.dictionaries.ProducerDictionary( <function <lambda> at 0x...>, {'foo': 1, 'bar': 2, 'orb': True} )
+    >>> ddct2 = ddct1.copy( )
+    >>> ddct2
+    accretive.dictionaries.ProducerDictionary( <function <lambda> at 0x...>, {'foo': 1, 'bar': 2, 'orb': True} )
+
+Comparison
+-------------------------------------------------------------------------------
 
 Equality comparisons may be made against any registered subclass of
 :py:class:`collections.abc.Mapping`. Note that the producer is excluded from
@@ -134,5 +265,5 @@ the equality comparison; only data is compared; this is the same behavior as
 
 .. doctest:: ProducerDictionary
 
-    >>> other_ddct == { 'red': True, 'size': '2XLT', 'cotton': True, 'inspectors': { 42 } }
+    >>> ddct2 == { 'foo': 1, 'bar': 2, 'orb': True }
     True
