@@ -81,6 +81,10 @@ nitpick_ignore = [
     ( 'py:class', "module" ),
     ( 'py:class',
       "v, remove specified key and return the corresponding value." ),
+    # Workaround for missing 'typing_extensions' documentation.
+    ( 'py:class', "typing_extensions.Any" ),
+    ( 'py:class', "typing_extensions.Never" ),
+    ( 'py:class', "typing_extensions.Self" ),
 ]
 
 # -- Options for linkcheck builder -------------------------------------------

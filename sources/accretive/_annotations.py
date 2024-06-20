@@ -25,10 +25,10 @@
 
 
 from types import ModuleType as Module
-from typing import Any  # Note: To suppress Sphinx warning.
 
 from typing_extensions import (
     Annotated as Annotation,
+    Any,
     Callable,
     Collection,     # TODO: Python 3.9: collections.abc.Collection
     Dict,           # TODO: Python 3.9: dict
