@@ -113,6 +113,11 @@ make-all = [
   'packagers',
   'docsgen',
 ]
+[tool.hatch.envs.qa]
+description = ''' Quality ensurance environment. '''
+template = 'develop'
+[[tool.hatch.envs.qa.matrix]]
+python = [ '3.8', '3.9', '3.10', '3.11', '3.12', 'pypy3.9', 'pypy3.10' ]
 [tool.hatch.version]
 path = 'sources/accretive/__init__.py'
 

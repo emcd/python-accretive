@@ -68,8 +68,6 @@ Or deleted.
     ...
     accretive.exceptions.IndelibleAttributeError: Cannot reassign or delete existing attribute 'port'.
 
-(Seems like the configuration is locked in.)
-
 New Attributes
 -------------------------------------------------------------------------------
 

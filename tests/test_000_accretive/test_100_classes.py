@@ -215,6 +215,7 @@ def test_151_class_attribute_nonprotection( module_qname, class_name ):
 def test_200_abc_mutation_allowance( module_qname, class_name ):
     ''' Class allows mutation of ABC machinery. '''
     from collections.abc import Mapping
+    from platform import python_implementation
     module = cache_import_module( module_qname )
     class_factory_class = getattr( module, class_name )
 
@@ -226,8 +227,10 @@ def test_200_abc_mutation_allowance( module_qname, class_name ):
     ):
         ''' test '''
 
+    python_kind = python_implementation( )
     assert hasattr( Object, '__abstractmethods__' )
-    assert hasattr( Object, '_abc_impl' )
+    if python_kind in ( 'CPython', ):
+        assert hasattr( Object, '_abc_impl' )
 
 
 @pytest.mark.parametrize(
