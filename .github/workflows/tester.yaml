@@ -22,7 +22,7 @@ jobs:
       python-version: '${{ matrix.python-version }}'
 
   report:
-    needs: test
+    needs: [initialize, test]
     uses: ./.github/workflows/reusable--reporter.yaml
     with:
       python-version: '${{ fromJSON(needs.initialize.outputs.python-versions-json)[0] }}'

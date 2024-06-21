@@ -20,7 +20,11 @@ jobs:
 
       - name: Test
         run: |
-          hatch --env qa.${{ inputs.python-version }} run coverage run
+          set -eu
+          [[ '${{ inputs.python-version }}' =~ ^[0-9].* ]] \
+            && python_version='py${{ inputs.python-version }}' \
+            || python_version='${{inputs.python-version }}'
+          hatch --env "qa.${python_version}" run coverage run
         shell: bash
 
       - name: Preserve Coverage Results
