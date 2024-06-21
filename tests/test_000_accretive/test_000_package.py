@@ -20,6 +20,8 @@
 
 ''' Assert basic characteristics of package and modules thereof. '''
 
+# mypy: ignore-errors
+
 
 import pytest
 

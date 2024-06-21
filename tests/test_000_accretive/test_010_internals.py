@@ -20,6 +20,7 @@
 
 ''' Assert correct function of internals. '''
 
+# mypy: ignore-errors
 # pylint: disable=magic-value-comparison,protected-access
 
 

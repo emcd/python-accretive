@@ -20,6 +20,7 @@
 
 ''' Package of tests. '''
 
+# mypy: ignore-errors
 # pylint: disable=magic-value-comparison
 
 

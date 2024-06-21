@@ -7,11 +7,12 @@
         https://jareddillard.com/blog/common-ways-to-customize-sphinx-themes.html
 '''
 
+# mypy: ignore-errors
 # pylint: disable=consider-using-namedtuple-or-dataclass
 # ruff: noqa: E402,F401
 
 
-def _prepare( ) -> dict: # type: ignore[type-arg]
+def _prepare( ):
     from pathlib import Path
     from sys import path as module_discovery_locations
     from tomli import load  # TODO: Python 3.11: tomllib
@@ -22,9 +23,7 @@ def _prepare( ) -> dict: # type: ignore[type-arg]
         return load( project_file )
 
 
-def _calculate_copyright_notice(
-    information: dict, copyright_holder: str # type: ignore[type-arg]
-) -> str:
+def _calculate_copyright_notice( information, copyright_holder ):
     from datetime import datetime as DateTime
     first_year = information[ 'tool' ][ 'SELF' ][ 'year-of-origin' ]
     now_year = DateTime.utcnow( ).year
@@ -60,7 +59,7 @@ extensions = [
 
 templates_path = [ '_templates' ]
 
-exclude_patterns = [ ] # type: ignore
+exclude_patterns = [ ]
 
 rst_prolog = f'''
 .. |project| replace:: {project}

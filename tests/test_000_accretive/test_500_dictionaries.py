@@ -20,6 +20,7 @@
 
 ''' Assert correct function of dictionaries. '''
 
+# mypy: ignore-errors
 # pylint: disable=attribute-defined-outside-init
 # pylint: disable=invalid-name,magic-value-comparison,protected-access
 
