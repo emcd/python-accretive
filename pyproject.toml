@@ -23,14 +23,17 @@ classifiers = [ # https://pypi.org/classifiers
   'Programming Language :: Python :: 3.11',
   'Programming Language :: Python :: 3.12',
   'Programming Language :: Python :: Implementation :: CPython',
-  #'Programming Language :: Python :: Implementation :: PyPy',
+  'Programming Language :: Python :: Implementation :: PyPy',
   'Topic :: Software Development',
 ]
 keywords = [ 'api', 'dictionary', 'namespace', 'accretion', 'indelibility' ]
-# TODO: [project.urls]
 [[project.authors]]
 name = 'Eric McDonald'
 email = 'emcd@users.noreply.github.com'
+[project.urls]
+'Homepage' = 'https://github.com/emcd/python-accretive'
+'Source Code' = 'https://github.com/emcd/python-accretive'
+'Issue Tracker' = 'https://github.com/emcd/python-accretive/issues'
 
 [tool.SELF]
 year-of-origin = 2024

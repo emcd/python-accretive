@@ -1,0 +1,28 @@
+name: Tester
+
+on:
+  pull_request:
+    branches: ['*']
+  push:
+    branches: ['master', 'release-*']
+  workflow_dispatch: {}
+
+jobs:
+
+  initialize:
+    uses: ./.github/workflows/reusable--initializer.yaml
+
+  test:
+    needs: initialize
+    strategy:
+      matrix:
+        python-version: ${{ fromJSON(needs.initialize.outputs.python-versions-json) }}
+    uses: ./.github/workflows/reusable--tester.yaml
+    with:
+      python-version: '${{ matrix.python-version }}'
+
+  report:
+    needs: test
+    uses: ./.github/workflows/reusable--reporter.yaml
+    with:
+      python-version: '${{ fromJSON(needs.initialize.outputs.python-versions-json)[0] }}'

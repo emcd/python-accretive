@@ -1,0 +1,30 @@
+name: Reusable Tester
+
+on:
+  workflow_call:
+    inputs:
+      python-version:
+        required: true
+        type: string
+
+jobs:
+
+  test:
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Prepare Python
+        uses: ./.github/actions/python-hatch
+        with:
+          python-version: '${{ inputs.python-version }}'
+
+      - name: Test
+        run: |
+          hatch --env qa.${{ inputs.python-version }} run coverage run
+        shell: bash
+
+      - name: Preserve Coverage Results
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-results-${{ inputs.python-version }}--${{ github.run_id }}
+          path: .auxiliary/caches/pytest/coverage.sqlite3.*

@@ -1,0 +1,47 @@
+name: Reusable Reporter
+
+on:
+  workflow_call:
+    inputs:
+      publish:
+        description: 'Publish the generated reports?'
+        default: false
+        required: false
+        type: boolean
+      python-version:
+        required: true
+        type: string
+
+jobs:
+
+  report-coverage:
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Prepare Python
+        uses: ./.github/actions/python-hatch
+        with:
+          python-version: '${{ inputs.python-version }}'
+
+      - name: Restore Coverage Results
+        uses: actions/download-artifact@v4
+        with:
+          pattern: coverage-results-*--${{ github.run_id }}
+          path: .auxiliary/caches/pytest
+          merge-multiple: true
+
+      - name: Report Coverage
+        run: |
+          hatch --env develop run coverage combine
+          hatch --env develop run coverage report
+          hatch --env develop run coverage html
+          hatch --env develop run coverage xml
+
+      # TODO: Replace Codecov with Github-native solution.
+      - name: Publish Coverage Report
+        if: inputs.publish
+        uses: codecov/codecov-action@v4
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+        with:
+          files: artifacts/coverage-pytest/coverage.xml
