@@ -13,7 +13,7 @@ jobs:
     needs: initialize
     uses: ./.github/workflows/reusable--packager.yaml
     with:
-      python-version: '${{ fromJSON(needs.initialize.outputs.python-versions-json)[0] }}'
+      python-version: '${{ fromJSON(needs.initialize.outputs.python-versions)[0] }}'
 
   publish-to-testpypi:
     name: 'Publish Python Package Distributions (TestPyPI)'
