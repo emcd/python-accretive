@@ -60,16 +60,12 @@ This namespace can be initialized from multiple iterables and from keyword
 arguments. (Keyword arguments shown below; see documentation for additional
 forms of initialization.)
 
-.. doctest:: readme-namespace
-
     >>> from accretive import Namespace
     >>> ns = Namespace( apples = 12, bananas = 6, cherries = 42 )
     >>> ns
     accretive.namespaces.Namespace( apples = 12, bananas = 6, cherries = 42 )
 
 Arbitrary attributes can be assigned, as is expected in Python.
-
-.. doctest:: readme-namespace
 
     >>> ns.blueberries = 96
     >>> ns.strawberries = 24
@@ -78,8 +74,6 @@ Arbitrary attributes can be assigned, as is expected in Python.
 
 Since the namespace is accretive, attributes cannot be deleted.
 
-.. doctest:: readme-namespace
-
     >>> del ns.apples
     Traceback (most recent call last):
     ...
@@ -87,16 +81,12 @@ Since the namespace is accretive, attributes cannot be deleted.
 
 Or reassigned.
 
-.. doctest:: readme-namespace
-
     >>> ns.apples = 14
     Traceback (most recent call last):
     ...
     accretive.exceptions.IndelibleAttributeError: Cannot reassign or delete existing attribute 'apples'.
 
 The attributes thus retain their original values.
-
-.. doctest:: readme-namespace
 
     >>> ns
     accretive.namespaces.Namespace( apples = 12, bananas = 6, cherries = 42, blueberries = 96, strawberries = 24 )
@@ -110,8 +100,6 @@ be initialized from multiple iterables and from keyword arguments. (Keyword
 arguments shown below; see documentation for additional forms of
 initialization.)
 
-.. doctest:: readme-dictionary
-
     >>> from accretive import Dictionary
     >>> dct = Dictionary( apples = 12, bananas = 6, cherries = 42 )
     >>> dct
@@ -121,14 +109,10 @@ Entries can be added to the dictionary after initialization. This includes via
 a batch operation, such as ``update``, which can accept the same forms of
 arguments as dictionary initialization.
 
-.. doctest:: readme-dictionary
-
     >>> dct.update( blueberries = 96, strawberries = 24 )
     accretive.dictionaries.Dictionary( {'apples': 12, 'bananas': 6, 'cherries': 42, 'blueberries': 96, 'strawberries': 24} )
 
 Since the dictionary is accretive, existing entries cannot be removed.
-
-.. doctest:: readme-dictionary
 
     >>> del dct[ 'bananas' ]
     Traceback (most recent call last):
@@ -137,16 +121,12 @@ Since the dictionary is accretive, existing entries cannot be removed.
 
 Or altered.
 
-.. doctest:: readme-dictionary
-
     >>> dct[ 'bananas' ] = 11
     Traceback (most recent call last):
     ...
     accretive.exceptions.IndelibleEntryError: Cannot update or remove existing entry for 'bananas'.
 
 The entries thus remain unchanged.
-
-.. doctest:: readme-dictionary
 
     >>> dct
     accretive.dictionaries.Dictionary( {'apples': 12, 'bananas': 6, 'cherries': 42, 'blueberries': 96, 'strawberries': 24} )
