@@ -23,8 +23,6 @@ jobs:
           hatch --env develop build
         shell: bash
 
-      # TODO? Generate GPG signatures.
-
       - name: Preserve Distributions
         uses: actions/upload-artifact@v4
         with:
