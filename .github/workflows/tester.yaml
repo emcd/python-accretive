@@ -13,16 +13,16 @@ jobs:
     uses: ./.github/workflows/reusable--initializer.yaml
 
   test:
-    needs: initialize
-    strategy:
-      matrix:
-        python-version: ${{ fromJSON(needs.initialize.outputs.python-versions-json) }}
+    needs: [initialize]
     uses: ./.github/workflows/reusable--tester.yaml
     with:
-      python-version: '${{ matrix.python-version }}'
+      matrix-exclusions: '${{ needs.initialize.outputs.matrix-exclusions }}'
+      platforms: '${{ needs.initialize.outputs.platforms }}'
+      python-versions: '${{ needs.initialize.outputs.python-versions }}'
+      python-descriptors: '${{ needs.initialize.outputs.python-descriptors }}'
 
   report:
     needs: [initialize, test]
     uses: ./.github/workflows/reusable--reporter.yaml
     with:
-      python-version: '${{ fromJSON(needs.initialize.outputs.python-versions-json)[0] }}'
+      python-version: '${{ fromJSON(needs.initialize.outputs.python-versions)[0] }}'
