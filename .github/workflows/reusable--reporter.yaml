@@ -32,10 +32,12 @@ jobs:
 
       - name: Report Coverage
         run: |
+          set -eu
           hatch --env develop run coverage combine
           hatch --env develop run coverage report
           hatch --env develop run coverage html
           hatch --env develop run coverage xml
+        shell: bash
 
       # TODO: Replace Codecov with Github-native solution.
       - name: Publish Coverage Report

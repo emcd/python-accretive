@@ -1,0 +1,40 @@
+name: Release
+
+on: workflow_dispatch
+
+jobs:
+
+  initialize:
+    uses: ./.github/workflows/reusable--initializer.yaml
+
+  # TODO: Run complete tester on release.
+
+  package:
+    needs: initialize
+    uses: ./.github/workflows/reusable--packager.yaml
+    with:
+      python-version: '${{ fromJSON(needs.initialize.outputs.python-versions-json)[0] }}'
+
+  publish-to-testpypi:
+    name: 'Publish Python Package Distributions (TestPyPI)'
+    needs: [initialize, package]
+    runs-on: ubuntu-latest
+    environment:
+      name: testpypi
+      # TODO: Substitute repository variable in upload URL.
+      url: https://test.pypi.org/p/accretive
+    permissions:
+      id-token: write
+    steps:
+
+      - name: Restore Distributions
+        uses: actions/download-artifact@v4
+        with:
+          name: python-package-distributions--${{ github.run_id }}
+          path: .auxiliary/artifacts/hatch-build/
+
+      - name: Publish Distribution (TestPyPI)
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          packages-dir: .auxiliary/artifacts/hatch-build/
+          repository-url: https://test.pypi.org/legacy/

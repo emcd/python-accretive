@@ -1,0 +1,32 @@
+name: Reusable Packager
+
+on:
+  workflow_call:
+    inputs:
+      python-version:
+        required: true
+        type: string
+
+jobs:
+
+  package:
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Prepare Python
+        uses: emcd/python-accretive/.github/actions/python-hatch@master
+        with:
+          python-version: '${{ inputs.python-version }}'
+
+      - name: Package Sdist + Wheel
+        run: |
+          hatch --env develop build
+        shell: bash
+
+      # TODO? Generate GPG signatures.
+
+      - name: Preserve Distributions
+        uses: actions/upload-artifact@v4
+        with:
+          name: python-package-distributions--${{ github.run_id }}
+          path: .auxiliary/artifacts/hatch-build/
