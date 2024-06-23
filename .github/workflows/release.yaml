@@ -3,6 +3,7 @@ name: Release
 on:
   workflow_dispatch:
     inputs:
+      # TODO: Flag for publication.
       which-pypi:
         description: 'Which Python package index?'
         required: true
@@ -11,17 +12,23 @@ on:
           - pypi
           - testpypi
         default: testpypi
-      # TODO: Flag to publish to Github.
 
 jobs:
 
   initialize:
     uses: ./.github/workflows/reusable--initializer.yaml
 
-  # TODO: Run reusable tester.
+  test:
+    needs: [initialize]
+    uses: ./.github/workflows/reusable--tester.yaml
+    with:
+      matrix-exclusions: '${{ needs.initialize.outputs.matrix-exclusions }}'
+      platforms: '${{ needs.initialize.outputs.platforms }}'
+      python-versions: '${{ needs.initialize.outputs.python-versions }}'
+      python-descriptors: '${{ needs.initialize.outputs.python-descriptors }}'
 
   docsgen:
-    needs: initialize
+    needs: [initialize, test]
     permissions:
       contents: write
       id-token: write
@@ -31,46 +38,13 @@ jobs:
       python-version: '${{ fromJSON(needs.initialize.outputs.python-versions)[0] }}'
 
   package:
-    needs: initialize
+    needs: [initialize, docsgen]
     permissions:
       contents: write
       id-token: write
     uses: ./.github/workflows/reusable--packager.yaml
     with:
+      pypi-api-urls: '${{ needs.initialize.outputs.pypi-api-urls }}'
+      pypi-package-urls: '${{ needs.initialize.outputs.pypi-package-urls }}'
       python-version: '${{ fromJSON(needs.initialize.outputs.python-versions)[0] }}'
-
-  # TODO: Factor into reusable packager.
-  publish:
-    if: false
-    needs: [initialize, package]
-    runs-on: ubuntu-latest
-    environment:
-      name: '${{ inputs.which-pypi }}'
-      url: '${{ fromJSON(needs.initialize.outputs.pypi-package-urls)[inputs.which-pypi] }}${{ vars.PYTHON_PACKAGE_NAME }}'
-    permissions:
-      contents: write
-      id-token: write
-    steps:
-
-      - name: Restore Distributions
-        uses: actions/download-artifact@v4
-        with:
-          name: python-package-distributions--${{ github.run_id }}
-          path: .auxiliary/artifacts/hatch-build/
-
-      - name: Publish Distributions (PyPI)
-        uses: pypa/gh-action-pypi-publish@release/v1
-        with:
-          packages-dir: .auxiliary/artifacts/hatch-build/
-          repository-url: '${{ fromJSON(needs.initialize.outputs.pypi-api-urls)[inputs.which-pypi] }}'
-          print-hash: true
-          skip-existing: ${{ 'testpypi' == inputs.which-pypi }}
-
-      - name: Sign Distributions
-        uses: sigstore/gh-action-sigstore-python@v2.1.1
-        with:
-          inputs: >-
-            .auxiliary/artifacts/hatch-build/*.tar.gz
-            .auxiliary/artifacts/hatch-build/*.whl
-
-      # TODO: Publish release on Github.
+      which-pypi: '${{ inputs.which-pypi }}'
