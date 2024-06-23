@@ -99,8 +99,8 @@ linters = [
   'pylint sources documentation tests',
 ]
 packagers = [
-  'hatch build --target sdist --target wheel'
-  # TODO: Sign packages.
+  'hatch build',
+  # TODO? Sign packages.
 ]
 testers = [
   'coverage erase',

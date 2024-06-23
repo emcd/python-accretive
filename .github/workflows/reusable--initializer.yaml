@@ -11,6 +11,12 @@ on:
       platforms:
         description: 'Array of platforms in JSON format.'
         value: '${{ jobs.define-constants.outputs.platforms }}'
+      pypi-api-urls:
+        description: 'Map of PyPI API endpoint names to URLS in JSON format.'
+        value: '${{ jobs.define-constants.outputs.pypi-api-urls }}'
+      pypi-package-urls:
+        description: 'Map of PyPI package endpoint names to URLS in JSON format.'
+        value: '${{ jobs.define-constants.outputs.pypi-package-urls }}'
       python-versions:
         description: 'Array of Python versions in JSON format.'
         value: '${{ jobs.define-constants.outputs.python-versions }}'
@@ -25,6 +31,8 @@ jobs:
     outputs:
       matrix-exclusions: '${{ steps.matrix-exclusions.outputs.pairs }}'
       platforms: '${{ steps.platforms.outputs.names }}'
+      pypi-api-urls: '${{ steps.pypi-urls.outputs.apis }}'
+      pypi-package-urls: '${{ steps.pypi-urls.outputs.packages }}'
       python-versions: '${{ steps.python-versions.outputs.names }}'
       python-descriptors: '${{ steps.python-versions.outputs.specs }}'
     steps:
@@ -79,3 +87,25 @@ jobs:
           echo "pairs=${pairs}" >>${GITHUB_OUTPUT}
           cat ${GITHUB_OUTPUT}
         shell: bash
+
+      - name: Declare PyPI URLs
+        id: pypi-urls
+        run: |
+          set -eu
+          packages="$(jq --compact-output << EOF
+          {
+            "pypi": "https://pypi.org/p/",
+            "testpypi": "https://test.pypi.org/p/"
+          }
+          EOF
+          )"
+          echo "packages=${packages}" >>${GITHUB_OUTPUT}
+          apis="$(jq --compact-output << EOF
+          {
+            "pypi": "https://upload.pypi.org/legacy/",
+            "testpypi": "https://test.pypi.org/legacy/"
+          }
+          EOF
+          )"
+          echo "apis=${apis}" >>${GITHUB_OUTPUT}
+          cat ${GITHUB_OUTPUT}

@@ -1,13 +1,24 @@
 name: Release
 
-on: workflow_dispatch
+on:
+  workflow_dispatch:
+    inputs:
+      which-pypi:
+        description: 'Which Python package index?'
+        required: true
+        type: choice
+        options:
+          - pypi
+          - testpypi
+        default: testpypi
+      # TODO: Flag to publish to Github.
 
 jobs:
 
   initialize:
     uses: ./.github/workflows/reusable--initializer.yaml
 
-  # TODO: Run complete tester on release.
+  # TODO: Run reusable tester.
 
   package:
     needs: initialize
@@ -15,15 +26,14 @@ jobs:
     with:
       python-version: '${{ fromJSON(needs.initialize.outputs.python-versions)[0] }}'
 
-  publish-to-testpypi:
-    name: 'Publish Python Package Distributions (TestPyPI)'
+  publish:
     needs: [initialize, package]
     runs-on: ubuntu-latest
     environment:
-      name: testpypi
-      # TODO: Substitute repository variable in upload URL.
-      url: https://test.pypi.org/p/accretive
+      name: '${{ inputs.which-pypi }}'
+      url: '${{ fromJSON(needs.initialize.outputs.pypi-package-urls)[inputs.which-pypi] }}${{ vars.PYTHON_PACKAGE_NAME }}'
     permissions:
+      contents: write
       id-token: write
     steps:
 
@@ -33,8 +43,21 @@ jobs:
           name: python-package-distributions--${{ github.run_id }}
           path: .auxiliary/artifacts/hatch-build/
 
-      - name: Publish Distribution (TestPyPI)
+      # TODO: Publish version-specific documentation on Github pages.
+
+      - name: Publish Distributions (PyPI)
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
           packages-dir: .auxiliary/artifacts/hatch-build/
-          repository-url: https://test.pypi.org/legacy/
+          repository-url: '${{ fromJSON(needs.initialize.outputs.pypi-api-urls)[inputs.which-pypi] }}'
+          print-hash: true
+          skip-existing: ${{ 'testpypi' == inputs.which-pypi }}
+
+      - name: Sign Distributions
+        uses: sigstore/gh-action-sigstore-python@v2.1.1
+        with:
+          inputs: >-
+            .auxiliary/artifacts/hatch-build/*.tar.gz
+            .auxiliary/artifacts/hatch-build/*.whl
+
+      # TODO: Publish release on Github.
