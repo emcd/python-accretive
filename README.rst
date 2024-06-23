@@ -20,9 +20,25 @@
                                   accretive
 *******************************************************************************
 
+.. image:: https://img.shields.io/pypi/v/accretive
+   :alt: Project Version
+   :target: https://pypi.org/project/accretive/
+
+.. image:: https://img.shields.io/pypi/status/accretive
+   :alt: PyPI - Status
+   :target: https://pypi.org/project/accretive/
+
 .. image:: https://github.com/emcd/python-accretive/actions/workflows/tester.yaml/badge.svg?branch=master&event=push
    :alt: Tests Status
    :target: https://github.com/emcd/python-accretive/actions/workflows/tester.yaml
+
+.. image:: https://img.shields.io/pypi/pyversions/accretive
+   :alt: Python Versions
+   :target: https://pypi.org/project/accretive/
+
+.. image:: https://img.shields.io/pypi/l/accretive
+   :alt: Project License
+   :target: https://github.com/emcd/python-accretive/blob/master/LICENSE.txt
 
 A Python library package which provides *accretive data structures*.
 
@@ -176,3 +192,11 @@ Installation
 .. image:: https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json
    :alt: Ruff
    :target: https://github.com/astral-sh/ruff
+
+.. image:: https://img.shields.io/pypi/implementation/accretive
+   :alt: PyPI - Implementation
+   :target: https://pypi.org/project/accretive/
+
+.. image:: https://img.shields.io/pypi/wheel/accretive
+   :alt: PyPI - Wheel
+   :target: https://pypi.org/project/accretive/
