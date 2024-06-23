@@ -20,6 +20,10 @@
                                   accretive
 *******************************************************************************
 
+.. image:: https://github.com/emcd/python-accretive/actions/workflows/tester.yaml/badge.svg?branch=master&event=push
+   :alt: Tests Status
+   :target: https://github.com/emcd/python-accretive/actions/workflows/tester.yaml
+
 A Python library package which provides *accretive data structures*.
 
 Accretive data structures can grow at any time but can never shrink. An
@@ -34,11 +38,12 @@ convenience of incremental initialization.
 
 .. note::
 
-  Enforcement of immutability is quite difficult in Python. While this library
-  encourages immutability by default, it can be circumvented by anyone who has
-  intermediate knowledge of Python machinery and who is determined to
-  circumvent the immutability. Use the library in the spirit of making programs
-  safer, but understand that it cannot truly prevent unwanted state tampering.
+    Enforcement of immutability is quite difficult in Python. While this
+    library encourages immutability by default, it can be circumvented by
+    anyone who has intermediate knowledge of Python machinery and who is
+    determined to circumvent the immutability. Use the library in the spirit of
+    making programs safer, but understand that it cannot truly prevent unwanted
+    state tampering.
 
 In addition to accretive **dictionaries** (including dictionaries with *default
 entries*) and **namespaces**, this package also provides accretive **classes**
@@ -60,36 +65,36 @@ This namespace can be initialized from multiple iterables and from keyword
 arguments. (Keyword arguments shown below; see documentation for additional
 forms of initialization.)
 
-    >>> from accretive import Namespace
-    >>> ns = Namespace( apples = 12, bananas = 6, cherries = 42 )
-    >>> ns
-    accretive.namespaces.Namespace( apples = 12, bananas = 6, cherries = 42 )
+>>> from accretive import Namespace
+>>> ns = Namespace( apples = 12, bananas = 6, cherries = 42 )
+>>> ns
+accretive.namespaces.Namespace( apples = 12, bananas = 6, cherries = 42 )
 
 Arbitrary attributes can be assigned, as is expected in Python.
 
-    >>> ns.blueberries = 96
-    >>> ns.strawberries = 24
-    >>> ns
-    accretive.namespaces.Namespace( apples = 12, bananas = 6, cherries = 42, blueberries = 96, strawberries = 24 )
+>>> ns.blueberries = 96
+>>> ns.strawberries = 24
+>>> ns
+accretive.namespaces.Namespace( apples = 12, bananas = 6, cherries = 42, blueberries = 96, strawberries = 24 )
 
 Since the namespace is accretive, attributes cannot be deleted.
 
-    >>> del ns.apples
-    Traceback (most recent call last):
-    ...
-    accretive.exceptions.IndelibleAttributeError: Cannot reassign or delete existing attribute 'apples'.
+>>> del ns.apples
+Traceback (most recent call last):
+...
+accretive.exceptions.IndelibleAttributeError: Cannot reassign or delete existing attribute 'apples'.
 
 Or reassigned.
 
-    >>> ns.apples = 14
-    Traceback (most recent call last):
-    ...
-    accretive.exceptions.IndelibleAttributeError: Cannot reassign or delete existing attribute 'apples'.
+>>> ns.apples = 14
+Traceback (most recent call last):
+...
+accretive.exceptions.IndelibleAttributeError: Cannot reassign or delete existing attribute 'apples'.
 
 The attributes thus retain their original values.
 
-    >>> ns
-    accretive.namespaces.Namespace( apples = 12, bananas = 6, cherries = 42, blueberries = 96, strawberries = 24 )
+>>> ns
+accretive.namespaces.Namespace( apples = 12, bananas = 6, cherries = 42, blueberries = 96, strawberries = 24 )
 
 
 Accretive Dictionary
@@ -100,36 +105,36 @@ be initialized from multiple iterables and from keyword arguments. (Keyword
 arguments shown below; see documentation for additional forms of
 initialization.)
 
-    >>> from accretive import Dictionary
-    >>> dct = Dictionary( apples = 12, bananas = 6, cherries = 42 )
-    >>> dct
-    accretive.dictionaries.Dictionary( {'apples': 12, 'bananas': 6, 'cherries': 42} )
+>>> from accretive import Dictionary
+>>> dct = Dictionary( apples = 12, bananas = 6, cherries = 42 )
+>>> dct
+accretive.dictionaries.Dictionary( {'apples': 12, 'bananas': 6, 'cherries': 42} )
 
 Entries can be added to the dictionary after initialization. This includes via
 a batch operation, such as ``update``, which can accept the same forms of
 arguments as dictionary initialization.
 
-    >>> dct.update( blueberries = 96, strawberries = 24 )
-    accretive.dictionaries.Dictionary( {'apples': 12, 'bananas': 6, 'cherries': 42, 'blueberries': 96, 'strawberries': 24} )
+>>> dct.update( blueberries = 96, strawberries = 24 )
+accretive.dictionaries.Dictionary( {'apples': 12, 'bananas': 6, 'cherries': 42, 'blueberries': 96, 'strawberries': 24} )
 
 Since the dictionary is accretive, existing entries cannot be removed.
 
-    >>> del dct[ 'bananas' ]
-    Traceback (most recent call last):
-    ...
-    accretive.exceptions.IndelibleEntryError: Cannot update or remove existing entry for 'bananas'.
+>>> del dct[ 'bananas' ]
+Traceback (most recent call last):
+...
+accretive.exceptions.IndelibleEntryError: Cannot update or remove existing entry for 'bananas'.
 
 Or altered.
 
-    >>> dct[ 'bananas' ] = 11
-    Traceback (most recent call last):
-    ...
-    accretive.exceptions.IndelibleEntryError: Cannot update or remove existing entry for 'bananas'.
+>>> dct[ 'bananas' ] = 11
+Traceback (most recent call last):
+...
+accretive.exceptions.IndelibleEntryError: Cannot update or remove existing entry for 'bananas'.
 
 The entries thus remain unchanged.
 
-    >>> dct
-    accretive.dictionaries.Dictionary( {'apples': 12, 'bananas': 6, 'cherries': 42, 'blueberries': 96, 'strawberries': 24} )
+>>> dct
+accretive.dictionaries.Dictionary( {'apples': 12, 'bananas': 6, 'cherries': 42, 'blueberries': 96, 'strawberries': 24} )
 
 
 Installation
@@ -138,3 +143,36 @@ Installation
 ::
 
     pip install accretive
+
+
+`More Flair <https://www.imdb.com/title/tt0151804/characters/nm0431918>`_
+===============================================================================
+...than the required minimum
+
+.. image:: https://img.shields.io/github/last-commit/emcd/python-accretive
+   :alt: GitHub last commit
+   :target: https://github.com/emcd/python-accretive
+
+.. image:: https://img.shields.io/badge/%F0%9F%A5%9A-Hatch-4051b5.svg
+   :alt: Hatch
+   :target: https://github.com/pypa/hatch
+
+.. image:: https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit
+   :alt: pre-commit
+   :target: https://github.com/pre-commit/pre-commit
+
+.. image:: https://img.shields.io/badge/security-bandit-yellow.svg
+   :alt: Bandit
+   :target: https://github.com/PyCQA/bandit
+
+.. image:: https://www.mypy-lang.org/static/mypy_badge.svg
+   :alt: Mypy
+   :target: https://mypy-lang.org
+
+.. image:: https://img.shields.io/badge/linting-pylint-yellowgreen
+   :alt: Pylint
+   :target: https://github.com/PyCQA/pylint
+
+.. image:: https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json
+   :alt: Ruff
+   :target: https://github.com/astral-sh/ruff
