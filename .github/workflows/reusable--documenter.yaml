@@ -1,0 +1,88 @@
+name: Reusable Documenter
+
+on:
+  workflow_call:
+    inputs:
+      python-version:
+        required: true
+        type: string
+
+jobs:
+
+  generate:
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Prepare Python
+        uses: emcd/python-accretive/.github/actions/python-hatch@master
+        with:
+          python-version: '${{ inputs.python-version }}'
+
+      - name: Generate Documentation
+        id: generate
+        run: |
+          set -eu -o pipefail
+          hatch --env develop run docsgen
+          echo "version=$(hatch --env develop version 2>/dev/null)" >>${GITHUB_OUTPUT}
+          cat ${GITHUB_OUTPUT}
+        shell: bash
+
+      - name: Update Publications Store
+        id: update-store
+        # TODO: Split into documentataion preparation and packaging.
+        run: |
+          set -eu -o pipefail
+          version="${{ steps.generate.outputs.version }}"
+          publications_path="$(pwd)/.auxiliary/publications"
+          tarball_path="${publications_path}/website.tar.xz"
+          temp_path="$(pwd)/.auxiliary/artifacts/website"
+          html_path="${temp_path}/sphinx-html"
+          mkdir --parents "${publications_path}" "${html_path}"
+          if [[ -f ${tarball_path} ]]; then
+              tar --extract --file="${tarball_path}" --verbose --xz \
+                --directory="${temp_path}"; fi
+          rm --force --recursive "${html_path}/${version}"
+          mv '.auxiliary/artifacts/sphinx-html' "${html_path}/${version}"
+          if [[ ! -f "${temp_path}/versions.json" ]]; then
+            echo '{"versions": []}' > "${temp_path}/versions.json"; fi
+          jq --arg version "${version}" '.versions += [$version]' \
+            "${temp_path}/versions.json"
+          touch "${temp_path}/index.html"
+          touch "${temp_path}/.nojekyll"
+          git config --global user.name 'Github Actions Robot'
+          # TODO: Get email ID from context.
+          git config --global user.email 'emcd@users.noreply.github.com'
+          current_branch="$(git rev-parse --abbrev-ref HEAD)"
+          git fetch origin publication
+          git checkout publication
+          rm --force ${tarball_path}
+          pushd "${temp_path}"
+          tar --create --file="${tarball_path}" --verbose --xz *
+          popd
+          git add "${tarball_path}"
+          git commit -m "Update documents for publication."
+          git push origin publication
+          git checkout "${current_branch}"
+          echo "path=${temp_path}" >>${GITHUB_OUTPUT}
+          cat ${GITHUB_OUTPUT}
+        shell: bash
+
+      - name: Upload Pages Artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: '${{ steps.update-store.outputs.path }}'
+
+  publish:
+    needs: generate
+    permissions:
+      id-token: write # to verify deployment originates from appropriate source
+      pages: write    # to deploy to Pages
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+
+      - name: Deploy Pages Artifact
+        id: deployment
+        uses: actions/deploy-pages@v4

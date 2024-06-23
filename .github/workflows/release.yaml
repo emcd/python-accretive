@@ -20,13 +20,28 @@ jobs:
 
   # TODO: Run reusable tester.
 
+  docsgen:
+    needs: initialize
+    permissions:
+      contents: write
+      id-token: write
+      pages: write
+    uses: ./.github/workflows/reusable--documenter.yaml
+    with:
+      python-version: '${{ fromJSON(needs.initialize.outputs.python-versions)[0] }}'
+
   package:
     needs: initialize
+    permissions:
+      contents: write
+      id-token: write
     uses: ./.github/workflows/reusable--packager.yaml
     with:
       python-version: '${{ fromJSON(needs.initialize.outputs.python-versions)[0] }}'
 
+  # TODO: Factor into reusable packager.
   publish:
+    if: false
     needs: [initialize, package]
     runs-on: ubuntu-latest
     environment:
@@ -42,8 +57,6 @@ jobs:
         with:
           name: python-package-distributions--${{ github.run_id }}
           path: .auxiliary/artifacts/hatch-build/
-
-      # TODO: Publish version-specific documentation on Github pages.
 
       - name: Publish Distributions (PyPI)
         uses: pypa/gh-action-pypi-publish@release/v1
