@@ -106,24 +106,29 @@ Initial Installation
 
 2. Clone this repository.
 
-3. Ensure that you have installed
+3. Install Git LFS Git hooks in this repository:
+   ::
+
+       git lfs install
+
+4. Ensure that you have installed
    `Pipx <https://github.com/pypa/pipx/blob/main/README.md>`_.
    (If installing via ``pip``, you will want to use your system Python rather
    than the current global Python provided by Asdf, Mise, Pyenv, etc....)
 
-4. Ensure that you have installed
+5. Ensure that you have installed
    `Hatch <https://github.com/pypa/hatch/blob/master/README.md>`_ via Pipx:
    ::
 
        pipx install hatch
 
-5. Ensure that you have installed `pre-commit <https://pre-commit.com/>`_ via
+6. Ensure that you have installed `pre-commit <https://pre-commit.com/>`_ via
    Pipx:
    ::
 
        pipx install pre-commit
 
-6. Install Git pre-commit and pre-push hooks:
+7. Install Git pre-commit and pre-push hooks:
    ::
 
        pre-commit install --config .auxiliary/configuration/pre-commit.yaml
