@@ -46,12 +46,12 @@ jobs:
           if [[ ! -f "${temp_path}/versions.json" ]]; then
             echo '{"versions": []}' > "${temp_path}/versions.json"; fi
           jq --arg version "${version}" '.versions += [$version]' \
-            "${temp_path}/versions.json"
+            "${temp_path}/versions.json" >"${temp_path}/versions-temp.json"
+          mv --force "${temp_path}/versions-temp.json" "${temp_path}/versions.json"
           touch "${temp_path}/index.html"
           touch "${temp_path}/.nojekyll"
           git config --global user.name 'Github Actions Robot'
-          # TODO: Get email ID from context.
-          git config --global user.email 'emcd@users.noreply.github.com'
+          git config --global user.email '${{ github.actor }}@users.noreply.github.com'
           current_branch="$(git rev-parse --abbrev-ref HEAD)"
           git fetch origin publication
           git checkout publication

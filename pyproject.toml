@@ -32,7 +32,9 @@ name = 'Eric McDonald'
 email = 'emcd@users.noreply.github.com'
 [project.urls]
 'Homepage' = 'https://github.com/emcd/python-accretive'
+'Documentation' = 'https://emcd.github.io/python-accretive'
 'Source Code' = 'https://github.com/emcd/python-accretive'
+'Download' = 'https://pypi.org/project/accretive/#files'
 'Issue Tracker' = 'https://github.com/emcd/python-accretive/issues'
 
 [tool.SELF]
