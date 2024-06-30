@@ -68,10 +68,10 @@ Or deleted.
     ...
     accretive.exceptions.IndelibleAttributeError: Cannot reassign or delete existing attribute 'port'.
 
-New Attributes
+Attribute Assignment
 -------------------------------------------------------------------------------
 
-However, new attributes can be added.
+However, new attributes can be assigned.
 
 .. doctest:: Namespace
 

@@ -187,7 +187,7 @@ Installation
 
 .. image:: https://img.shields.io/badge/linting-pylint-yellowgreen
    :alt: Pylint
-   :target: https://github.com/PyCQA/pylint
+   :target: https://github.com/pylint-dev/pylint
 
 .. image:: https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json
    :alt: Ruff
