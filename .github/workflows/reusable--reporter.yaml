@@ -3,11 +3,6 @@ name: Reusable Reporter
 on:
   workflow_call:
     inputs:
-      publish:
-        description: 'Publish the generated reports?'
-        default: false
-        required: false
-        type: boolean
       python-version:
         required: true
         type: string
@@ -40,11 +35,8 @@ jobs:
           hatch --env develop run coverage xml --ignore-errors
         shell: bash
 
-      # TODO: Replace Codecov with Github-native solution.
-      - name: Publish Coverage Report
-        if: inputs.publish
-        uses: codecov/codecov-action@v4
-        env:
-          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+      - name: Preserve Coverage Reports
+        uses: actions/upload-artifact@v4
         with:
-          files: artifacts/coverage-pytest/coverage.xml
+          name: coverage-reports--${{ github.run_id }}
+          path: .auxiliary/artifacts/coverage-pytest
