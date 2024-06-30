@@ -69,20 +69,23 @@ python = '3.8'
 [tool.hatch.envs.develop]
 description = ''' Development environment. '''
 dependencies = [
+  'Mako',
   'bandit',
   'coverage[toml]',
   'furo',
   'hypothesis',
   'icecream',
   'mypy',
+  'packaging',
   'pylint',
   'pytest',
-  'semgrep',
   'ruff',
+  'semgrep',
   'sphinx',
   'sphinx-copybutton',
   'sphinx-inline-tabs',
   'towncrier',
+  'typer',
 ]
 [tool.hatch.envs.develop.env-vars]
 HYPOTHESIS_STORAGE_DIRECTORY = '.auxiliary/caches/hypothesis'
@@ -119,7 +122,7 @@ make-all = [
   'docsgen',
 ]
 [tool.hatch.envs.qa]
-description = ''' Quality ensurance environment. '''
+description = ''' Quality assurance environment. '''
 template = 'develop'
 [[tool.hatch.envs.qa.matrix]]
 python = [ '3.8', '3.9', '3.10', '3.11', '3.12', 'pypy3.9', 'pypy3.10' ]
