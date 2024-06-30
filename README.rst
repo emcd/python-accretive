@@ -43,7 +43,7 @@
 A Python library package which provides *accretive data structures*.
 
 Accretive data structures can grow at any time but can never shrink. An
-accretive dictionary accepts new entires, but cannot have existing entries
+accretive dictionary accepts new entries, but cannot have existing entries
 altered or removed. Similarly, an accretive namespace accepts new attributes,
 but cannot have existing attributes assigned to new values or deleted.
 
