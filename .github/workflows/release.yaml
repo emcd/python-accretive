@@ -27,14 +27,21 @@ jobs:
       python-versions: '${{ needs.initialize.outputs.python-versions }}'
       python-descriptors: '${{ needs.initialize.outputs.python-descriptors }}'
 
-  docsgen:
+  report:
     needs: [initialize, test]
+    uses: ./.github/workflows/reusable--reporter.yaml
+    with:
+      python-version: '${{ fromJSON(needs.initialize.outputs.python-versions)[0] }}'
+
+  docsgen:
+    needs: [initialize, report]
     permissions:
       contents: write
       id-token: write
       pages: write
     uses: ./.github/workflows/reusable--documenter.yaml
     with:
+      include-reports: true
       python-version: '${{ fromJSON(needs.initialize.outputs.python-versions)[0] }}'
 
   package:
