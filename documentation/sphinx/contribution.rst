@@ -250,31 +250,83 @@ Release Process
 Initial Release Candidate
 -------------------------------------------------------------------------------
 
-1. Checkout the ``master`` branch.
+1. Checkout ``master`` branch.
+
 2. Pull from upstream to ensure all changes have been synced.
+
 3. Checkout new release branch: ``release-<major>.<minor>``.
-4. Bump alpha to release candidate. Tag. Commit.
+
+4. Bump alpha to release candidate. Commit.
+   ::
+
+        hatch --env develop version rc
+
 5. Run Towncrier. Commit.
+   ::
+
+        hatch --env develop run towncrier build
+
+6. Tag.
+   ::
+
+        git tag v${rc_version}
+
 6. Push release branch and tag to upstream with tracking enabled.
-7. Bump alpha to next minor or major version on ``master`` branch. Tag. Commit.
-8. Cherry-pick Towncrier commit back to ``master`` branch.
+
+7. Checkout ``master`` branch.
+
+8. Bump alpha to next minor version on ``master`` branch. Commit.
+   ::
+
+        hatch --env develop version minor,alpha
+
+9. Cherry-pick Towncrier commit back to ``master`` branch.
+
+10. Tag.
+    ::
+
+        git tag v${alpha_version}
 
 Release
 -------------------------------------------------------------------------------
 
 1. Checkout release branch.
-2. Bump release candidate to release. Tag. Commit.
-3. Push release branch and tag to upstream.
-4. Run the ``release`` workflow in Github Actions, using the release tag.
+
+2. Bump release candidate to release. Commit.
+   ::
+
+        hatch --env develop version release
+
+3. Tag.
+   ::
+
+        git tag v${release_version}
+
+4. Push release branch and tag to upstream.
 
 Postrelease Patch
 -------------------------------------------------------------------------------
 
 1. Checkout release branch.
+
 2. Develop and test patch against branch. Add Towncrier entry. Commit.
-3. Bump release to patch or increment patch number. Tag. Commit.
+
+3. Bump release to patch or increment patch number. Commit.
+   ::
+
+        hatch --env develop version patch
+
 4. Run Towncrier. Commit.
-5. Push release branch and tag to upstream.
-6. Run the ``release`` workflow in Github Actions, using the release tag.
+   ::
+
+        hatch --env develop run towncrier build
+
+5. Tag.
+   ::
+
+        git tag v${patch_version}
+
+6. Push release branch and tag to upstream.
+
 7. Cherry-pick patch and Towncrier commit back to ``master`` branch, resolving
    conflicts as necessary.
