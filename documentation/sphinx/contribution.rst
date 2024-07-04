@@ -42,7 +42,7 @@ Specific Considerations
 * **Answering Questions**: Follow the `Stack Overflow guidelines on how to
   write a good answer <https://stackoverflow.com/help/how-to-answer>`_.
   However, avoid responses like "don't do that," as they can be perceived as
-  condescending.  Recommend rather than command.
+  condescending. Recommend rather than command.
 
 * **No Egotism**: Argue by facts and reason, not by appeals to authority or
   perceived popular opinion.
@@ -87,29 +87,28 @@ worth reading:
 Ways to Contribute
 ===============================================================================
 
-.. todo:: Link to issue tracker.
+* File bug reports and feature requests in the `issue tracker
+  <https://github.com/emcd/python-accretive/issues>`_. (Please try to avoid
+  duplicate issues.)
 
-Things to be Done
-===============================================================================
-
-.. todolist::
+* Fork the repository and submit `pull requests
+  <https://github.com/emcd/python-accretive/pulls>`_ to improve the library or
+  its documentation.
 
 Development
 ===============================================================================
-
-.. todo:: Link to development guide.
 
 Initial Installation
 -------------------------------------------------------------------------------
 
 1. Ensure that you have installed `Git LFS <https://git-lfs.com/>`_.
 
-2. Clone this repository.
+2. Clone your fork of the repository.
 
 3. Install Git LFS Git hooks in this repository:
    ::
 
-       git lfs install
+        git lfs install
 
 4. Ensure that you have installed
    `Pipx <https://github.com/pypa/pipx/blob/main/README.md>`_.
@@ -120,18 +119,18 @@ Initial Installation
    `Hatch <https://github.com/pypa/hatch/blob/master/README.md>`_ via Pipx:
    ::
 
-       pipx install hatch
+        pipx install hatch
 
 6. Ensure that you have installed `pre-commit <https://pre-commit.com/>`_ via
    Pipx:
    ::
 
-       pipx install pre-commit
+        pipx install pre-commit
 
 7. Install Git pre-commit and pre-push hooks:
    ::
 
-       pre-commit install --config .auxiliary/configuration/pre-commit.yaml
+        pre-commit install --config .auxiliary/configuration/pre-commit.yaml
 
 Installation Updates
 -------------------------------------------------------------------------------
@@ -139,12 +138,20 @@ Installation Updates
 1. Run:
    ::
 
-       git pull
+        git pull
 
 2. Remove the Hatch virtual environments:
    ::
 
-       hatch env prune
+        hatch env prune
+
+Python Interpreter
+-------------------------------------------------------------------------------
+
+1. Run:
+   ::
+
+        hatch --env develop run python
 
 Shell
 -------------------------------------------------------------------------------
@@ -152,7 +159,65 @@ Shell
 1. Run:
    ::
 
-       hatch --env develop shell
+        hatch --env develop shell
+
+Guidelines
+-------------------------------------------------------------------------------
+
+* Be sure to install the Git hooks, as mentioned in the ``Installation``
+  section. This will save you turnaround time from pull request validation
+  failures.
+
+* Maintain or improve the current level of code coverage. Even if code coverage
+  is at 100%, consider cases which are not explicitly tested.
+
+* Allow natural and expected Python exceptions to pass through the application
+  programming interface boundary. Raise an exception from the library for any
+  failure condition that arises from the use of the provided features that are
+  part of the interfaces of the underlying Python object types or functions.
+
+* Never swallow exceptions. Either chain a ``__cause__`` with a ``from``
+  original exception or raise a new exception with original exception as the
+  ``__context__``.
+
+* Avoid ancillary imports into a module namespace. Instead, place common
+  imports into the `__` base module or import at the function level. This
+  avoids pollution of the module namespace, which should only have public
+  attributes which relate to the interface that it is providing. This also
+  makes functions more relocatable, since they carry their dependencies with
+  them rather than rely on imports within the module which houses them.
+
+* Documentation must be written as Sphinx reStructuredText. The docstrings for
+  functions must not include parameter or return type documentation. Parameter
+  and return type documentation is handled via :pep:`727` annotations. Pull
+  requests, which include Markdown documentation or which attempt to provide
+  function docstrings in the style of Google, NumPy, Sphinx, etc..., will be
+  rejected.
+
+* Respect the existing code style. Pull requests, which attempt to enforce
+  the ``black`` style  or another style, will be rejected. A summary of the
+  style is:
+
+  - **Spacing**: Use spaces between identifiers and other tokens. Modern
+    writing systems use this convention, which emerged around the 7th century
+    of the Common Era, to improve readability. Computer code can generally be
+    written this way too... also to improve readability.
+
+  - **Line Width**: Follow :pep:`8` on this: no more than 79 columns for code
+    lines. Consider how long lines affect display on laptops or side-by-side
+    code panes with enlarged font sizes. (Enlarged font sizes are used to
+    reduce eye strain and allow people to code with visual correction.)
+
+  - **Vertical Compactness**: Function definitions, loop bodies, and condition
+    bodies, which consist of single statement and which are sufficiently short,
+    should be placed on the same line as the statement that introduces the
+    body. Blank lines should not be used to group statements within a function
+    body. If you need to group statements in a function, then perhaps the
+    function should be refactored into multiple functions. Function bodies
+    should not be longer than thirty lines long. I.e., one should not have to
+    scroll to read a function.
+
+* Use long option names, whenever possible, in command line examples.
 
 
 Internal Development Interface
@@ -177,3 +242,38 @@ Module ``accretive._docstrings``
 
 .. automodule:: accretive._docstrings
    :ignore-module-all: true
+
+
+Release Process
+===============================================================================
+
+Initial Release Candidate
+-------------------------------------------------------------------------------
+
+1. Checkout the ``master`` branch.
+2. Pull from upstream to ensure all changes have been synced.
+3. Checkout new release branch: ``release-<major>-<minor>``.
+4. Bump alpha to release candidate. Tag. Commit.
+5. Run Towncrier. Commit.
+6. Push release branch and tag to upstream with tracking enabled.
+7. Cherry-pick Towncrier commit back to ``master`` branch.
+
+Release
+-------------------------------------------------------------------------------
+
+1. Checkout release branch.
+2. Bump release candidate to release. Tag. Commit.
+3. Push release branch and tag to upstream.
+4. Run the ``release`` workflow in Github Actions, using the release tag.
+
+Postrelease Patch
+-------------------------------------------------------------------------------
+
+1. Checkout release branch.
+2. Develop and test patch against branch. Add Towncrier entry. Commit.
+3. Bump release to patch or increment patch number. Tag. Commit.
+4. Run Towncrier. Commit.
+5. Push release branch and tag to upstream.
+6. Run the ``release`` workflow in Github Actions, using the release tag.
+7. Cherry-pick patch and Towncrier commit back to ``master`` branch, resolving
+   conflicts as necessary.
