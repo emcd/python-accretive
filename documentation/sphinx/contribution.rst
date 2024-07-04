@@ -252,11 +252,12 @@ Initial Release Candidate
 
 1. Checkout the ``master`` branch.
 2. Pull from upstream to ensure all changes have been synced.
-3. Checkout new release branch: ``release-<major>-<minor>``.
+3. Checkout new release branch: ``release-<major>.<minor>``.
 4. Bump alpha to release candidate. Tag. Commit.
 5. Run Towncrier. Commit.
 6. Push release branch and tag to upstream with tracking enabled.
-7. Cherry-pick Towncrier commit back to ``master`` branch.
+7. Bump alpha to next minor or major version on ``master`` branch. Tag. Commit.
+8. Cherry-pick Towncrier commit back to ``master`` branch.
 
 Release
 -------------------------------------------------------------------------------
