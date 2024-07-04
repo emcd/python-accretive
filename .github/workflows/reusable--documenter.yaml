@@ -50,9 +50,12 @@ jobs:
           cat ${GITHUB_OUTPUT}
         shell: bash
 
-      # TODO: Sign commit with GPG key.
-      #       (Probably cannot use Github API to create commit,
-      #        because Git LFS filters will not run.)
+      # TODO: Sign commit with GPG key or use Github API.
+      #       If Github API, need to upload tarball to LFS endpoint first.
+      #       References:
+      #         https://github.com/orgs/community/discussions/24623
+      #         https://www.mattmoriarity.com/2019-04-25-uploading-media-with-git-lfs
+      #         https://github.com/AnesFoufa/githublfs/blob/main/githublfs.py
       - name: Update Publication Branch
         id: update-branch
         run: |
@@ -72,11 +75,13 @@ jobs:
         shell: bash
 
       - name: Upload Pages Artifact
+        if: startsWith(github.ref, 'refs/tags/')
         uses: actions/upload-pages-artifact@v3
         with:
           path: '${{ steps.update-branch.outputs.website }}'
 
   publish:
+    if: startsWith(github.ref, 'refs/tags/')
     needs: generate
     permissions:
       id-token: write # to verify deployment originates from appropriate source

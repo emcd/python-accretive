@@ -1,4 +1,4 @@
-name: Tester
+name: qa
 
 on:
   pull_request:

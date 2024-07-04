@@ -46,6 +46,7 @@ jobs:
           path: .auxiliary/artifacts/hatch-build/
 
   publish-pypi:
+    if: ${{ 'testpypi' == inputs.which-pypi || startsWith(github.ref, 'refs/tags/') }}
     needs: [package]
     runs-on: ubuntu-latest
     environment:
@@ -71,6 +72,7 @@ jobs:
           skip-existing: ${{ 'testpypi' == inputs.which-pypi }}
 
   publish-github:
+    if: startsWith(github.ref, 'refs/tags/')
     needs: [package, publish-pypi]
     runs-on: ubuntu-latest
     permissions:
