@@ -1,9 +1,10 @@
 name: release
 
 on:
+  push:
+    tags: [ 'v[1-9]+.*' ]
   workflow_dispatch:
     inputs:
-      # TODO: Flag for publication.
       which-pypi:
         description: 'Which Python package index?'
         required: true
@@ -54,4 +55,4 @@ jobs:
       pypi-api-urls: '${{ needs.initialize.outputs.pypi-api-urls }}'
       pypi-package-urls: '${{ needs.initialize.outputs.pypi-package-urls }}'
       python-version: '${{ fromJSON(needs.initialize.outputs.python-versions)[0] }}'
-      which-pypi: '${{ inputs.which-pypi }}'
+      which-pypi: "${{ inputs.which-pypi || 'pypi' }}"
