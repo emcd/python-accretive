@@ -36,40 +36,29 @@ jobs:
           hatch --env develop run docsgen
         shell: bash
 
-      - name: Update Website
-        id: update-website
-        run: |
-          set -eu -o pipefail
-          tarball="$(pwd)/.auxiliary/publications/website.tar.xz"
-          git fetch origin publication || true
-          git checkout publication -- "${tarball}" || true
-          version="$(hatch --env develop version 2>/dev/null)"
-          hatch --env develop run python .auxiliary/utilities/update-website.py "${version}"
-          git stash save --include-untracked 'website'
-          echo "tarball=${tarball}" >>${GITHUB_OUTPUT}
-          cat ${GITHUB_OUTPUT}
-        shell: bash
-
       # TODO: Sign commit with GPG key or use Github API.
       #       If Github API, need to upload tarball to LFS endpoint first.
       #       References:
       #         https://github.com/orgs/community/discussions/24623
       #         https://www.mattmoriarity.com/2019-04-25-uploading-media-with-git-lfs
       #         https://github.com/AnesFoufa/githublfs/blob/main/githublfs.py
-      - name: Update Publication Branch
-        id: update-branch
+      - name: Update Website
+        id: update-website
         run: |
           set -eu -o pipefail
           git config --global user.name 'Github Actions Robot'
           git config --global user.email '${{ github.actor }}@users.noreply.github.com'
-          current_branch="$(git rev-parse --abbrev-ref HEAD)"
-          git checkout publication || git checkout -b publication
-          rm --force '${{ steps.update-website.outputs.tarball }}'
-          git stash pop
-          git add '${{ steps.update-website.outputs.tarball }}'
-          git commit --message='Update documents for publication.'
-          git push origin publication
-          git checkout "${current_branch}"
+          tarball="$(pwd)/.auxiliary/publications/website.tar.xz"
+          git fetch origin publication || true
+          git checkout publication -- "${tarball}" || true
+          version="$(hatch --env develop version 2>/dev/null)"
+          hatch --env develop run python .auxiliary/utilities/update-website.py "${version}"
+          git add "${tarball}"
+          # Commit to publication branch without checkout.
+          # https://stackoverflow.com/a/66850396/14833542
+          git branch --force publication \
+            $(git commit-tree $(git write-tree) -p publication -m "Update documents for publication.")
+          git push origin publication:publication
           echo "website=$(pwd)/.auxiliary/artifacts/website" >>${GITHUB_OUTPUT}
           cat ${GITHUB_OUTPUT}
         shell: bash
@@ -78,7 +67,7 @@ jobs:
         if: startsWith(github.ref, 'refs/tags/')
         uses: actions/upload-pages-artifact@v3
         with:
-          path: '${{ steps.update-branch.outputs.website }}'
+          path: '${{ steps.update-website.outputs.website }}'
 
   publish:
     if: startsWith(github.ref, 'refs/tags/')
