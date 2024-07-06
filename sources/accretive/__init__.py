@@ -60,7 +60,7 @@ __doc__ = __.generate_docstring(
 
 
 __all__ = __.discover_public_attributes( globals( ) )
-__version__ = '1.1a0'
+__version__ = '1.0rc1'
 
 
 complete.modules.reclassify_modules( globals( ) )
