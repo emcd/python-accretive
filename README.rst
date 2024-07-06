@@ -32,6 +32,10 @@
    :alt: Tests Status
    :target: https://github.com/emcd/python-accretive/actions/workflows/tester.yaml
 
+.. image:: https://emcd.github.io/python-accretive/coverage.svg
+   :alt: Code Coverage Percentage
+   :target: https://github.com/emcd/python-accretive/actions/workflows/tester.yaml
+
 .. image:: https://img.shields.io/pypi/pyversions/accretive
    :alt: Python Versions
    :target: https://pypi.org/project/accretive/
