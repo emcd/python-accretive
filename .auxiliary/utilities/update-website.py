@@ -48,6 +48,8 @@ def main( version: str ):
         available_species.append( species )
     index_data = _update_versions_json( paths, version, available_species )
     _update_index_html( paths, index_data )
+    if ( paths.artifacts / 'coverage-pytest' ).is_dir( ):
+        _update_coverage_badge( paths )
     ( paths.website / '.nojekyll' ).touch( )
     with _springy_chdir( paths.website ):
         with tarfile_open( paths.archive, 'w:xz' ) as archive:
@@ -62,12 +64,22 @@ def _discover_paths( ):
     paths.auxiliary = paths.project / '.auxiliary'
     paths.publications = paths.auxiliary / 'publications'
     paths.archive = paths.publications / 'website.tar.xz'
-    paths.template = Path( __file__ ).parent / 'website.html.mako'
     paths.artifacts = paths.auxiliary / 'artifacts'
     paths.website = paths.artifacts / 'website'
+    paths.coverage = paths.website / 'coverage.svg'
     paths.index = paths.website / 'index.html'
     paths.versions = paths.website / 'versions.json'
     return paths
+
+
+def _extract_coverage( paths ):
+    from math import floor
+    from xml.etree import ElementTree # nosec
+    path = paths.artifacts / 'coverage-pytest/coverage.xml'
+    # nosemgrep
+    root = ElementTree.parse( path ).getroot( ) # nosec
+    coverage = float( root.get( 'line-rate' ) )
+    return floor( coverage * 100 )
 
 
 @_context_manager
@@ -79,10 +91,32 @@ def _springy_chdir( new_path ):
     chdir( old_path )
 
 
-def _update_index_html( paths, data ):
+def _update_coverage_badge( paths ):
+    from pathlib import Path
     from mako.template import Template
+    coverage = _extract_coverage( paths )
+    color = 'red' if coverage < 50 else 'yellow' if coverage < 80 else 'green'
+    label_text = 'coverage'
+    value_text = f"{coverage}%"
+    label_width = len( label_text ) * 6 + 10
+    value_width = len( value_text ) * 6 + 15
+    total_width = label_width + value_width
+    path = Path( __file__ ).parent / 'coverage.svg.mako'
     template = Template( # nosec use_of_mako_templates
-        filename = str( paths.template ) )
+        filename = str( path ) )
+    with paths.coverage.open( 'w' ) as file:
+        file.write( template.render(
+            color = color, total_width = total_width,
+            label_text = label_text, value_text = value_text,
+            label_width = label_width, value_width = value_width ) )
+
+
+def _update_index_html( paths, data ):
+    from pathlib import Path
+    from mako.template import Template
+    path = Path( __file__ ).parent / 'website.html.mako'
+    template = Template( # nosec use_of_mako_templates
+        filename = str( path ) )
     with paths.index.open( 'w' ) as file:
         file.write( template.render( **data ) )
 
