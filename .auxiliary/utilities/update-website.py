@@ -23,13 +23,17 @@
 # mypy: ignore-errors
 
 
+from contextlib import contextmanager as _context_manager
+
+
 def main( version: str ):
     ''' Runs website updater. '''
     from shutil import copytree, rmtree
     from tarfile import open as tarfile_open
     paths = _discover_paths( )
-    _ensure_paths( paths )
+    paths.publications.mkdir( exist_ok = True, parents = True )
     if paths.website.is_dir( ): rmtree( paths.website )
+    paths.website.mkdir( exist_ok = True, parents = True )
     if paths.archive.is_file( ):
         with tarfile_open( paths.archive, 'r:xz' ) as archive:
             archive.extractall( path = paths.website )
@@ -45,15 +49,16 @@ def main( version: str ):
     index_data = _update_versions_json( paths, version, available_species )
     _update_index_html( paths, index_data )
     ( paths.website / '.nojekyll' ).touch( )
-    with tarfile_open( paths.archive, 'w:xz' ) as archive:
-        archive.add( paths.website )
+    with _springy_chdir( paths.website ):
+        with tarfile_open( paths.archive, 'w:xz' ) as archive:
+            archive.add( '.' )
 
 
 def _discover_paths( ):
     from pathlib import Path
     from types import SimpleNamespace
     paths = SimpleNamespace( )
-    paths.project = Path( ) # TODO: Discover.
+    paths.project = Path( ).resolve( ) # TODO: Discover.
     paths.auxiliary = paths.project / '.auxiliary'
     paths.publications = paths.auxiliary / 'publications'
     paths.archive = paths.publications / 'website.tar.xz'
@@ -65,9 +70,13 @@ def _discover_paths( ):
     return paths
 
 
-def _ensure_paths( paths ):
-    paths.publications.mkdir( exist_ok = True, parents = True )
-    paths.website.mkdir( exist_ok = True, parents = True )
+@_context_manager
+def _springy_chdir( new_path ):
+    from os import chdir, getcwd
+    old_path = getcwd( )
+    chdir( new_path )
+    yield new_path
+    chdir( old_path )
 
 
 def _update_index_html( paths, data ):
