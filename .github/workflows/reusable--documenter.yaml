@@ -49,7 +49,7 @@ jobs:
           git config --global user.name 'Github Actions Robot'
           git config --global user.email '${{ github.actor }}@users.noreply.github.com'
           tarball="$(pwd)/.auxiliary/publications/website.tar.xz"
-          git fetch origin publication || true
+          git fetch origin publication:publication || true
           git checkout publication -- "${tarball}" || true
           version="$(hatch --env develop version 2>/dev/null)"
           hatch --env develop run python .auxiliary/utilities/update-website.py "${version}"
