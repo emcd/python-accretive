@@ -206,16 +206,16 @@ Guidelines
   - **Line Width**: Follow :pep:`8` on this: no more than 79 columns for code
     lines. Consider how long lines affect display on laptops or side-by-side
     code panes with enlarged font sizes. (Enlarged font sizes are used to
-    reduce eye strain and allow people to code with visual correction.)
+    reduce eye strain and allow people to code without visual correction.)
 
   - **Vertical Compactness**: Function definitions, loop bodies, and condition
-    bodies, which consist of single statement and which are sufficiently short,
-    should be placed on the same line as the statement that introduces the
-    body. Blank lines should not be used to group statements within a function
-    body. If you need to group statements in a function, then perhaps the
-    function should be refactored into multiple functions. Function bodies
-    should not be longer than thirty lines long. I.e., one should not have to
-    scroll to read a function.
+    bodies, which consist of a single statement and which are sufficiently
+    short, should be placed on the same line as the statement that introduces
+    the body. Blank lines should not be used to group statements within a
+    function body. If you need to group statements within a function body, then
+    perhaps the function should be refactored. Function bodies should not be
+    longer than thirty lines. I.e., one should not have to scroll to read a
+    function.
 
 * Use long option names, whenever possible, in command line examples.
 
