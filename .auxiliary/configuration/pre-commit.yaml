@@ -56,6 +56,14 @@ repos:
     fail_fast: true
     additional_dependencies: [ 'bandit[toml]' ]
 
+- repo: https://github.com/emcd/tryceratops
+  rev: toml
+  hooks:
+  - id: tryceratops
+    name: 'Lint: Tryceratops'
+    stages: [ 'push' ]
+    fail_fast: true
+
 - repo: https://github.com/pre-commit/mirrors-mypy
   rev: v1.10.0
   hooks:

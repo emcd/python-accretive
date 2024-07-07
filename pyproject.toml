@@ -85,6 +85,7 @@ dependencies = [
   'sphinx-copybutton',
   'sphinx-inline-tabs',
   'towncrier',
+  'tryceratops @ git+https://github.com/emcd/tryceratops@toml',
   'typer',
 ]
 [tool.hatch.envs.develop.env-vars]
@@ -100,8 +101,12 @@ docsgen = [
      documentation/sphinx .auxiliary/artifacts/sphinx-html''',
 ]
 linters = [
+  'ruff check --quiet sources documentation tests',
+  'bandit --configfile pyproject.toml --quiet --recursive sources',
+  'tryceratops sources',
   'mypy sources',
   'pylint sources documentation tests',
+  'semgrep --config p/python --error --quiet --skip-unknown-extensions sources',
 ]
 packagers = [
   'hatch build',
