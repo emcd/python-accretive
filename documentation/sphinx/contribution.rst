@@ -261,12 +261,7 @@ Initial Release Candidate
 
         hatch --env develop version rc
 
-5. Run Towncrier. Commit.
-   ::
-
-        hatch --env develop run towncrier build
-
-6. Tag.
+5. Tag.
    ::
 
         git tag v${rc_version}
@@ -297,12 +292,17 @@ Release
 
         hatch --env develop version release
 
-3. Tag.
+3. Run Towncrier. Commit.
+   ::
+
+        hatch --env develop run towncrier build
+
+4. Tag.
    ::
 
         git tag v${release_version}
 
-4. Push release branch and tag to upstream.
+5. Push release branch and tag to upstream.
 
 Postrelease Patch
 -------------------------------------------------------------------------------
