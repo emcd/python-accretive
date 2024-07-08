@@ -64,8 +64,13 @@ only-include = [ 'sources/accretive' ]
 only-include = [ 'sources/accretive' ]
 [tool.hatch.build.targets.wheel.sources]
 'sources/accretive' = 'accretive'
+[tool.hatch.env]
+requires = [ 'hatch-pip-compile' ]
 [tool.hatch.envs.default]
+type = 'pip-compile'
 python = '3.8'
+lock-filename = '.auxiliary/data/{env_name}.pipc'
+pip-compile-hashes = true
 [tool.hatch.envs.develop]
 description = ''' Development environment. '''
 dependencies = [
