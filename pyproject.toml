@@ -85,7 +85,7 @@ dependencies = [
   'sphinx-copybutton',
   'sphinx-inline-tabs',
   'towncrier',
-  'tryceratops @ git+https://github.com/emcd/tryceratops@toml',
+  'tryceratops',
   'typer',
 ]
 [tool.hatch.envs.develop.env-vars]
