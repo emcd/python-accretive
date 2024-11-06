@@ -26,14 +26,11 @@
 from . import __
 from . import aaliases
 from . import classes
-from . import complete
-from . import concealment
 from . import dictionaries
 from . import exceptions
 from . import modules
 from . import namespaces
 from . import objects
-from . import protection
 from . import qaliases
 
 from .classes import *
@@ -43,28 +40,9 @@ from .namespaces import *
 from .objects import *
 
 
-_subpackages = ( concealment, protection, complete )
-
-
-__doc__ = __.generate_docstring(
-    __.Docstring( __doc__ ),
-    'subpackage behavior: attributes accretion',
-    __.Docstring(
-        'Subpackages with variants of the data structures are available:' ),
-    __.Docstring( '\n\n'.join(
-        "* :py:mod:`{name}`: {headline}".format(
-            name = package.__package__,
-            headline = (
-                package.__doc__ or '' ).split( '\n', maxsplit = 1 )[ 0 ] )
-        for package in _subpackages ) ) )
-
-
 __all__ = __.discover_public_attributes( globals( ) )
 __version__ = '2.0a0'
 
 
-complete.modules.reclassify_modules( globals( ) )
-for _subpackage in _subpackages:
-    complete.modules.reclassify_modules( vars( _subpackage ) )
-_attribute_visibility_includes_ = frozenset( ( '__version__', ) )
-__.modules[ __package__ ].__class__ = complete.modules.Module
+modules.reclassify_modules( globals( ) )
+__.modules[ __package__ ].__class__ = modules.Module

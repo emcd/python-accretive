@@ -76,6 +76,7 @@ dependencies = [
   'icecream',
   'mypy',
   'packaging',
+  'pre-commit',
   'pylint',
   'pytest',
   'ruff',

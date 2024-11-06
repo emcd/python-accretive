@@ -28,5 +28,3 @@ Examples
    namespaces
    modules
    aliases
-   concealment
-   protection

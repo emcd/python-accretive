@@ -17,32 +17,39 @@
    +--------------------------------------------------------------------------+
 
 
-Concealment
+*******************************************************************************
+API
+*******************************************************************************
+
+
+Package ``accretive``
 ===============================================================================
 
-The ``accretive.concealment`` subpackage offers variants on the main package
-modules. These variants conceal all non-public attributes from the
-:py:func:`dir` function by default. Normally hidden attributes can be exposed
-on instances by providing a class attribute, named
-``_attribute_visibility_includes_``. A similar
-``_class_attribute_visibility_includes_`` attribute can be provided on
-metaclasses to conceal class attributes.
 
-.. doctest:: Concealment
+Module ``accretive``
+-------------------------------------------------------------------------------
 
-    >>> from accretive.concealment import Object
-    >>> class MyObject( Object ):
-    ...     _attribute_visibility_includes_ = frozenset( ( '__dunder_attr__', ) )
-    ...     def __init__( self ):
-    ...         super( ).__init__( )
-    ...         self.visible = 'hi'
-    ...         self._hidden = '*lurks*'
-    ...         self.__dunder_attr__ = 'hi!'
-    ...
-    >>> obj = MyObject( )
-    >>> dir( obj )
-    ['__dunder_attr__', 'visible']
-    >>> obj._hidden
-    '*lurks*'
-    >>> obj.__dict__
-    {'visible': 'hi', '_hidden': '*lurks*', '__dunder_attr__': 'hi!'}
+.. automodule:: accretive
+   :imported-members:
+
+
+Module ``accretive.exceptions``
+-------------------------------------------------------------------------------
+
+.. automodule:: accretive.exceptions
+
+
+Module ``accretive.aaliases``
+-------------------------------------------------------------------------------
+
+.. automodule:: accretive.aaliases
+   :imported-members:
+   :noindex:
+
+
+Module ``accretive.qaliases``
+-------------------------------------------------------------------------------
+
+.. automodule:: accretive.qaliases
+   :imported-members:
+   :noindex:

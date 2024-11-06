@@ -25,7 +25,10 @@
 
 
 from abc import ABCMeta as ABCFactory
-from collections.abc import Mapping as AbstractDictionary
+from collections.abc import (
+    Collection as AbstractCollection,
+    Mapping as AbstractDictionary,
+)
 from functools import partial as partial_function
 from inspect import cleandoc as clean_docstring
 from sys import modules
@@ -47,9 +50,10 @@ class ClassConcealerExtension( type ):
         By default, public attributes are displayed.
     '''
 
-    _class_attribute_visibility_includes_: _a.Collection[ str ] = frozenset( )
+    _class_attribute_visibility_includes_: AbstractCollection[ str ] = (
+        frozenset( ) )
 
-    def __dir__( class_ ) -> _a.Tuple[ str, ... ]:
+    def __dir__( class_ ) -> tuple[ str, ... ]:
         return tuple( sorted(
             name for name in super( ).__dir__( )
             if  not name.startswith( '_' )
@@ -62,9 +66,9 @@ class ConcealerExtension:
         By default, public attributes are displayed.
     '''
 
-    _attribute_visibility_includes_: _a.Collection[ str ] = frozenset( )
+    _attribute_visibility_includes_: AbstractCollection[ str ] = frozenset( )
 
-    def __dir__( self ) -> _a.Tuple[ str, ... ]:
+    def __dir__( self ) -> tuple[ str, ... ]:
         return tuple( sorted(
             name for name in super( ).__dir__( )
             if  not name.startswith( '_' )
