@@ -110,8 +110,7 @@ Initial Installation
 
         git lfs install
 
-4. Ensure that you have installed
-   `Pipx <https://github.com/pypa/pipx/blob/main/README.md>`_.
+4. Ensure that you have installed `Pipx <https://pipx.pypa.io/stable/>`_.
    (If installing via ``pip``, you will want to use your system Python rather
    than the current global Python provided by Asdf, Mise, Pyenv, etc....)
 

@@ -92,6 +92,8 @@ linkcheck_ignore = [
     # Circular dependency between building HTML and publishing it.
     # Ideally, we want to warn on failure rather than ignore.
     fr'https://emcd\.github\.io/.*{project}.*/.*',
+    # Stack Overflow rate limits too aggressively, which breaks matrix builds.
+    r'https://stackoverflow\.com/help/.*',
 ]
 
 # -- Options for HTML output -------------------------------------------------
@@ -125,7 +127,7 @@ autodoc_default_options = {
 intersphinx_mapping = {
     'python': (
         'https://docs.python.org/3', None),
-    'typing_extensions': (
+    'typing-extensions': (
         'https://typing-extensions.readthedocs.io/en/latest', None),
 }
 
