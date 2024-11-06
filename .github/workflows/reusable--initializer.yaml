@@ -54,12 +54,10 @@ jobs:
           set -eu
           python_descriptors="$(jq --compact-output <<EOF
           {
-            "3.8": {"hatch": "py3.8"},
-            "3.9": {"hatch": "py3.9"},
             "3.10": {"hatch": "py3.10"},
             "3.11": {"hatch": "py3.11"},
             "3.12": {"hatch": "py3.12"},
-            "pypy3.9": {"hatch": "pypy3.9"},
+            "3.13": {"hatch": "py3.13"},
             "pypy3.10": {"hatch": "pypy3.10"}
           }
           EOF
@@ -74,12 +72,9 @@ jobs:
         id: matrix-exclusions
         run: |
           set -eu
-          # Python 3.8 on MacOS seems not to be well-maintained.
           # PyPy has slow I/O, even slower on Windows.
           pairs="$(jq --compact-output <<EOF
           [
-            {"platform": "macos-latest", "python-version": "3.8"},
-            {"platform": "windows-latest", "python-version": "pypy3.9"},
             {"platform": "windows-latest", "python-version": "pypy3.10"}
           ]
           EOF

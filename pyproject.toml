@@ -8,20 +8,19 @@ description = 'Accretive data structures.'
 dynamic = [ 'version' ]
 license = 'Apache-2.0'
 readme = { 'file' = 'README.rst', 'content-type' = 'text/x-rst' }
-requires-python = '>= 3.8'
+requires-python = '>= 3.10'
 dependencies = [
-  'typing_extensions',
+  'typing-extensions',
 ]
 classifiers = [ # https://pypi.org/classifiers
   'Development Status :: 5 - Production/Stable',
   'Intended Audience :: Developers',
   'License :: OSI Approved :: Apache Software License',
   'Programming Language :: Python :: 3 :: Only',
-  'Programming Language :: Python :: 3.8',
-  'Programming Language :: Python :: 3.9',
   'Programming Language :: Python :: 3.10',
   'Programming Language :: Python :: 3.11',
   'Programming Language :: Python :: 3.12',
+  'Programming Language :: Python :: 3.13',
   'Programming Language :: Python :: Implementation :: CPython',
   'Programming Language :: Python :: Implementation :: PyPy',
   'Topic :: Software Development',
@@ -65,7 +64,7 @@ only-include = [ 'sources/accretive' ]
 [tool.hatch.build.targets.wheel.sources]
 'sources/accretive' = 'accretive'
 [tool.hatch.envs.default]
-python = '3.8'
+python = '3.10'
 [tool.hatch.envs.develop]
 description = ''' Development environment. '''
 dependencies = [
@@ -85,6 +84,7 @@ dependencies = [
   'sphinx-copybutton',
   'sphinx-inline-tabs',
   'towncrier',
+  'tryceratops',
   'typer',
 ]
 [tool.hatch.envs.develop.env-vars]
@@ -100,8 +100,12 @@ docsgen = [
      documentation/sphinx .auxiliary/artifacts/sphinx-html''',
 ]
 linters = [
+  'ruff check --quiet sources documentation tests',
+  'bandit --configfile pyproject.toml --quiet --recursive sources',
+  'tryceratops sources',
   'mypy sources',
   'pylint sources documentation tests',
+  'semgrep --config p/python --error --quiet --skip-unknown-extensions sources',
 ]
 packagers = [
   'hatch build',
@@ -125,7 +129,7 @@ make-all = [
 description = ''' Quality assurance environment. '''
 template = 'develop'
 [[tool.hatch.envs.qa.matrix]]
-python = [ '3.8', '3.9', '3.10', '3.11', '3.12', 'pypy3.9', 'pypy3.10' ]
+python = [ '3.10', '3.11', '3.12', '3.13', 'pypy3.10' ]
 [tool.hatch.version]
 path = 'sources/accretive/__init__.py'
 
