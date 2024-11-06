@@ -80,7 +80,9 @@ nitpick_ignore = [
     ( 'py:class', "module" ),
     ( 'py:class',
       "v, remove specified key and return the corresponding value." ),
-    # Workaround for missing 'typing_extensions' documentation.
+    # Workaround for "missing" 'typing_extensions' documentation.
+    # (The objects.inv file exists for Intersphinx, but something is broken.)
+    ( 'py:class', "typing_extensions.Annotated" ),
     ( 'py:class', "typing_extensions.Any" ),
     ( 'py:class', "typing_extensions.Never" ),
     ( 'py:class', "typing_extensions.Self" ),

@@ -39,14 +39,6 @@ Module ``accretive.exceptions``
 .. automodule:: accretive.exceptions
 
 
-Module ``accretive.aaliases``
--------------------------------------------------------------------------------
-
-.. automodule:: accretive.aaliases
-   :imported-members:
-   :noindex:
-
-
 Module ``accretive.qaliases``
 -------------------------------------------------------------------------------
 

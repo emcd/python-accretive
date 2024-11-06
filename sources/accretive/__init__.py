@@ -24,7 +24,6 @@
 
 
 from . import __
-from . import aaliases
 from . import classes
 from . import dictionaries
 from . import exceptions
