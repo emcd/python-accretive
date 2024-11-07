@@ -86,6 +86,9 @@ nitpick_ignore = [
     ( 'py:class', "typing_extensions.Any" ),
     ( 'py:class', "typing_extensions.Never" ),
     ( 'py:class', "typing_extensions.Self" ),
+    # Other weirdnesses.
+    ( 'py:class', 'Doc' ),
+    ( 'py:class', 'types.Annotated' ),
 ]
 
 # -- Options for linkcheck builder -------------------------------------------

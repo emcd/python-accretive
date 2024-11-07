@@ -24,30 +24,30 @@
 from __future__ import annotations
 
 from . import __
-from . import _annotations as _a
 
 
 class Class( type ):
     ''' Accretive classes. '''
 
     def __new__(
-        factory: _a.Type[ type ],
+        factory: type[ type ],
         name: str,
-        bases: _a.Tuple[ type, ... ],
-        namespace: _a.MutableMapping[ str, _a.Any ],
+        bases: tuple[ type, ... ],
+        namespace: __.cabc.MutableMapping[ str, __.a.Any ],
         docstring: str = None,
-        **nomargs: _a.Any
+        **nomargs: __.a.Any
     ) -> Class:
         if docstring: namespace[ '__doc__' ] = docstring
-        return _a.cast(
+        return __.a.cast( # type: ignore[no-any-return]
             Class,
-            super( ).__new__( factory, name, bases, namespace, **nomargs ) )
+            super( ).__new__( # type: ignore[misc]
+                factory, name, bases, namespace, **nomargs ) )
 
     def __delattr__( class_, name: str ) -> None:
         from .exceptions import IndelibleAttributeError
         raise IndelibleAttributeError( name )
 
-    def __setattr__( class_, name: str, value: _a.Any ) -> None:
+    def __setattr__( class_, name: str, value: __.a.Any ) -> None:
         from .exceptions import IndelibleAttributeError
         if hasattr( class_, name ): raise IndelibleAttributeError( name )
         # Note: CPython cell class is not set in all circumstances.
@@ -68,7 +68,8 @@ Class.__doc__ = __.generate_docstring(
 class ABCFactory( Class, __.ABCFactory ): # type: ignore[misc]
     ''' Accretive abstract base classes (ABC). '''
 
-    def __setattr__( class_, name: str, value: _a.Any ) -> None:
+    def __setattr__( class_, name: str, value: __.a.Any ) -> None:
+        # TODO: Disarm accretive behavior until initialization complete.
         # Bypass accretion machinery for ABC magic attributes.
         if ( # pylint: disable=magic-value-comparison
             '__abstractmethods__' == name or name.startswith( '_abc_' )

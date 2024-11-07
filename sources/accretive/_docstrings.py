@@ -24,7 +24,7 @@
 from types import MappingProxyType as _DictionaryProxy
 
 
-TABLE = _DictionaryProxy( {
+TABLE: _DictionaryProxy[ str, str ] = _DictionaryProxy( {
 
     'abc attributes exemption': '''
 Derived from and compatible with :py:class:`abc.ABCMeta`. The

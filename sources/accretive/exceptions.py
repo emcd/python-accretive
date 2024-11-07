@@ -22,7 +22,6 @@
 
 
 from . import __ # pylint: disable=cyclic-import
-from . import _annotations as _a
 from . import classes as _classes # pylint: disable=cyclic-import
 from . import objects as _objects # pylint: disable=cyclic-import
 
@@ -36,7 +35,7 @@ class Omniexception(
 ):
     ''' Base for exceptions raised by package API. '''
 
-    _attribute_visibility_includes_: _a.Collection[ str ] = (
+    _attribute_visibility_includes_: __.cabc.Collection[ str ] = (
         frozenset( ( '__cause__', '__context__', ) ) )
 
 
@@ -51,7 +50,7 @@ class IndelibleAttributeError( Omniexception, AttributeError, TypeError ):
 class IndelibleEntryError( Omniexception, TypeError ):
     ''' Attempt to update or remove indelible dictionary entry. '''
 
-    def __init__( self, indicator: _a.Any ) -> None:
+    def __init__( self, indicator: __.a.Any ) -> None:
         super( ).__init__(
             f"Cannot update or remove existing entry for {indicator!r}." )
 

@@ -22,7 +22,6 @@
 
 
 from . import __
-from . import _annotations as _a
 
 
 class Module( __.Module ): # type: ignore[misc]
@@ -32,7 +31,7 @@ class Module( __.Module ): # type: ignore[misc]
         from .exceptions import IndelibleAttributeError
         raise IndelibleAttributeError( name )
 
-    def __setattr__( self, name: str, value: _a.Any ) -> None:
+    def __setattr__( self, name: str, value: __.a.Any ) -> None:
         from .exceptions import IndelibleAttributeError
         if hasattr( self, name ): raise IndelibleAttributeError( name )
         super( ).__setattr__( name, value )
@@ -41,7 +40,7 @@ Module.__doc__ = __.generate_docstring(
     Module, 'description of module', 'module attributes accretion' )
 
 
-reclassify_modules: _a.ModuleReclassifier = __.partial_function(
+reclassify_modules: __.ModuleReclassifier = __.partial_function(
     __.reclassify_modules, to_class = Module )
 
 

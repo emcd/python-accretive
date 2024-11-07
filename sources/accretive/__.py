@@ -24,21 +24,49 @@
 # pylint: disable=unused-import
 
 
+import collections.abc as cabc
+
 from abc import ABCMeta as ABCFactory
-from collections.abc import (
-    Collection as AbstractCollection,
-    Mapping as AbstractDictionary,
-)
 from functools import partial as partial_function
 from inspect import cleandoc as clean_docstring
 from sys import modules
 from types import (
     MappingProxyType as DictionaryProxy,
     ModuleType as Module,
+    NotImplementedType as TypeofNotImplemented,
     SimpleNamespace,
 )
 
-from . import _annotations as _a
+from . import _annotations as a
+
+
+ComparisonResult: a.TypeAlias = bool | TypeofNotImplemented
+DictionaryNominativeArgument: a.TypeAlias = a.Annotation[
+    a.Any,
+    a.Doc(
+        'Zero or more keyword arguments from which to initialize '
+        'dictionary data.' )
+]
+# TODO: Support taking our dictionaries, themselves, as arguments.
+#       Supposed to work via structural typing, but must match protocol.
+#       https://github.com/python/mypy/issues/2922
+#       https://github.com/python/mypy/issues/2922#issuecomment-1186587232
+#       https://github.com/python/typing/discussions/1127#discussioncomment-2538837
+#       https://mypy.readthedocs.io/en/latest/protocols.html
+DictionaryPositionalArgument: a.TypeAlias = a.Annotation[
+        cabc.Mapping[ cabc.Hashable, a.Any ]
+    |   cabc.Iterable[ tuple[ cabc.Hashable, a.Any] ],
+    a.Doc(
+        'Zero or more iterables from which to initialize dictionary data. '
+        'Each iterable must be dictionary or sequence of key-value pairs. '
+        'Duplicate keys will result in an error.' )
+]
+DictionaryProducer: a.TypeAlias = a.Annotation[
+    cabc.Callable[ [ ], a.Any ],
+    a.Doc( 'Callable which produces values for absent dictionary entries.' )
+]
+ModuleReclassifier: a.TypeAlias = cabc.Callable[
+    [ cabc.Mapping[ str, a.Any ] ], None ]
 
 
 _no_value = object( )
@@ -50,7 +78,7 @@ class ClassConcealerExtension( type ):
         By default, public attributes are displayed.
     '''
 
-    _class_attribute_visibility_includes_: AbstractCollection[ str ] = (
+    _class_attribute_visibility_includes_: cabc.Collection[ str ] = (
         frozenset( ) )
 
     def __dir__( class_ ) -> tuple[ str, ... ]:
@@ -66,7 +94,7 @@ class ConcealerExtension:
         By default, public attributes are displayed.
     '''
 
-    _attribute_visibility_includes_: AbstractCollection[ str ] = frozenset( )
+    _attribute_visibility_includes_: cabc.Collection[ str ] = frozenset( )
 
     def __dir__( self ) -> tuple[ str, ... ]:
         return tuple( sorted(
@@ -85,54 +113,54 @@ class CoreDictionary( ConcealerExtension, dict ): # type: ignore[type-arg]
 
     def __init__(
         self,
-        *iterables: _a.DictionaryPositionalArgument,
-        **entries: _a.DictionaryNominativeArgument
+        *iterables: DictionaryPositionalArgument,
+        **entries: DictionaryNominativeArgument
     ):
         super( ).__init__( )
         self.update( *iterables, **entries )
 
-    def __delitem__( self, key: _a.Hashable ) -> None:
+    def __delitem__( self, key: cabc.Hashable ) -> None:
         from .exceptions import IndelibleEntryError
         raise IndelibleEntryError( key )
 
-    def __setitem__( self, key: _a.Hashable, value: _a.Any ) -> None:
+    def __setitem__( self, key: cabc.Hashable, value: a.Any ) -> None:
         from .exceptions import IndelibleEntryError
         if key in self: raise IndelibleEntryError( key )
         super( ).__setitem__( key, value )
 
-    def clear( self ) -> _a.Never:
+    def clear( self ) -> a.Never:
         ''' Raises exception. Cannot clear indelible entries. '''
         from .exceptions import InvalidOperationError
         raise InvalidOperationError( 'clear' )
 
-    def copy( self ) -> _a.Self:
+    def copy( self ) -> a.Self:
         ''' Provides fresh copy of dictionary. '''
         return type( self )( self )
 
     def pop( # pylint: disable=unused-argument
-        self, key: _a.Hashable, default: _a.Any = _no_value
-    ) -> _a.Never:
+        self, key: cabc.Hashable, default: a.Any = _no_value
+    ) -> a.Never:
         ''' Raises exception. Cannot pop indelible entry. '''
         from .exceptions import InvalidOperationError
         raise InvalidOperationError( 'pop' )
 
-    def popitem( self ) -> _a.Never:
+    def popitem( self ) -> a.Never:
         ''' Raises exception. Cannot pop indelible entry. '''
         from .exceptions import InvalidOperationError
         raise InvalidOperationError( 'popitem' )
 
-    def update( # type: ignore[override]
+    def update(
         self,
-        *iterables: _a.DictionaryPositionalArgument,
-        **entries: _a.DictionaryNominativeArgument
-    ) -> _a.Self:
+        *iterables: DictionaryPositionalArgument,
+        **entries: DictionaryNominativeArgument
+    ) -> a.Self:
         ''' Adds new entries as a batch. '''
         from itertools import chain
         # Add values in order received, enforcing no alteration.
         for indicator, value in chain.from_iterable( map(
             lambda element: (
                 element.items( )
-                if isinstance( element, AbstractDictionary )
+                if isinstance( element, cabc.Mapping )
                 else element
             ),
             ( *iterables, entries )
@@ -144,15 +172,15 @@ class Docstring( str ):
     ''' Dedicated docstring container. '''
 
 
-def discover_fqname( obj: _a.Any ) -> str:
+def discover_fqname( obj: a.Any ) -> str:
     ''' Discovers fully-qualified name for class of instance. '''
     class_ = type( obj )
     return f"{class_.__module__}.{class_.__qualname__}"
 
 
 def discover_public_attributes(
-    attributes: _a.Mapping[ str, _a.Any ]
-) -> _a.Tuple[ str, ... ]:
+    attributes: cabc.Mapping[ str, a.Any ]
+) -> tuple[ str, ... ]:
     ''' Discovers public attributes of certain types from dictionary.
 
         By default, callables, including classes, are discovered.
@@ -163,7 +191,7 @@ def discover_public_attributes(
 
 
 def generate_docstring(
-    *fragment_ids: _a.Union[ _a.Type, Docstring, str ]
+    *fragment_ids: type | Docstring | str
 ) -> str:
     ''' Sews together docstring fragments into clean docstring. '''
     from inspect import cleandoc, getdoc, isclass
@@ -172,14 +200,14 @@ def generate_docstring(
     for fragment_id in fragment_ids:
         if isclass( fragment_id ): fragment = getdoc( fragment_id ) or ''
         elif isinstance( fragment_id, Docstring ): fragment = fragment_id
-        else: fragment = TABLE[ fragment_id ]
+        else: fragment = TABLE[ fragment_id ] # type: ignore
         fragments.append( cleandoc( fragment ) )
     return '\n\n'.join( fragments )
 
 
 def reclassify_modules(
-    attributes: _a.Mapping[ str, _a.Any ],
-    to_class: _a.Type[ Module ]
+    attributes: cabc.Mapping[ str, a.Any ],
+    to_class: type[ Module ]
 ) -> None:
     ''' Reclassifies modules in dictionary with custom module type. '''
     for attribute in attributes.values( ):

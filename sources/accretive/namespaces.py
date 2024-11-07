@@ -22,7 +22,6 @@
 
 
 from . import __
-from . import _annotations as _a
 from . import objects as _objects
 
 
@@ -31,8 +30,8 @@ class Namespace( _objects.Object ): # pylint: disable=eq-without-hash
 
     def __init__(
         self,
-        *iterables: _a.DictionaryPositionalArgument,
-        **attributes: _a.DictionaryNominativeArgument
+        *iterables: __.DictionaryPositionalArgument,
+        **attributes: __.DictionaryNominativeArgument
     ) -> None:
         super( ).__init__( )
         super( ).__getattribute__( '__dict__' ).update(
@@ -46,16 +45,16 @@ class Namespace( _objects.Object ): # pylint: disable=eq-without-hash
         if not attributes: return f"{fqname}( )"
         return f"{fqname}( {attributes} )"
 
-    def __eq__( self, other: _a.Any ) -> _a.ComparisonResult:
+    def __eq__( self, other: __.a.Any ) -> __.ComparisonResult:
         mydict = super( ).__getattribute__( '__dict__' )
         if isinstance( other, ( Namespace, __.SimpleNamespace ) ):
-            return mydict == other.__dict__ # type: ignore[no-any-return]
+            return mydict == other.__dict__
         return NotImplemented
 
-    def __ne__( self, other: _a.Any ) -> _a.ComparisonResult:
+    def __ne__( self, other: __.a.Any ) -> __.ComparisonResult:
         mydict = super( ).__getattribute__( '__dict__' )
         if isinstance( other, ( Namespace, __.SimpleNamespace ) ):
-            return mydict != other.__dict__ # type: ignore[no-any-return]
+            return mydict != other.__dict__
         return NotImplemented
 
 Namespace.__doc__ = __.generate_docstring(
