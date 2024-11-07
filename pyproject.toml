@@ -78,6 +78,7 @@ dependencies = [
   'packaging',
   'pre-commit',
   'pylint',
+  'pyright',
   'pytest',
   'ruff',
   'semgrep',

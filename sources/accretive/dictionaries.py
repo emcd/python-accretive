@@ -34,7 +34,10 @@ class _Dictionary( # type: ignore
 _no_value: object = object( )
 
 
-class Dictionary( _objects.Object ): # pylint: disable=eq-without-hash
+class Dictionary( # pylint: disable=eq-without-hash
+    _objects.Object,
+    __.a.Generic[ __.H, __.V ], # type: ignore[misc]
+):
     ''' Accretive dictionary. '''
 
     __slots__ = ( '_data_', )
@@ -49,7 +52,7 @@ class Dictionary( _objects.Object ): # pylint: disable=eq-without-hash
         self._data_ = _Dictionary( *iterables, **entries )
         super( ).__init__( )
 
-    def __iter__( self ) -> __.cabc.Iterator[ __.cabc.Hashable ]:
+    def __iter__( self ) -> __.cabc.Iterator[ __.H ]:
         return iter( self._data_ )
 
     def __len__( self ) -> int:
@@ -128,13 +131,16 @@ Dictionary.__doc__ = __.generate_docstring(
     'dictionary entries accretion',
     'instance attributes accretion',
 )
-# Register as subclass of AbstractDictionary rather than use it as mixin.
+# Register as subclass of Mapping rather than use it as mixin.
 # We directly implement, for the sake of efficiency, the methods which the
 # mixin would provide.
 __.cabc.Mapping.register( Dictionary )
 
 
-class ProducerDictionary( Dictionary ):
+class ProducerDictionary(
+    Dictionary,
+    __.a.Generic[ __.H, __.V ], # type: ignore[misc]
+):
     ''' Accretive dictionary with default value for missing entries. '''
 
     __slots__ = ( '_producer_', )

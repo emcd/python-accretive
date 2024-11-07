@@ -28,9 +28,11 @@ from typing_extensions import (
     Annotated as Annotation,
     Any,
     Doc,
+    Generic,
     Never,
     Self,
     TypeAlias,
+    TypeVar,
     cast,
 )
 

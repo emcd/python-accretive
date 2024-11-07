@@ -40,6 +40,10 @@ from types import (
 from . import _annotations as a
 
 
+H = a.TypeVar( 'H', bound = cabc.Hashable )
+V = a.TypeVar( 'V' )
+
+
 ComparisonResult: a.TypeAlias = bool | TypeofNotImplemented
 DictionaryNominativeArgument: a.TypeAlias = a.Annotation[
     a.Any,
