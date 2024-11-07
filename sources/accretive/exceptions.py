@@ -33,13 +33,18 @@ class Omniexception(
     __.ConcealerExtension, _objects.Object, BaseException,
     metaclass = _Class,
 ):
-    ''' Base for exceptions raised by package API. '''
+    ''' Base for all exceptions raised by package API. '''
+    # TODO: Immutable class and object attributes.
 
     _attribute_visibility_includes_: __.cabc.Collection[ str ] = (
         frozenset( ( '__cause__', '__context__', ) ) )
 
 
-class IndelibleAttributeError( Omniexception, AttributeError, TypeError ):
+class Omnierror( Omniexception, Exception ):
+    ''' Base for error exceptions raised by package API. '''
+
+
+class IndelibleAttributeError( Omnierror, AttributeError, TypeError ):
     ''' Attempt to reassign or delete indelible attribute. '''
 
     def __init__( self, name: str ) -> None:
@@ -47,7 +52,7 @@ class IndelibleAttributeError( Omniexception, AttributeError, TypeError ):
             f"Cannot reassign or delete existing attribute {name!r}." )
 
 
-class IndelibleEntryError( Omniexception, TypeError ):
+class IndelibleEntryError( Omnierror, TypeError ):
     ''' Attempt to update or remove indelible dictionary entry. '''
 
     def __init__( self, indicator: __.a.Any ) -> None:
@@ -55,11 +60,8 @@ class IndelibleEntryError( Omniexception, TypeError ):
             f"Cannot update or remove existing entry for {indicator!r}." )
 
 
-class InvalidOperationError( Omniexception, RuntimeError, TypeError ):
+class InvalidOperationError( Omnierror, RuntimeError, TypeError ):
     ''' Attempt to perform invalid operation. '''
 
     def __init__( self, name: str ) -> None:
         super( ).__init__( f"Cannot perform operation {name!r}." )
-
-
-__all__ = __.discover_public_attributes( globals( ) )

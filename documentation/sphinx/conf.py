@@ -82,12 +82,13 @@ nitpick_ignore = [
       "v, remove specified key and return the corresponding value." ),
     # Other weirdnesses. (Something is broken in how Sphinx autodoc processes
     # certain typing forms.)
+    ( 'py:class', "Doc" ),
+    ( 'py:class', "NotImplementedType" ),
     ( 'py:class', "collections.abc.Annotated" ),
     ( 'py:class', "typing_extensions.Annotated" ),
     ( 'py:class', "typing_extensions.Any" ),
     ( 'py:class', "typing_extensions.Never" ),
     ( 'py:class', "typing_extensions.Self" ),
-    ( 'py:class', "Doc" ),
     ( 'py:class', "types.Annotated" ),
     ( 'py:obj', "accretive.__.H" ),
     ( 'py:obj', "accretive.__.V" ),

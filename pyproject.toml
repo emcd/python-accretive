@@ -184,6 +184,8 @@ valid-metaclass-classmethod-first-arg = [ 'maker', 'factory' ]
 ignored-parents = [
   'abc.ABCMeta',
   'accretive.__.ClassConcealerExtension',
+  'accretive.exceptions.Omniexception',
+  'accretive.exceptions.Omnierror',
   'accretive.objects.Class',
   'accretive.objects.Object',
   'builtins.AttributeError',
@@ -272,6 +274,10 @@ dummy-variables-rgx = '''_$'''
 ignored-argument-names = '''_.*'''
 redefining-builtins-modules = [ 'builtins', 'io' ]
 
+[tool.pyright]
+reportSelfClsParameterName = false
+stubPath = 'sources/accretive/_typedecls'
+
 [tool.pytest.ini_options]
 # Note: Cannot run doctests from Pytest, because Pytest tries to update '_'
 #       attribute on protected modules. Instead, we use Sphinx to run doctests.
@@ -283,6 +289,7 @@ python_functions = [ 'test_[0-9][0-9][0-9]_*' ]
 cache_dir = '.auxiliary/caches/pytest'
 
 [tool.ruff]
+builtins = [ 'ic' ]
 cache-dir = '.auxiliary/caches/ruff'
 [tool.ruff.lint]
 ignore = [

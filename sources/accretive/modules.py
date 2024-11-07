@@ -40,8 +40,13 @@ Module.__doc__ = __.generate_docstring(
     Module, 'description of module', 'module attributes accretion' )
 
 
-reclassify_modules: __.ModuleReclassifier = __.partial_function(
-    __.reclassify_modules, to_class = Module )
-
-
-__all__ = __.discover_public_attributes( globals( ) )
+def reclassify_modules(
+    attributes: __.cabc.Mapping[ str, __.a.Any ],
+    to_class: type[ Module ] = Module
+) -> None:
+    ''' Reclassifies modules in dictionary with custom module type. '''
+    from inspect import ismodule
+    for attribute in attributes.values( ):
+        if not ismodule( attribute ): continue
+        if isinstance( attribute, to_class ): continue
+        attribute.__class__ = to_class

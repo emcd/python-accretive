@@ -182,6 +182,3 @@ ProducerDictionary.__doc__ = __.generate_docstring(
     'dictionary entries production',
     'instance attributes accretion',
 )
-
-
-__all__ = __.discover_public_attributes( globals( ) )

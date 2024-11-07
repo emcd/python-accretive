@@ -207,17 +207,3 @@ def generate_docstring(
         else: fragment = TABLE[ fragment_id ] # type: ignore
         fragments.append( cleandoc( fragment ) )
     return '\n\n'.join( fragments )
-
-
-def reclassify_modules(
-    attributes: cabc.Mapping[ str, a.Any ],
-    to_class: type[ Module ]
-) -> None:
-    ''' Reclassifies modules in dictionary with custom module type. '''
-    for attribute in attributes.values( ):
-        if not isinstance( attribute, Module ): continue
-        if isinstance( attribute, to_class ): continue
-        attribute.__class__ = to_class
-
-
-__all__ = ( )

@@ -43,7 +43,6 @@ MODULE_ATTRIBUTE_NAMES = (
     'discover_fqname',
     'discover_public_attributes',
     'generate_docstring',
-    'reclassify_modules',
 )
 
 exceptions = cache_import_module( f"{PACKAGE_NAME}.exceptions" )
@@ -222,23 +221,3 @@ def test_501_docstring_generation_validity( ):
         'foo bar',
         module.generate_docstring( 'class attributes accretion' ) ) )
     assert docstring_expected == docstring_generated
-
-
-def test_600_module_reclassification( ):
-    ''' Modules are correctly reclassified. '''
-    from types import ModuleType as Module
-    m1 = Module( 'm1' )
-    m2 = Module( 'm2' )
-
-    class FooModule( Module ):
-        ''' test '''
-
-    m3 = FooModule( 'm3' )
-    attrs = { 'bar': 42, 'orb': True, 'm1': m1, 'm2': m2, 'm3': m3 }
-    assert not isinstance( m1, FooModule )
-    assert not isinstance( m2, FooModule )
-    assert isinstance( m3, FooModule )
-    module.reclassify_modules( attrs, FooModule )
-    assert isinstance( m1, FooModule )
-    assert isinstance( m2, FooModule )
-    assert isinstance( m3, FooModule )

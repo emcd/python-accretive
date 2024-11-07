@@ -55,6 +55,3 @@ class Object:
 
 Object.__doc__ = __.generate_docstring(
     Object, 'instance attributes accretion' )
-
-
-__all__ = __.discover_public_attributes( globals( ) )

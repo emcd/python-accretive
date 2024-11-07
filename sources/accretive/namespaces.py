@@ -59,6 +59,3 @@ class Namespace( _objects.Object ): # pylint: disable=eq-without-hash
 
 Namespace.__doc__ = __.generate_docstring(
     Namespace, 'description of namespace', 'instance attributes accretion' )
-
-
-__all__ = __.discover_public_attributes( globals( ) )

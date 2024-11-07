@@ -79,6 +79,28 @@ def test_101_accretion( module_qname, class_name ):
     'module_qname, class_name',
     product( THESE_MODULE_QNAMES, THESE_CLASSES_NAMES )
 )
+def test_500_module_reclassification( module_qname, class_name ):
+    ''' Modules are correctly reclassified. '''
+    module = cache_import_module( module_qname )
+    Module = getattr( module, class_name )
+    from types import ModuleType as Module_
+    m1 = Module_( 'm1' )
+    m2 = Module_( 'm2' )
+    m3 = Module( 'm3' )
+    attrs = { 'bar': 42, 'orb': True, 'm1': m1, 'm2': m2, 'm3': m3 }
+    assert not isinstance( m1, Module )
+    assert not isinstance( m2, Module )
+    assert isinstance( m3, Module )
+    module.reclassify_modules( attrs )
+    assert isinstance( m1, Module )
+    assert isinstance( m2, Module )
+    assert isinstance( m3, Module )
+
+
+@pytest.mark.parametrize(
+    'module_qname, class_name',
+    product( THESE_MODULE_QNAMES, THESE_CLASSES_NAMES )
+)
 def test_900_docstring_sanity( module_qname, class_name ):
     ''' Class has valid docstring. '''
     module = cache_import_module( module_qname )

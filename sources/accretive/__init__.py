@@ -39,7 +39,6 @@ from .namespaces import *
 from .objects import *
 
 
-__all__ = __.discover_public_attributes( globals( ) )
 __version__ = '2.0a0'
 
 

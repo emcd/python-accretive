@@ -84,6 +84,3 @@ ABCFactory.__doc__ = __.generate_docstring(
     'class attributes accretion',
     'abc attributes exemption',
 )
-
-
-__all__ = __.discover_public_attributes( globals( ) )

@@ -84,6 +84,3 @@ but cannot have existing attributes assigned to new values or deleted.
 ''',
 
 } )
-
-
-__all__ = ( )

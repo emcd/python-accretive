@@ -18,31 +18,11 @@
 #============================================================================#
 
 
-''' Qualified aliases to accretive data structures.
+''' Stubs for additional "builtin" types. '''
 
-    Useful for avoiding namespace collisions from attribute imports.
-'''
-
-# ruff: noqa: F401
-# pylint: disable=unused-import
+# https://github.com/microsoft/pyright/blob/main/docs/builtins.md
 
 
-from . import __
-from .classes import (
-    ABCFactory as           AccretiveABCFactory,
-    Class as                AccretiveClass,
-)
-from .dictionaries import (
-    Dictionary as           AccretiveDictionary,
-    ProducerDictionary as   AccretiveProducerDictionary,
-)
-from .modules import (
-    Module as               AccretiveModule,
-    reclassify_modules as   reclassify_modules_as_accretive,
-)
-from .namespaces import (
-    Namespace as            AccretiveNamespace,
-)
-from .objects import (
-    Object as               AccretiveObject,
-)
+from icecream import IceCreamDebugger # type: ignore
+
+ic: IceCreamDebugger

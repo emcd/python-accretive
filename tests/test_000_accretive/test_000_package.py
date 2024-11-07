@@ -111,30 +111,6 @@ def test_017_miscellaneous_attribute_visibility( aname ):
     assert aname in dir( package )
 
 
-@pytest.mark.parametrize( 'package_name', PACKAGES_NAMES )
-def test_030_wildcard_exportation( package_name ):
-    ''' Package provides wildcard exports. '''
-    package = cache_import_module( package_name )
-    assert hasattr( package, '__all__' )
-    assert isinstance( package.__all__, tuple )
-
-
-@pytest.mark.parametrize( 'package_name', PACKAGES_NAMES )
-def test_031_wildcard_exports_existence( package_name ):
-    ''' Wildcard exports are attributes of package. '''
-    package = cache_import_module( package_name )
-    exports = frozenset( package.__all__ )
-    assert exports == exports & package.__dict__.keys( )
-
-
-@pytest.mark.parametrize( 'package_name', PACKAGES_NAMES )
-def test_032_wildcard_exports_visibility( package_name ):
-    ''' Wildcard exports are in package attributes directory. '''
-    package = cache_import_module( package_name )
-    exports = frozenset( package.__all__ )
-    assert exports == exports & frozenset( dir( package ) )
-
-
 @pytest.mark.parametrize( 'module_qname', MODULES_QNAMES )
 def test_100_sanity( module_qname ):
     ''' Package module is sane. '''
@@ -142,27 +118,3 @@ def test_100_sanity( module_qname ):
     module = cache_import_module( module_qname )
     assert module.__package__ == package_name
     assert module.__name__ == module_qname
-
-
-@pytest.mark.parametrize( 'module_qname', MODULES_QNAMES )
-def test_130_wildcard_exportation( module_qname ):
-    ''' Package module provides wildcard exports. '''
-    module = cache_import_module( module_qname )
-    assert hasattr( module, '__all__' )
-    assert isinstance( module.__all__, tuple )
-
-
-@pytest.mark.parametrize( 'module_qname', MODULES_QNAMES )
-def test_131_wildcard_exports_existence( module_qname ):
-    ''' Wildcard exports are attributes of package module. '''
-    module = cache_import_module( module_qname )
-    exports = frozenset( module.__all__ )
-    assert exports == exports & module.__dict__.keys( )
-
-
-@pytest.mark.parametrize( 'module_qname', MODULES_QNAMES )
-def test_132_wildcard_exports_visibility( module_qname ):
-    ''' Wildcard exports are in package module attributes directory. '''
-    module = cache_import_module( module_qname )
-    exports = frozenset( module.__all__ )
-    assert exports == exports & frozenset( dir( module ) )
