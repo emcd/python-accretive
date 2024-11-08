@@ -59,6 +59,11 @@ When an attempt to access a missing entry is made, then the entry is added with
 a default value. Modeled after :py:class:`collections.defaultdict`.
 ''',
 
+    'dictionary entries validation': '''
+When an attempt to add a new entry is made, then the entry is validated against
+supplied criteria. If validation fails, then the entry is rejected.
+''',
+
     'instance attributes accretion': '''
 Prevents reassignment or deletion of instance attributes after they have been
 assigned. Only assignment of new instance attributes is permitted.

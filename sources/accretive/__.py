@@ -49,7 +49,7 @@ DictionaryNominativeArgument: a.TypeAlias = a.Annotation[
     a.Any,
     a.Doc(
         'Zero or more keyword arguments from which to initialize '
-        'dictionary data.' )
+        'dictionary data.' ),
 ]
 # TODO: Support taking our dictionaries, themselves, as arguments.
 #       Supposed to work via structural typing, but must match protocol.
@@ -63,11 +63,15 @@ DictionaryPositionalArgument: a.TypeAlias = a.Annotation[
     a.Doc(
         'Zero or more iterables from which to initialize dictionary data. '
         'Each iterable must be dictionary or sequence of key-value pairs. '
-        'Duplicate keys will result in an error.' )
+        'Duplicate keys will result in an error.' ),
 ]
 DictionaryProducer: a.TypeAlias = a.Annotation[
     cabc.Callable[ [ ], a.Any ],
-    a.Doc( 'Callable which produces values for absent dictionary entries.' )
+    a.Doc( 'Callable which produces values for absent dictionary entries.' ),
+]
+DictionaryValidator: a.TypeAlias = a.Annotation[
+    cabc.Callable[ [ cabc.Hashable, a.Any ], bool ],
+    a.Doc( 'Callable which validates entries before addition to dictionary.' ),
 ]
 ModuleReclassifier: a.TypeAlias = cabc.Callable[
     [ cabc.Mapping[ str, a.Any ] ], None ]

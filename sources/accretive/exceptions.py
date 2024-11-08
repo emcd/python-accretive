@@ -44,6 +44,14 @@ class Omnierror( Omniexception, Exception ):
     ''' Base for error exceptions raised by package API. '''
 
 
+class EntryValidationError( Omnierror, ValueError ):
+    ''' Attempt to add invalid entry to dictionary. '''
+
+    def __init__( self, key: __.cabc.Hashable, value: __.a.Any ) -> None:
+        super( ).__init__(
+            f"Cannot add invalid entry ( {key!r}, {value!r} ) to dictionary." )
+
+
 class IndelibleAttributeError( Omnierror, AttributeError, TypeError ):
     ''' Attempt to reassign or delete indelible attribute. '''
 

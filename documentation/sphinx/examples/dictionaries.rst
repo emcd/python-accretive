@@ -267,3 +267,103 @@ the equality comparison; only data is compared; this is the same behavior as
 
     >>> ddct2 == { 'foo': 1, 'bar': 2, 'orb': True }
     True
+
+Validator Dictionary
+===============================================================================
+
+Validator dictionaries ensure that all entries satisfy specified criteria. The first
+argument to the initializer must be a callable which accepts a key and value and
+returns a boolean indicating whether the entry is valid. Any additional arguments
+are treated the same as for the simple dictionary.
+
+.. doctest:: ValidatorDictionary
+
+    >>> from accretive import ValidatorDictionary
+
+Let us illustrate this with a dictionary that only accepts integer values.
+
+.. doctest:: ValidatorDictionary
+
+    >>> numbers = ValidatorDictionary( lambda k, v: isinstance( v, int ) )
+    >>> numbers[ 'answer' ] = 42
+    >>> numbers[ 'pi' ] = 3
+    >>> numbers
+    accretive.dictionaries.ValidatorDictionary( <function <lambda> at 0x...>, {'answer': 42, 'pi': 3} )
+
+Invalid entries are rejected.
+
+.. doctest:: ValidatorDictionary
+
+    >>> numbers[ 'e' ] = 2.718
+    Traceback (most recent call last):
+    ...
+    accretive.exceptions.EntryValidationError: Cannot add invalid entry ('e', 2.718) to dictionary.
+
+This includes attempts to add invalid entries via update.
+
+.. doctest:: ValidatorDictionary
+
+    >>> numbers.update( phi = 1.618 )
+    Traceback (most recent call last):
+    ...
+    accretive.exceptions.EntryValidationError: Cannot add invalid entry ('phi', 1.618) to dictionary.
+
+Producer-Validator Dictionary
+===============================================================================
+
+Producer-validator dictionaries combine the behaviors of producer and validator
+dictionaries. The first argument must be a producer callable, and the second
+must be a validator callable. Any additional arguments are treated the same as
+for the simple dictionary.
+
+.. doctest:: ProducerValidatorDictionary
+
+    >>> from accretive import ProducerValidatorDictionary
+
+A common use case is to automatically initialize data structures of a specific
+type while ensuring that only those types can be stored.
+
+.. doctest:: ProducerValidatorDictionary
+
+    >>> registries = ProducerValidatorDictionary(
+    ...     list,
+    ...     lambda k, v: isinstance( v, list )
+    ... )
+    >>> registries
+    accretive.dictionaries.ProducerValidatorDictionary( <class 'list'>, <function <lambda> at 0x...>, {} )
+
+The producer must create values that satisfy the validator.
+
+.. doctest:: ProducerValidatorDictionary
+
+    >>> handlers = registries[ 'handlers' ]  # Produces new list
+    >>> handlers.append( 'default_handler' )
+    >>> registries[ 'plugins' ] = [ ]  # Valid manual assignment
+    >>> registries
+    accretive.dictionaries.ProducerValidatorDictionary( <class 'list'>, <function <lambda> at 0x...>, {'handlers': ['default_handler'], 'plugins': []} )
+
+Invalid entries are rejected, whether assigned directly or via update.
+
+.. doctest:: ProducerValidatorDictionary
+
+    >>> registries[ 'modules' ] = { }  # Not a list
+    Traceback (most recent call last):
+    ...
+    accretive.exceptions.EntryValidationError: Cannot add invalid entry ('modules', {}) to dictionary.
+    >>> registries.update( callbacks = set( ) )  # Not a list
+    Traceback (most recent call last):
+    ...
+    accretive.exceptions.EntryValidationError: Cannot add invalid entry ('callbacks', set()) to dictionary.
+
+If the producer returns an invalid value, the entry is rejected.
+
+.. doctest:: ProducerValidatorDictionary
+
+    >>> bad_registries = ProducerValidatorDictionary(
+    ...     dict,  # Produces dictionaries
+    ...     lambda k, v: isinstance( v, list )  # Requires lists
+    ... )
+    >>> bad_registries[ 'anything' ]  # Production fails validation
+    Traceback (most recent call last):
+    ...
+    accretive.exceptions.EntryValidationError: Cannot add invalid entry ('anything', {}) to dictionary.

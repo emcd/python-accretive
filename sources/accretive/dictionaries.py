@@ -182,3 +182,150 @@ ProducerDictionary.__doc__ = __.generate_docstring(
     'dictionary entries production',
     'instance attributes accretion',
 )
+
+
+class ValidatorDictionary(
+    Dictionary,
+    __.a.Generic[ __.H, __.V ], # type: ignore[misc]
+):
+    ''' Accretive dictionary with validation of new entries. '''
+
+    __slots__ = ( '_validator_', )
+
+    _validator_: __.DictionaryValidator
+
+    def __init__(
+        self,
+        validator: __.DictionaryValidator,
+        /,
+        *iterables: __.DictionaryPositionalArgument,
+        **entries: __.DictionaryNominativeArgument,
+    ) -> None:
+        self._validator_ = validator
+        super( ).__init__( *iterables, **entries )
+
+    def __repr__( self ) -> str:
+        return "{fqname}( {validator}, {contents} )".format(
+            fqname = __.discover_fqname( self ),
+            validator = self._validator_,
+            contents = str( self._data_ ) )
+
+    def __setitem__( self, key: __.cabc.Hashable, value: __.a.Any ) -> None:
+        if not self._validator_( key, value ):
+            from .exceptions import EntryValidationError
+            raise EntryValidationError( key, value )
+        super( ).__setitem__( key, value )
+
+    def copy( self ) -> __.a.Self:
+        ''' Provides fresh copy of dictionary. '''
+        dictionary = type( self )( self._validator_ )
+        return dictionary.update( self )
+
+    def update(
+        self,
+        *iterables: __.DictionaryPositionalArgument,
+        **entries: __.DictionaryNominativeArgument,
+    ) -> __.a.Self:
+        ''' Adds new entries as a batch. '''
+        from itertools import chain
+        # Validate all entries before adding any
+        for indicator, value in chain.from_iterable( map(
+            lambda element: (
+                element.items( )
+                if isinstance( element, __.cabc.Mapping )
+                else element
+            ),
+            ( *iterables, entries )
+        ) ):
+            if not self._validator_( indicator, value ):
+                from .exceptions import EntryValidationError
+                raise EntryValidationError( indicator, value )
+        return super( ).update( *iterables, **entries )
+
+ValidatorDictionary.__doc__ = __.generate_docstring(
+    ValidatorDictionary,
+    'dictionary entries accretion',
+    'dictionary entries validation',
+    'instance attributes accretion',
+)
+
+
+class ProducerValidatorDictionary(
+    Dictionary,
+    __.a.Generic[ __.H, __.V ], # type: ignore[misc]
+):
+    ''' Accretive dictionary with defaults and validation. '''
+
+    __slots__ = ( '_producer_', '_validator_' )
+
+    _producer_: __.DictionaryProducer
+    _validator_: __.DictionaryValidator
+
+    def __init__(
+        self,
+        producer: __.DictionaryProducer,
+        validator: __.DictionaryValidator,
+        /,
+        *iterables: __.DictionaryPositionalArgument,
+        **entries: __.DictionaryNominativeArgument,
+    ) -> None:
+        self._producer_ = producer
+        self._validator_ = validator
+        super( ).__init__( *iterables, **entries )
+
+    def __repr__( self ) -> str:
+        return "{fqname}( {producer}, {validator}, {contents} )".format(
+            fqname = __.discover_fqname( self ),
+            producer = self._producer_,
+            validator = self._validator_,
+            contents = str( self._data_ ) )
+
+    def __getitem__( self, key: __.cabc.Hashable ) -> __.a.Any:
+        if key not in self:
+            value = self._producer_( )
+            if not self._validator_( key, value ):
+                from .exceptions import EntryValidationError
+                raise EntryValidationError( key, value )
+            self[ key ] = value
+        else: value = super( ).__getitem__( key )
+        return value
+
+    def __setitem__( self, key: __.cabc.Hashable, value: __.a.Any ) -> None:
+        if not self._validator_( key, value ):
+            from .exceptions import EntryValidationError
+            raise EntryValidationError( key, value )
+        super( ).__setitem__( key, value )
+
+    def copy( self ) -> __.a.Self:
+        ''' Provides fresh copy of dictionary. '''
+        dictionary = type( self )( self._producer_, self._validator_ )
+        return dictionary.update( self )
+
+    def update(
+        self,
+        *iterables: __.DictionaryPositionalArgument,
+        **entries: __.DictionaryNominativeArgument,
+    ) -> __.a.Self:
+        ''' Adds new entries as a batch. '''
+        from itertools import chain
+        # Validate all entries before adding any
+        for indicator, value in chain.from_iterable( map(
+            lambda element: (
+                element.items( )
+                if isinstance( element, __.cabc.Mapping )
+                else element
+            ),
+            ( *iterables, entries )
+        ) ):
+            if not self._validator_( indicator, value ):
+                from .exceptions import EntryValidationError
+                raise EntryValidationError( indicator, value )
+        return super( ).update( *iterables, **entries )
+
+ProducerValidatorDictionary.__doc__ = __.generate_docstring(
+    ProducerValidatorDictionary,
+    'dictionary entries accretion',
+    'dictionary entries production',
+    'dictionary entries validation',
+    'instance attributes accretion',
+)
