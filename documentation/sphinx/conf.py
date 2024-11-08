@@ -85,6 +85,7 @@ nitpick_ignore = [
     ( 'py:class', "Doc" ),
     ( 'py:class', "NotImplementedType" ),
     ( 'py:class', "collections.abc.Annotated" ),
+    ( 'py:class', "typing_extensions._ProtocolMeta" ),
     ( 'py:class', "typing_extensions.Annotated" ),
     ( 'py:class', "typing_extensions.Any" ),
     ( 'py:class', "typing_extensions.Never" ),

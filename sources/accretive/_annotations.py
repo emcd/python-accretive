@@ -30,6 +30,7 @@ from typing_extensions import (
     Doc,
     Generic,
     Never,
+    Protocol,
     Self,
     TypeAlias,
     TypeVar,

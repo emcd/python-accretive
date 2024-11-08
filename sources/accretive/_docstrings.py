@@ -26,13 +26,6 @@ from types import MappingProxyType as _DictionaryProxy
 
 TABLE: _DictionaryProxy[ str, str ] = _DictionaryProxy( {
 
-    'abc attributes exemption': '''
-Derived from and compatible with :py:class:`abc.ABCMeta`. The
-``__abstractmethods__`` class attribute and the class attributes, whose names
-start with ``_abc_``, are exempt from the accretion mechanism so that the
-internal method abstraction machinery can function correctly.
-''',
-
     'class attributes accretion': '''
 Prevents reassignment or deletion of class attributes after they have been
 assigned. Only assignment of new class attributes is permitted.

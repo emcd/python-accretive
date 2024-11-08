@@ -85,11 +85,11 @@ class ClassConcealerExtension( type ):
     _class_attribute_visibility_includes_: cabc.Collection[ str ] = (
         frozenset( ) )
 
-    def __dir__( class_ ) -> tuple[ str, ... ]:
+    def __dir__( selfclass ) -> tuple[ str, ... ]:
         return tuple( sorted(
             name for name in super( ).__dir__( )
             if  not name.startswith( '_' )
-                or name in class_._class_attribute_visibility_includes_ ) )
+                or name in selfclass._class_attribute_visibility_includes_ ) )
 
 
 class ConcealerExtension:

@@ -27,6 +27,7 @@
 import pytest
 
 from itertools import product
+from platform import python_implementation
 
 from . import (
     MODULES_QNAMES,
@@ -37,14 +38,15 @@ from . import (
 
 THESE_MODULE_QNAMES = tuple(
     name for name in MODULES_QNAMES if name.endswith( '.classes' ) )
-ABC_FACTORIES_NAMES = ( 'ABCFactory', )
-THESE_CLASSES_NAMES = ( 'Class', *ABC_FACTORIES_NAMES, )
-NONABC_FACTORIES_NAMES = tuple(
-    name for name in THESE_CLASSES_NAMES
-    if name not in ABC_FACTORIES_NAMES )
+THESE_CLASSES_NAMES = ( 'Class', 'ABCFactory', 'ProtocolClass' )
 
 base = cache_import_module( f"{PACKAGE_NAME}.__" )
 exceptions = cache_import_module( f"{PACKAGE_NAME}.exceptions" )
+
+pypy_skip_mark = pytest.mark.skipif(
+    'PyPy' == python_implementation( ),
+    reason = "PyPy handles class cell updates differently"
+)
 
 
 @pytest.mark.parametrize(
@@ -95,7 +97,161 @@ def test_101_accretion( module_qname, class_name ):
     'module_qname, class_name',
     product( THESE_MODULE_QNAMES, THESE_CLASSES_NAMES )
 )
-def test_102_docstring_assignment( module_qname, class_name ):
+def test_110_class_decorators( module_qname, class_name ):
+    ''' Class accepts and applies decorators correctly. '''
+    module = cache_import_module( module_qname )
+    class_factory_class = getattr( module, class_name )
+    decorator_calls = [ ]
+
+    def test_decorator1( cls ):
+        decorator_calls.append( 'decorator1' )
+        cls.decorator1_attr = 'value1'
+        return cls
+
+    def test_decorator2( cls ):
+        decorator_calls.append( 'decorator2' )
+        cls.decorator2_attr = 'value2'
+        return cls
+
+    class Object(
+        metaclass = class_factory_class,
+        decorators = ( test_decorator1, test_decorator2 )
+    ):
+        ''' test '''
+        attr = 42
+
+        _class_behaviors_ = { 'foo' }
+
+    assert [ 'decorator1', 'decorator2' ] == decorator_calls
+    assert 'value1' == Object.decorator1_attr
+    assert 'value2' == Object.decorator2_attr
+    with pytest.raises( exceptions.IndelibleAttributeError ):
+        Object.decorator1_attr = 'new_value'
+    with pytest.raises( exceptions.IndelibleAttributeError ):
+        Object.decorator2_attr = 'new_value'
+
+
+@pypy_skip_mark
+@pytest.mark.parametrize(
+    'module_qname, class_name',
+    product( THESE_MODULE_QNAMES, THESE_CLASSES_NAMES )
+)
+def test_111_class_decorator_reproduction_method( module_qname, class_name ):
+    ''' Class handles decorator reproduction with super() method. '''
+    module = cache_import_module( module_qname )
+    class_factory_class = getattr( module, class_name )
+    from dataclasses import dataclass
+
+    class Object(
+        metaclass = class_factory_class,
+        decorators = ( dataclass( slots = True ), )
+    ):
+        ''' test '''
+        value: str = 'test'
+
+        def method_with_super( self ):
+            ''' References class cell on CPython. '''
+            super( ).__init__( )
+            return self.__class__.__name__
+
+        def other_method_with_super( self ):
+            ''' References class cell on CPython. '''
+            super( ).__init__( )
+            return 'other'
+
+    # Verify class was properly reproduced and both methods work
+    obj = Object( )
+    assert 'Object' == obj.method_with_super( )
+    assert 'other' == obj.other_method_with_super( )
+
+
+@pypy_skip_mark
+@pytest.mark.parametrize(
+    'module_qname, class_name',
+    product( THESE_MODULE_QNAMES, THESE_CLASSES_NAMES )
+)
+def test_112_class_decorator_reproduction_property( module_qname, class_name ):
+    ''' Class handles decorator reproduction with dotted access property. '''
+    module = cache_import_module( module_qname )
+    class_factory_class = getattr( module, class_name )
+    from dataclasses import dataclass
+
+    class Object(
+        metaclass = class_factory_class,
+        decorators = ( dataclass( slots = True ), )
+    ):
+        ''' test '''
+        value: str = 'test'
+
+        @property
+        def prop_with_class( self ):
+            ''' References class cell on CPython. '''
+            return self.__class__.__name__
+
+        @property
+        def other_prop_with_class( self ):
+            ''' References class cell on CPython. '''
+            return f"other_{self.__class__.__name__}"
+
+    # Verify class was properly reproduced and both properties work
+    obj = Object( )
+    assert 'Object' == obj.prop_with_class
+    assert 'other_Object' == obj.other_prop_with_class
+
+
+@pypy_skip_mark
+@pytest.mark.parametrize(
+    'module_qname, class_name',
+    product( THESE_MODULE_QNAMES, THESE_CLASSES_NAMES )
+)
+def test_113_class_decorator_reproduction_no_cell( module_qname, class_name ):
+    ''' Class handles decorator reproduction with no class cell. '''
+    module = cache_import_module( module_qname )
+    class_factory_class = getattr( module, class_name )
+    from dataclasses import dataclass
+
+    class Object(
+        metaclass = class_factory_class,
+        decorators = ( dataclass( slots = True ), )
+    ):
+        ''' test '''
+        value: str = 'test'
+
+        def method_without_cell( self ): # pylint: disable=no-self-use
+            ''' Operates without class cell on CPython. '''
+            return 'no_cell'
+
+    # Verify class was properly reproduced
+    obj = Object()
+    assert 'no_cell' == obj.method_without_cell( )
+
+
+@pytest.mark.parametrize(
+    'module_qname, class_name',
+    product( THESE_MODULE_QNAMES, THESE_CLASSES_NAMES )
+)
+def test_114_decorator_error_handling( module_qname, class_name ):
+    ''' Class handles decorator errors appropriately. '''
+    module = cache_import_module( module_qname )
+    class_factory_class = ( # pylint: disable=unused-variable
+        getattr( module, class_name ) )
+
+    def failing_decorator( cls ):
+        raise ValueError( "Decorator failure" ) # noqa
+
+    with pytest.raises( ValueError, match = "Decorator failure" ):
+        class Object( # pylint: disable=unused-variable
+            metaclass = class_factory_class,
+            decorators = ( failing_decorator, )
+        ):
+            ''' test '''
+
+
+@pytest.mark.parametrize(
+    'module_qname, class_name',
+    product( THESE_MODULE_QNAMES, THESE_CLASSES_NAMES )
+)
+def test_120_docstring_assignment( module_qname, class_name ):
     ''' Class has dynamically-assigned docstring. '''
     module = cache_import_module( module_qname )
     class_factory_class = getattr( module, class_name )
@@ -106,56 +262,6 @@ def test_102_docstring_assignment( module_qname, class_name ):
 
     assert 'test' != Object.__doc__
     assert 'dynamic' == Object.__doc__
-
-
-@pytest.mark.parametrize(
-    'module_qname, class_name',
-    product( THESE_MODULE_QNAMES, ABC_FACTORIES_NAMES )
-)
-def test_200_abc_mutation_allowance( module_qname, class_name ):
-    ''' Class allows mutation of ABC machinery. '''
-    from collections.abc import Mapping
-    from platform import python_implementation
-    module = cache_import_module( module_qname )
-    class_factory_class = getattr( module, class_name )
-
-    class Object( metaclass = class_factory_class ):
-        ''' test '''
-
-    class Dict( # pylint: disable=abstract-method,unused-variable
-        Object, Mapping
-    ):
-        ''' test '''
-
-    python_kind = python_implementation( )
-    assert hasattr( Object, '__abstractmethods__' )
-    if python_kind in ( 'CPython', ):
-        assert hasattr( Object, '_abc_impl' )
-
-
-@pytest.mark.parametrize(
-    'module_qname, class_name',
-    product( THESE_MODULE_QNAMES, NONABC_FACTORIES_NAMES )
-)
-def test_201_abc_mutation_prevention( module_qname, class_name ):
-    ''' Class prevents mutation of ABC machinery. '''
-    from abc import ABCMeta
-    from collections.abc import Mapping
-    module = cache_import_module( module_qname )
-    class_factory_class = getattr( module, class_name )
-
-    class Class( class_factory_class, ABCMeta ):
-        ''' test '''
-
-    class Object( metaclass = Class ):
-        ''' test '''
-
-    with pytest.raises( exceptions.IndelibleAttributeError ):
-
-        class Dict( # pylint: disable=abstract-method,unused-variable
-            Object, Mapping
-        ):
-            ''' test '''
 
 
 # TODO? String representations.
@@ -196,27 +302,3 @@ def test_902_docstring_mentions_accretion( module_qname, class_name ):
     class_factory_class = getattr( module, class_name )
     fragment = base.generate_docstring( 'class attributes accretion' )
     assert fragment in class_factory_class.__doc__
-
-
-@pytest.mark.parametrize(
-    'module_qname, class_name',
-    product( THESE_MODULE_QNAMES, ABC_FACTORIES_NAMES )
-)
-def test_950_docstring_mentions_abc_exemption( module_qname, class_name ):
-    ''' Class docstring mentions ABC attributes exemption. '''
-    module = cache_import_module( module_qname )
-    class_factory_class = getattr( module, class_name )
-    fragment = base.generate_docstring( 'abc attributes exemption' )
-    assert fragment in class_factory_class.__doc__
-
-
-@pytest.mark.parametrize(
-    'module_qname, class_name',
-    product( THESE_MODULE_QNAMES, NONABC_FACTORIES_NAMES )
-)
-def test_951_docstring_not_mentions_abc_exemption( module_qname, class_name ):
-    ''' Class docstring does not mention ABC attributes exemption. '''
-    module = cache_import_module( module_qname )
-    class_factory_class = getattr( module, class_name )
-    fragment = base.generate_docstring( 'abc attributes exemption' )
-    assert fragment not in class_factory_class.__doc__
