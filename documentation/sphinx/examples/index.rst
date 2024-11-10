@@ -24,9 +24,8 @@ Examples
 .. toctree::
    :maxdepth: 2
 
+   classes
    dictionaries
    namespaces
    modules
    aliases
-   concealment
-   protection

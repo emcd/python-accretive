@@ -27,7 +27,7 @@ Table of Contents
    :maxdepth: 2
 
    examples/index
-   api/index
+   api
    changelog
    contribution
    license

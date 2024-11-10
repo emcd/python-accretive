@@ -29,16 +29,20 @@
 
 from . import __
 from .classes import (
-    ABCFactory as AccretiveABCFactory,
-    Class as AccretiveClass,
+    ABCFactory as           AccretiveABCFactory,
+    Class as                AccretiveClass,
 )
 from .dictionaries import (
-    Dictionary as AccretiveDictionary,
-    ProducerDictionary as AccretiveProducerDictionary,
+    Dictionary as           AccretiveDictionary,
+    ProducerDictionary as   AccretiveProducerDictionary,
 )
-from .modules import Module as AccretiveModule
-from .namespaces import Namespace as AccretiveNamespace
-from .objects import Object as AccretiveObject
-
-
-__all__ = __.discover_public_attributes( globals( ) )
+from .modules import (
+    Module as               AccretiveModule,
+    reclassify_modules as   reclassify_modules_as_accretive,
+)
+from .namespaces import (
+    Namespace as            AccretiveNamespace,
+)
+from .objects import (
+    Object as               AccretiveObject,
+)

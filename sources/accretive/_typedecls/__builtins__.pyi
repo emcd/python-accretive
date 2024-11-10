@@ -18,30 +18,11 @@
 #============================================================================#
 
 
-''' Protected accretive dictionaries. '''
+''' Stubs for additional "builtin" types. '''
+
+# https://github.com/microsoft/pyright/blob/main/docs/builtins.md
 
 
-from .. import __
-from .. import dictionaries as _dictionaries
-from . import classes as _classes
+from icecream import IceCreamDebugger # type: ignore
 
-
-class Dictionary(
-    _dictionaries.Dictionary,
-    metaclass = _classes.Class,
-    docstring = __.generate_docstring(
-        _dictionaries.Dictionary, 'protection of class' )
-):
-    ''' Accretive dictionary. '''
-
-
-class ProducerDictionary(
-    _dictionaries.ProducerDictionary,
-    metaclass = _classes.Class,
-    docstring = __.generate_docstring(
-        _dictionaries.ProducerDictionary, 'protection of class' )
-):
-    ''' Accretive dictionary with default values for missing entries. '''
-
-
-__all__ = __.discover_public_attributes( globals( ) )
+ic: IceCreamDebugger

@@ -22,7 +22,6 @@
 
 
 from . import __
-from . import _annotations as _a
 
 
 class Module( __.Module ): # type: ignore[misc]
@@ -32,7 +31,7 @@ class Module( __.Module ): # type: ignore[misc]
         from .exceptions import IndelibleAttributeError
         raise IndelibleAttributeError( name )
 
-    def __setattr__( self, name: str, value: _a.Any ) -> None:
+    def __setattr__( self, name: str, value: __.a.Any ) -> None:
         from .exceptions import IndelibleAttributeError
         if hasattr( self, name ): raise IndelibleAttributeError( name )
         super( ).__setattr__( name, value )
@@ -41,8 +40,13 @@ Module.__doc__ = __.generate_docstring(
     Module, 'description of module', 'module attributes accretion' )
 
 
-reclassify_modules: _a.ModuleReclassifier = __.partial_function(
-    __.reclassify_modules, to_class = Module )
-
-
-__all__ = __.discover_public_attributes( globals( ) )
+def reclassify_modules(
+    attributes: __.cabc.Mapping[ str, __.a.Any ],
+    to_class: type[ Module ] = Module
+) -> None:
+    ''' Reclassifies modules in dictionary with custom module type. '''
+    from inspect import ismodule
+    for attribute in attributes.values( ):
+        if not ismodule( attribute ): continue
+        if isinstance( attribute, to_class ): continue
+        attribute.__class__ = to_class

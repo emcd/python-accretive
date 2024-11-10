@@ -30,28 +30,14 @@ import pytest
 from itertools import product
 
 from . import (
-    CONCEALMENT_PACKAGES_NAMES,
     MODULES_QNAMES,
     PACKAGE_NAME,
-    PROTECTION_PACKAGES_NAMES,
     cache_import_module,
 )
 
 
 THESE_MODULE_QNAMES = tuple(
     name for name in MODULES_QNAMES if name.endswith( '.namespaces' ) )
-THESE_CONCEALMENT_MODULE_QNAMES = tuple(
-    name for name in THESE_MODULE_QNAMES
-    if name.startswith( CONCEALMENT_PACKAGES_NAMES ) )
-THESE_NONCONCEALMENT_MODULE_QNAMES = tuple(
-    name for name in THESE_MODULE_QNAMES
-    if not name.startswith( CONCEALMENT_PACKAGES_NAMES ) )
-THESE_PROTECTION_MODULE_QNAMES = tuple(
-    name for name in THESE_MODULE_QNAMES
-    if name.startswith( PROTECTION_PACKAGES_NAMES ) )
-THESE_NONPROTECTION_MODULE_QNAMES = tuple(
-    name for name in THESE_MODULE_QNAMES
-    if not name.startswith( PROTECTION_PACKAGES_NAMES ) )
 THESE_CLASSES_NAMES = ( 'Namespace', )
 
 base = cache_import_module( f"{PACKAGE_NAME}.__" )
@@ -106,7 +92,7 @@ def test_102_string_representation( module_qname, class_name ):
     module = cache_import_module( module_qname )
     factory = getattr( module, class_name )
     obj = factory( )
-    assert base.discover_fqname( obj ) in repr( obj )
+    assert base.calculate_fqname( obj ) in repr( obj )
     obj.a = 1
     obj.b = 2
     assert 'a = 1, b = 2' in repr( obj )
@@ -134,91 +120,6 @@ def test_105_dictionary_equality( module_qname, class_name ):
     ns2.baz = 43
     assert ns1 != ns2
     assert ns2 != ns1
-
-
-@pytest.mark.parametrize(
-    'module_qname, class_name',
-    product( THESE_CONCEALMENT_MODULE_QNAMES, THESE_CLASSES_NAMES )
-)
-def test_110_attribute_concealment( module_qname, class_name ):
-    ''' Namespace conceals attributes. '''
-    module = cache_import_module( module_qname )
-    Object = getattr( module, class_name )
-
-    class Concealer( Object ):
-        ''' test '''
-        _attribute_visibility_includes_ = frozenset( ( '_private', ) )
-
-    obj = Concealer( )
-    assert not dir( obj )
-    obj.public = 42
-    assert 'public' in dir( obj )
-    obj._nonpublic = 3.1415926535
-    assert '_nonpublic' not in dir( obj )
-    assert '_private' not in dir( obj )
-    obj._private = 'foo'
-    assert '_private' in dir( obj )
-
-
-@pytest.mark.parametrize(
-    'module_qname, class_name',
-    product( THESE_NONCONCEALMENT_MODULE_QNAMES, THESE_CLASSES_NAMES )
-)
-def test_111_attribute_nonconcealment( module_qname, class_name ):
-    ''' Namespace does not conceal attributes. '''
-    module = cache_import_module( module_qname )
-    Object = getattr( module, class_name )
-
-    class Concealer( Object ):
-        ''' test '''
-        _attribute_visibility_includes_ = frozenset( ( '_private', ) )
-
-    obj = Concealer( )
-    assert '_attribute_visibility_includes_' in dir( obj )
-    obj.public = 42
-    assert 'public' in dir( obj )
-    obj._nonpublic = 3.1415926535
-    assert '_nonpublic' in dir( obj )
-    assert '_private' not in dir( obj )
-    obj._private = 'foo'
-    assert '_private' in dir( obj )
-
-
-@pytest.mark.parametrize(
-    'module_qname, class_name',
-    product( THESE_PROTECTION_MODULE_QNAMES, THESE_CLASSES_NAMES )
-)
-def test_150_class_attribute_protection( module_qname, class_name ):
-    ''' Class attributes are protected. '''
-    module = cache_import_module( module_qname )
-    Object = getattr( module, class_name )
-    with pytest.raises( exceptions.IndelibleAttributeError ):
-        Object.__setattr__ = None
-    with pytest.raises( exceptions.IndelibleAttributeError ):
-        del Object.__setattr__
-    Object.foo = 42
-    with pytest.raises( exceptions.IndelibleAttributeError ):
-        Object.foo = -1
-    with pytest.raises( exceptions.IndelibleAttributeError ):
-        del Object.foo
-    # Cleanup.
-    type.__delattr__( Object, 'foo' )
-
-
-@pytest.mark.parametrize(
-    'module_qname, class_name',
-    product( THESE_NONPROTECTION_MODULE_QNAMES, THESE_CLASSES_NAMES )
-)
-def test_151_class_attribute_nonprotection( module_qname, class_name ):
-    ''' Class attributes are not protected. '''
-    module = cache_import_module( module_qname )
-    Object = getattr( module, class_name )
-    Object.foo = 42
-    assert 42 == Object.foo
-    Object.foo = -1
-    assert -1 == Object.foo
-    del Object.foo
-    assert not hasattr( Object, 'foo' )
 
 
 @pytest.mark.parametrize(
@@ -256,51 +157,3 @@ def test_902_docstring_mentions_accretion( module_qname, class_name ):
     Object = getattr( module, class_name )
     fragment = base.generate_docstring( 'instance attributes accretion' )
     assert fragment in Object.__doc__
-
-
-@pytest.mark.parametrize(
-    'module_qname, class_name',
-    product( THESE_CONCEALMENT_MODULE_QNAMES, THESE_CLASSES_NAMES )
-)
-def test_910_docstring_mentions_concealment( module_qname, class_name ):
-    ''' Class docstring mentions concealment. '''
-    module = cache_import_module( module_qname )
-    Object = getattr( module, class_name )
-    fragment = base.generate_docstring( 'instance attributes concealment' )
-    assert fragment in Object.__doc__
-
-
-@pytest.mark.parametrize(
-    'module_qname, class_name',
-    product( THESE_NONCONCEALMENT_MODULE_QNAMES, THESE_CLASSES_NAMES )
-)
-def test_911_docstring_not_mentions_concealment( module_qname, class_name ):
-    ''' Class docstring does not mention concealment. '''
-    module = cache_import_module( module_qname )
-    Object = getattr( module, class_name )
-    fragment = base.generate_docstring( 'instance attributes concealment' )
-    assert fragment not in Object.__doc__
-
-
-@pytest.mark.parametrize(
-    'module_qname, class_name',
-    product( THESE_PROTECTION_MODULE_QNAMES, THESE_CLASSES_NAMES )
-)
-def test_930_docstring_mentions_protection( module_qname, class_name ):
-    ''' Class docstring mentions protection. '''
-    module = cache_import_module( module_qname )
-    Object = getattr( module, class_name )
-    fragment = base.generate_docstring( 'protection of class' )
-    assert fragment in Object.__doc__
-
-
-@pytest.mark.parametrize(
-    'module_qname, class_name',
-    product( THESE_NONPROTECTION_MODULE_QNAMES, THESE_CLASSES_NAMES )
-)
-def test_931_docstring_not_mentions_protection( module_qname, class_name ):
-    ''' Class docstring does not mention protection. '''
-    module = cache_import_module( module_qname )
-    Object = getattr( module, class_name )
-    fragment = base.generate_docstring( 'protection of class' )
-    assert fragment not in Object.__doc__

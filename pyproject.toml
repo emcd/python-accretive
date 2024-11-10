@@ -76,7 +76,9 @@ dependencies = [
   'icecream',
   'mypy',
   'packaging',
+  'pre-commit',
   'pylint',
+  'pyright',
   'pytest',
   'ruff',
   'semgrep',
@@ -175,13 +177,15 @@ include-naming-hint = true
 [tool.pylint.classes]
 defining-attr-methods = [ '__init__', '__new__', '__post_init__' ]
 exclude-protected = [ ]
-valid-classmethod-first-arg = [ 'kind', 'class_' ]
-valid-metaclass-classmethod-first-arg = [ 'maker', 'factory' ]
+valid-classmethod-first-arg = [ 'selfclass' ]
+valid-metaclass-classmethod-first-arg = [ 'factory' ]
 [tool.pylint.design]
 # TODO: exclude-too-few-public-methods: Consider exception hierarchies.
 ignored-parents = [
   'abc.ABCMeta',
   'accretive.__.ClassConcealerExtension',
+  'accretive.exceptions.Omniexception',
+  'accretive.exceptions.Omnierror',
   'accretive.objects.Class',
   'accretive.objects.Object',
   'builtins.AttributeError',
@@ -203,7 +207,12 @@ max-returns = 6
 max-statements = 30
 min-public-methods = 1
 [tool.pylint.exceptions]
-overgeneral-exceptions = [ 'builtins.BaseException', 'builtins.Exception' ]
+overgeneral-exceptions = [
+  'accretive.exceptions.Omnierror',
+  'accretive.exceptions.Omniexception',
+  'builtins.BaseException',
+  'builtins.Exception'
+]
 [tool.pylint.format]
 ignore-long-lines = '''^(\s*<?https?://\S+>?|([^'"]*\s+)?#.*)$'''
 max-line-length = 79
@@ -218,6 +227,7 @@ allow-wildcard-with-all = false
 logging-format-style = 'new'
 [tool.pylint.'messages control']
 disable = [
+  'consider-using-assignment-expr',
   'consider-using-f-string',
   'duplicate-code',  # TODO: Re-enable after heuristic is fixed.
   'fixme',
@@ -270,6 +280,10 @@ dummy-variables-rgx = '''_$'''
 ignored-argument-names = '''_.*'''
 redefining-builtins-modules = [ 'builtins', 'io' ]
 
+[tool.pyright]
+reportSelfClsParameterName = false
+stubPath = 'sources/accretive/_typedecls'
+
 [tool.pytest.ini_options]
 # Note: Cannot run doctests from Pytest, because Pytest tries to update '_'
 #       attribute on protected modules. Instead, we use Sphinx to run doctests.
@@ -281,6 +295,7 @@ python_functions = [ 'test_[0-9][0-9][0-9]_*' ]
 cache_dir = '.auxiliary/caches/pytest'
 
 [tool.ruff]
+builtins = [ 'ic' ]
 cache-dir = '.auxiliary/caches/ruff'
 [tool.ruff.lint]
 ignore = [

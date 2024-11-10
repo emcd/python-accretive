@@ -21,29 +21,35 @@
 ''' Assert correct function of internals. '''
 
 # mypy: ignore-errors
-# pylint: disable=magic-value-comparison,protected-access
+# pylint: disable=attribute-defined-outside-init
+# pylint: disable=magic-value-comparison
+# pylint: disable=missing-class-docstring
+# pylint: disable=protected-access
+# ruff: noqa: E711,E712
 
 
 import pytest
 
+from platform import python_implementation
 from types import MappingProxyType as DictionaryProxy
 
 from . import PACKAGE_NAME, cache_import_module
 
 
 MODULE_QNAME = f"{PACKAGE_NAME}.__"
-CONCEALER_EXTENSIONS_NAMES = (
-    'ClassConcealerExtension',
-    'ConcealerExtension',
-)
 MODULE_ATTRIBUTE_NAMES = (
-    *CONCEALER_EXTENSIONS_NAMES,
+    'Absent',
+    'ConcealerExtension',
     'CoreDictionary',
     'Docstring',
-    'discover_fqname',
+    'Falsifier',
+    'InternalClass',
+    'InternalObject',
+    #'absent',
+    'calculate_class_fqname',
+    'calculate_fqname',
     'discover_public_attributes',
     'generate_docstring',
-    'reclassify_modules',
 )
 
 exceptions = cache_import_module( f"{PACKAGE_NAME}.exceptions" )
@@ -52,43 +58,138 @@ module = cache_import_module( MODULE_QNAME )
 dictionary_posargs = ( ( ( 'foo', 1 ), ( 'bar', 2 ) ), { 'unicorn': True } )
 dictionary_nomargs = DictionaryProxy( dict( orb = False ) )
 
-
-@pytest.mark.parametrize( 'class_name', CONCEALER_EXTENSIONS_NAMES )
-def test_100_concealer_extension_instantiation( class_name ):
-    ''' Class instantiantes. '''
-    factory = getattr( module, class_name )
-    posargs = ( 'Object', ( ), { } ) if issubclass( factory, type ) else ( )
-    obj = factory( *posargs )
-    assert isinstance( obj, factory )
+pypy_skip_mark = pytest.mark.skipif(
+    'PyPy' == python_implementation( ),
+    reason = "PyPy handles class cell updates differently"
+)
 
 
-@pytest.mark.parametrize( 'class_name', CONCEALER_EXTENSIONS_NAMES )
-def test_102_concealer_extension_attribute_concealment( class_name ):
-    ''' Class conceals attributes. '''
-    factory = getattr( module, class_name )
-    posargs = ( 'Object', ( ), { } ) if issubclass( factory, type ) else ( )
-    concealer_name = (
-        '_class_attribute_visibility_includes_'
-        if issubclass( factory, type )
-        else '_attribute_visibility_includes_' )
-    obj = factory( *posargs )
-    assert not dir( obj )
+def test_102_concealer_extension_attribute_visibility( ):
+    ''' Instance conceals attributes according to visibility rules. '''
+    obj = module.ConcealerExtension( )
     obj.public = 42
-    assert 'public' in dir( obj )
-    obj._nonpublic = 3.1415926535
-    assert '_nonpublic' not in dir( obj )
-    setattr( obj, concealer_name, frozenset( ( '_nonpublic', ) ) )
-    assert '_nonpublic' in dir( obj )
-    assert concealer_name not in dir( obj )
+    assert ( 'public', ) == tuple( dir( obj ) )
+    obj._hidden = 24
+    assert ( 'public', ) == tuple( dir( obj ) )
+    obj._visible = 12
+    obj._attribute_visibility_includes_ = frozenset( ( '_visible', ) )
+    assert ( '_visible', 'public' ) == tuple( sorted( dir( obj ) ) )
 
 
-def test_103_class_concealer_extension_creates_classes( ):
-    ''' Class factory class instances are classes. '''
-    from inspect import isclass
-    factory = module.ClassConcealerExtension
-    assert issubclass( factory, type )
-    obj = factory( 'Object', ( ), { } )
-    assert isclass( obj )
+def test_111_internal_class_immutability( ):
+    ''' Class attributes become immutable after initialization. '''
+    factory = module.InternalClass
+    class Example( metaclass = factory ): value = 42
+    with pytest.raises( AttributeError ): Example.value = 24
+    with pytest.raises( AttributeError ): del Example.value
+
+
+def test_112_internal_class_decorator_handling( ):
+    ''' Class properly handles decorators during creation. '''
+    factory = module.InternalClass
+    def decorator1( cls ):
+        cls.attr1 = 'one'
+        return cls
+    def decorator2( cls ):
+        cls.attr2 = 'two'
+        return cls
+
+    class Example(
+        metaclass = factory, decorators = ( decorator1, decorator2 )
+    ): pass
+
+    assert 'one' == Example.attr1
+    assert 'two' == Example.attr2 # pylint: disable=no-member
+    with pytest.raises( AttributeError ): Example.attr1 = 'changed'
+
+
+def test_113_internal_class_attribute_visibility( ):
+    ''' Class conceals attributes according to visibility rules. '''
+    factory = module.InternalClass
+
+    class Example( metaclass = factory ):
+        _class_attribute_visibility_includes_ = frozenset( ( '_visible', ) )
+        public = 42
+        _hidden = 24
+        _visible = 12
+
+    assert ( '_visible', 'public' ) == tuple( sorted( dir( Example ) ) )
+
+
+@pypy_skip_mark
+def test_114_internal_class_decorator_replacement( ):
+    ''' Class properly handles decorators that return new classes. '''
+    from dataclasses import dataclass
+    factory = module.InternalClass
+
+    class Example(
+        metaclass = factory, decorators = ( dataclass( slots = True ), )
+    ):
+        field1: str
+        field2: int
+
+    assert hasattr( Example, '__slots__' )
+    with pytest.raises( AttributeError ): Example.field1 = 'changed'
+
+
+def test_115_internal_class_behaviors_extension( ):
+    ''' Class properly extends existing behaviors. '''
+    factory = module.InternalClass
+
+    class Base( metaclass = factory ):
+        _class_behaviors_ = { 'existing' }
+
+    assert 'existing' in Base._class_behaviors_
+    assert module._immutability_label in Base._class_behaviors_
+
+
+def test_150_internal_object_immutability( ):
+    ''' Instance attributes cannot be modified or deleted. '''
+    class Example( module.InternalObject ):
+        def __init__( self ):
+            # Need to bypass normal setattr to initialize
+            super( module.InternalObject, self ).__setattr__( 'value', 42 )
+
+    obj = Example( )
+    with pytest.raises( AttributeError ): obj.value = 24
+    with pytest.raises( AttributeError ): obj.new_attr = 'test'
+    with pytest.raises( AttributeError ): del obj.value
+
+
+def test_160_falsifier_behavior( ):
+    ''' Falsifier objects are falsey and compare properly. '''
+    class Example( module.Falsifier ): pass
+
+    obj1 = Example( )
+    obj2 = Example( )
+    assert not obj1
+    assert obj1 == obj1 # pylint: disable=comparison-with-itself
+    assert obj1 != obj2
+    assert obj1 is not True
+    assert obj1 is not False
+    assert obj1 is not None
+
+
+def test_170_absent_singleton( ):
+    ''' Absent class produces singleton instance. '''
+    obj1 = module.Absent( )
+    obj2 = module.Absent( )
+    assert obj1 is obj2
+    assert obj1 is module.absent
+    assert not obj1
+    assert obj1 == obj1 # pylint: disable=comparison-with-itself
+    assert obj1 != None # pylint: disable=singleton-comparison
+    assert obj1 != False # pylint: disable=singleton-comparison
+
+
+def test_171_absent_type_guard( ):
+    ''' Type guard correctly identifies absent values. '''
+    def example( value: module.Optional[ str ] ) -> str:
+        if not module.is_absent( value ): return value
+        return 'default'
+
+    assert 'test' == example( 'test' )
+    assert 'default' == example( module.absent )
 
 
 def test_200_core_dictionary_instantiation( ):
@@ -147,6 +248,24 @@ def test_211_core_dictionary_entry_accretion_via_update( ):
         del dct[ 'baz' ]
 
 
+def test_212_core_dictionary_update_validation( ):
+    ''' Dictionary update properly handles various input types. '''
+    factory = module.CoreDictionary
+    dct = factory( )
+    dct.update( { 'a': 1, 'b': 2 } )
+    assert 1 == dct[ 'a' ]
+    dct.update( [ ( 'c', 3 ), ( 'd', 4 ) ] )
+    assert 3 == dct[ 'c' ]
+    dct.update( e = 5, f = 6 )
+    assert 5 == dct[ 'e' ]
+    dct.update( { 'g': 7 }, [ ( 'h', 8 ) ], i = 9 )
+    assert 7 == dct[ 'g' ]
+    assert 8 == dct[ 'h' ]
+    assert 9 == dct[ 'i' ]
+    with pytest.raises( exceptions.IndelibleEntryError ):
+        dct.update( { 'a': 10 } )
+
+
 def test_220_core_dictionary_operation_prevention( ):
     ''' Dictionary cannot perform entry deletions and mutations. '''
     factory = module.CoreDictionary
@@ -165,13 +284,14 @@ def test_220_core_dictionary_operation_prevention( ):
 
 def test_300_fqname_discovery( ):
     ''' Fully-qualified name of object is discovered. '''
-    assert 'builtins.NoneType' == module.discover_fqname( None )
+    assert 'builtins.NoneType' == module.calculate_fqname( None )
     assert (
         'builtins.type'
-        == module.discover_fqname( module.ConcealerExtension ) )
+        == module.calculate_fqname( module.ConcealerExtension ) )
     obj = module.ConcealerExtension( )
     assert (
-        f"{MODULE_QNAME}.ConcealerExtension" == module.discover_fqname( obj ) )
+        f"{MODULE_QNAME}.ConcealerExtension"
+        == module.calculate_fqname( obj ) )
 
 
 @pytest.mark.parametrize(
@@ -222,23 +342,3 @@ def test_501_docstring_generation_validity( ):
         'foo bar',
         module.generate_docstring( 'class attributes accretion' ) ) )
     assert docstring_expected == docstring_generated
-
-
-def test_600_module_reclassification( ):
-    ''' Modules are correctly reclassified. '''
-    from types import ModuleType as Module
-    m1 = Module( 'm1' )
-    m2 = Module( 'm2' )
-
-    class FooModule( Module ):
-        ''' test '''
-
-    m3 = FooModule( 'm3' )
-    attrs = { 'bar': 42, 'orb': True, 'm1': m1, 'm2': m2, 'm3': m3 }
-    assert not isinstance( m1, FooModule )
-    assert not isinstance( m2, FooModule )
-    assert isinstance( m3, FooModule )
-    module.reclassify_modules( attrs, FooModule )
-    assert isinstance( m1, FooModule )
-    assert isinstance( m2, FooModule )
-    assert isinstance( m3, FooModule )

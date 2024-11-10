@@ -28,15 +28,7 @@ from types import MappingProxyType as DictionaryProxy
 
 
 PACKAGE_NAME = 'accretive'
-PACKAGES_NAMES = (
-    PACKAGE_NAME,
-    *(  f"{PACKAGE_NAME}.{name}" for name
-        in ( 'concealment', 'protection', 'complete' ) )
-)
-CONCEALMENT_PACKAGES_NAMES = tuple(
-    f"{PACKAGE_NAME}.{name}" for name in ( 'concealment', 'complete', ) )
-PROTECTION_PACKAGES_NAMES = tuple(
-    f"{PACKAGE_NAME}.{name}" for name in ( 'protection', 'complete', ) )
+PACKAGES_NAMES = ( PACKAGE_NAME, )
 
 
 _modules_cache = { }
@@ -54,9 +46,10 @@ def cache_import_module( qname ):
 def _discover_module_names( package_name ):
     from pathlib import Path
     package = cache_import_module( package_name )
-    return tuple(   path.stem
-                    for path in Path( package.__file__ ).parent.glob( '*.py' )
-                    if '__init__.py' != path.name and path.is_file( ) )
+    return tuple(
+        path.stem
+        for path in Path( package.__file__ ).parent.glob( '*.py' )
+        if '__init__.py' != path.name and path.is_file( ) )
 
 MODULES_NAMES_BY_PACKAGE_NAME = DictionaryProxy( {
     name: _discover_module_names( name ) for name in PACKAGES_NAMES } )

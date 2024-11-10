@@ -20,30 +20,6 @@
 Aliases
 ===============================================================================
 
-Abbreviated Aliases
--------------------------------------------------------------------------------
-
-The ``accretive.aaliases`` module provides abbreviated aliases for accretive
-data structures. These are convenient if you think the original names are too
-long or have a problem with typing capital letters.
-
-.. doctest:: AbbreviatedAliases
-
-    >>> from accretive.aaliases import acdict, actype
-    >>> from accretive import Class, Dictionary
-
-Abbreviated aliases are equivalent to the original classes.
-
-.. doctest:: AbbreviatedAliases
-
-    >>> acdict is Dictionary
-    True
-    >>> actype is Class
-    True
-
-Qualified Aliases
--------------------------------------------------------------------------------
-
 The ``accretive.qaliases`` module provides qualified aliases for accretive data
 structures. These are useful if you have conflicting names in the namespace
 into which you are trying to import.

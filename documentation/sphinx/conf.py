@@ -80,10 +80,22 @@ nitpick_ignore = [
     ( 'py:class', "module" ),
     ( 'py:class',
       "v, remove specified key and return the corresponding value." ),
-    # Workaround for missing 'typing_extensions' documentation.
+    # Other weirdnesses. (Something is broken in how Sphinx autodoc processes
+    # certain typing forms.)
+    ( 'py:class', "Doc" ),
+    ( 'py:class', "NotImplementedType" ),
+    ( 'py:class', "collections.abc.Annotated" ),
+    ( 'py:class', "typing_extensions._ProtocolMeta" ),
+    ( 'py:class', "typing_extensions.Annotated" ),
     ( 'py:class', "typing_extensions.Any" ),
     ( 'py:class', "typing_extensions.Never" ),
+    ( 'py:class', "typing_extensions.NoDefault" ),
     ( 'py:class', "typing_extensions.Self" ),
+    ( 'py:class', "typing_extensions.TypeIs" ),
+    ( 'py:class', "types.Annotated" ),
+    ( 'py:class', "types.NoneType" ),
+    ( 'py:obj', "accretive.__.H" ),
+    ( 'py:obj', "accretive.__.V" ),
 ]
 
 # -- Options for linkcheck builder -------------------------------------------
