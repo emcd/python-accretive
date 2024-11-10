@@ -76,18 +76,18 @@ def test_012_attribute_module_visibility( module_qname ):
     assert module_name in dir( package )
 
 
-#@pytest.mark.parametrize(
-#    'module_qname',
-#    (   module_qname for module_qname, module_name
-#        in MODULES_NAMES_BY_MODULE_QNAME.items( )
-#        if module_name.startswith( '_' ) )
-#)
-#def test_013_attribute_module_invisibility( module_qname ):
-#    ''' Package module is not in package attributes directory. '''
-#    package_name = PACKAGES_NAMES_BY_MODULE_QNAME[ module_qname ]
-#    package = cache_import_module( package_name )
-#    module_name = MODULES_NAMES_BY_MODULE_QNAME[ module_qname ]
-#    assert module_name not in dir( package )
+@pytest.mark.parametrize(
+    'module_qname',
+    (   module_qname for module_qname, module_name
+        in MODULES_NAMES_BY_MODULE_QNAME.items( )
+        if module_name.startswith( '_' ) )
+)
+def test_013_attribute_module_invisibility( module_qname ):
+    ''' Package module is not in package attributes directory. '''
+    package_name = PACKAGES_NAMES_BY_MODULE_QNAME[ module_qname ]
+    package = cache_import_module( package_name )
+    module_name = MODULES_NAMES_BY_MODULE_QNAME[ module_qname ]
+    assert module_name not in dir( package )
 
 
 @pytest.mark.parametrize( 'aname', ( '__version__', ) )
