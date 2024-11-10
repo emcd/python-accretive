@@ -294,7 +294,7 @@ Release
 3. Run Towncrier. Commit.
    ::
 
-        hatch --env develop run towncrier build
+        hatch --env develop run towncrier build --keep
 
 4. Tag.
    ::
@@ -302,6 +302,16 @@ Release
         git tag v${release_version}
 
 5. Push release branch and tag to upstream.
+
+6. Wait for the release workflow to complete successfully.
+
+7. Clean up news fragments to prevent recycling in future releases. Commit.
+   ::
+
+        git rm documentation/towncrier/*.rst
+        git commit -m "Clean up news fragments."
+
+8. Push cleanup commit to upstream.
 
 Postrelease Patch
 -------------------------------------------------------------------------------
@@ -318,7 +328,7 @@ Postrelease Patch
 4. Run Towncrier. Commit.
    ::
 
-        hatch --env develop run towncrier build
+        hatch --env develop run towncrier build --keep
 
 5. Tag.
    ::
@@ -327,5 +337,15 @@ Postrelease Patch
 
 6. Push release branch and tag to upstream.
 
-7. Cherry-pick patch and Towncrier commit back to ``master`` branch, resolving
-   conflicts as necessary.
+7. Wait for the release workflow to complete successfully.
+
+8. Clean up news fragments to prevent recycling in future releases. Commit.
+   ::
+
+        git rm documentation/towncrier/*.rst
+        git commit -m "Clean up news fragments."
+
+9. Push cleanup commit to upstream.
+
+10. Cherry-pick patch and Towncrier commit back to ``master`` branch, resolving
+    conflicts as necessary.

@@ -3,20 +3,13 @@ name: Reusable Packager
 on:
   workflow_call:
     inputs:
-      pypi-api-urls:
-        required: true
-        type: string
-      pypi-package-urls:
+      artifacts-path:
         required: true
         type: string
       python-version:
         required: true
         type: string
-      which-pypi:
-        required: true
-        type: string
 
-# TODO: Use variable for artifacts path.
 jobs:
 
   package:
@@ -43,79 +36,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: python-package-distributions--${{ github.run_id }}
-          path: .auxiliary/artifacts/hatch-build/
-
-  publish-pypi:
-    if: ${{ 'testpypi' == inputs.which-pypi || startsWith(github.ref, 'refs/tags/') }}
-    needs: [package]
-    runs-on: ubuntu-latest
-    environment:
-      name: '${{ inputs.which-pypi }}'
-      url: '${{ fromJSON(inputs.pypi-package-urls)[inputs.which-pypi] }}${{ vars.PYTHON_PACKAGE_NAME }}'
-    permissions:
-      contents: write
-      id-token: write
-    steps:
-
-      - name: Restore Distributions
-        uses: actions/download-artifact@v4
-        with:
-          name: python-package-distributions--${{ github.run_id }}
-          path: .auxiliary/artifacts/hatch-build/
-
-      - name: Publish Distributions (PyPI)
-        uses: pypa/gh-action-pypi-publish@release/v1
-        with:
-          packages-dir: .auxiliary/artifacts/hatch-build/
-          repository-url: '${{ fromJSON(inputs.pypi-api-urls)[inputs.which-pypi] }}'
-          print-hash: true
-          skip-existing: ${{ 'testpypi' == inputs.which-pypi }}
-
-  publish-github:
-    if: startsWith(github.ref, 'refs/tags/')
-    needs: [package, publish-pypi]
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
-      id-token: write
-    steps:
-
-      - name: Restore Distributions
-        uses: actions/download-artifact@v4
-        with:
-          name: python-package-distributions--${{ github.run_id }}
-          path: .auxiliary/artifacts/hatch-build/
-
-      - name: Generate Integrity Check Values
-        run: |
-          set -eu -o pipefail
-          cd .auxiliary/artifacts/hatch-build
-          sha256sum *.tar.gz *.whl >SHA256SUMS.txt
-        shell: bash
-
-      - name: Sign Distributions
-        uses: sigstore/gh-action-sigstore-python@v2.1.1
-        with:
-          inputs: >-
-            .auxiliary/artifacts/hatch-build/SHA256SUMS.txt
-            .auxiliary/artifacts/hatch-build/*.tar.gz
-            .auxiliary/artifacts/hatch-build/*.whl
-
-      - name: Create Github Release
-        env:
-          GITHUB_TOKEN: ${{ github.token }}
-        run: |
-          # TODO: Fill out notes with relevant changelog snippet.
-          gh release create '${{ github.ref_name }}' \
-            --repo '${{ github.repository }}' \
-            --notes ""
-        shell: bash
-
-      - name: Publish Artifacts GitHub Release
-        env:
-          GITHUB_TOKEN: ${{ github.token }}
-        run: |
-          gh release upload '${{ github.ref_name }}' \
-            .auxiliary/artifacts/hatch-build/** \
-            --repo '${{ github.repository }}'
-        shell: bash
+          path: ${{ inputs.artifacts-path }}

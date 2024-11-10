@@ -14,8 +14,10 @@ on:
           - testpypi
         default: testpypi
 
-jobs:
+env:
+  DISTRIBUTIONS_PATH: .auxiliary/artifacts/hatch-build
 
+jobs:
   initialize:
     uses: ./.github/workflows/reusable--initializer.yaml
 
@@ -38,7 +40,6 @@ jobs:
     needs: [initialize, report]
     permissions:
       contents: write
-      id-token: write
       pages: write
     uses: ./.github/workflows/reusable--documenter.yaml
     with:
@@ -47,12 +48,85 @@ jobs:
 
   package:
     needs: [initialize, docsgen]
-    permissions:
-      contents: write
-      id-token: write
     uses: ./.github/workflows/reusable--packager.yaml
     with:
-      pypi-api-urls: '${{ needs.initialize.outputs.pypi-api-urls }}'
-      pypi-package-urls: '${{ needs.initialize.outputs.pypi-package-urls }}'
+      artifacts-path: ${{ env.DISTRIBUTIONS_PATH }}
       python-version: '${{ fromJSON(needs.initialize.outputs.python-versions)[0] }}'
-      which-pypi: "${{ inputs.which-pypi || 'pypi' }}"
+
+  publish-pypi:
+    if: ${{ inputs.which-pypi == 'testpypi' || startsWith(github.ref, 'refs/tags/') }}
+    needs: [initialize, package]
+    runs-on: ubuntu-latest
+    environment:
+      name: '${{ inputs.which-pypi || "pypi" }}'
+      url: '${{ fromJSON(needs.initialize.outputs.pypi-package-urls)[inputs.which-pypi || "pypi"] }}${{ vars.PYTHON_PACKAGE_NAME }}'
+    permissions:
+      id-token: write  # Only needed for PyPI trusted publishing
+    steps:
+      - name: Restore Distributions
+        uses: actions/download-artifact@v4
+        with:
+          name: python-package-distributions--${{ github.run_id }}
+          path: ${{ env.DISTRIBUTIONS_PATH }}
+
+      - name: Publish Distributions
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          packages-dir: ${{ env.DISTRIBUTIONS_PATH }}
+          repository-url: '${{ fromJSON(needs.initialize.outputs.pypi-api-urls)[inputs.which-pypi || "pypi"] }}'
+          print-hash: true
+          skip-existing: ${{ inputs.which-pypi == 'testpypi' }}
+
+  publish-github:
+    if: startsWith(github.ref, 'refs/tags/')
+    needs: [package, publish-pypi]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write  # Needed for creating and uploading to releases
+    steps:
+      - name: Restore Distributions
+        uses: actions/download-artifact@v4
+        with:
+          name: python-package-distributions--${{ github.run_id }}
+          path: ${{ env.DISTRIBUTIONS_PATH }}
+
+      - name: Generate Integrity Check Values
+        run: |
+          set -eu -o pipefail
+          cd ${{ env.DISTRIBUTIONS_PATH }}
+          sha256sum *.tar.gz *.whl >SHA256SUMS.txt
+        shell: bash
+
+      - name: Sign Distributions
+        uses: sigstore/gh-action-sigstore-python@v2.1.1
+        with:
+          inputs: >-
+            ${{ env.DISTRIBUTIONS_PATH }}/SHA256SUMS.txt
+            ${{ env.DISTRIBUTIONS_PATH }}/*.tar.gz
+            ${{ env.DISTRIBUTIONS_PATH }}/*.whl
+
+      - name: Generate Release Notes
+        id: release_notes
+        run: |
+          hatch --env develop run \
+            towncrier build --draft --version ${GITHUB_REF_NAME} \
+            > release-notes.rst
+        shell: bash
+
+      - name: Create Github Release
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          gh release create '${{ github.ref_name }}' \
+            --repo '${{ github.repository }}' \
+            --notes-file release-notes.rst
+        shell: bash
+
+      - name: Publish Artifacts GitHub Release
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          gh release upload '${{ github.ref_name }}' \
+            ${{ env.DISTRIBUTIONS_PATH }}/** \
+            --repo '${{ github.repository }}'
+        shell: bash
