@@ -274,9 +274,7 @@ Initial Release Candidate
 
         hatch --env develop version minor,alpha
 
-9. Cherry-pick Towncrier commit back to ``master`` branch.
-
-10. Tag.
+9. Tag.
     ::
 
         git tag v${alpha_version}
@@ -313,6 +311,8 @@ Release
 
 8. Push cleanup commit to upstream.
 
+9. Cherry-pick Towncrier commits back to ``master`` branch.
+
 Postrelease Patch
 -------------------------------------------------------------------------------
 
@@ -347,5 +347,5 @@ Postrelease Patch
 
 9. Push cleanup commit to upstream.
 
-10. Cherry-pick patch and Towncrier commit back to ``master`` branch, resolving
-    conflicts as necessary.
+10. Cherry-pick patch and Towncrier commits back to ``master`` branch,
+    resolving conflicts as necessary.
