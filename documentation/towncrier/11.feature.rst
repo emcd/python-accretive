@@ -1,2 +1,0 @@
-Add ``py.typed`` file to package to let typecheckers know that it has a full
-set of type annotations.

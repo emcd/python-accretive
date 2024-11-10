@@ -1,2 +1,0 @@
-Add missing alias for ``reclassify_modules`` to the qualified aliases module
-(``qaliases``) as ``reclassify_modules_as_accretive``.
