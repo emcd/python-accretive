@@ -58,8 +58,8 @@ jobs:
     needs: [initialize, package]
     runs-on: ubuntu-latest
     environment:
-      name: '${{ inputs.which-pypi || "pypi" }}'
-      url: '${{ fromJSON(needs.initialize.outputs.pypi-package-urls)[inputs.which-pypi || "pypi"] }}${{ vars.PYTHON_PACKAGE_NAME }}'
+      name: ${{ inputs.which-pypi || 'pypi' }}
+      url: ${{ fromJSON(needs.initialize.outputs.pypi-package-urls)[inputs.which-pypi || 'pypi'] }}${{ vars.PYTHON_PACKAGE_NAME }}
     permissions:
       id-token: write  # Only needed for PyPI trusted publishing
     steps:
@@ -73,7 +73,7 @@ jobs:
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
           packages-dir: ${{ env.DISTRIBUTIONS_PATH }}
-          repository-url: '${{ fromJSON(needs.initialize.outputs.pypi-api-urls)[inputs.which-pypi || "pypi"] }}'
+          repository-url: ${{ fromJSON(needs.initialize.outputs.pypi-api-urls)[inputs.which-pypi || 'pypi'] }}
           print-hash: true
           skip-existing: ${{ inputs.which-pypi == 'testpypi' }}
 
