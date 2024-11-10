@@ -31,10 +31,13 @@ from . import __
 from .classes import (
     ABCFactory as           AccretiveABCFactory,
     Class as                AccretiveClass,
+    ProtocolClass as        AccretiveProtocolClass,
 )
 from .dictionaries import (
-    Dictionary as           AccretiveDictionary,
-    ProducerDictionary as   AccretiveProducerDictionary,
+    Dictionary as                   AccretiveDictionary,
+    ProducerDictionary as           AccretiveProducerDictionary,
+    ProducerValidatorDictionary as  AccretiveProducerValidatorDictionary,
+    ValidatorDictionary as          AccretiveValidatorDictionary,
 )
 from .modules import (
     Module as               AccretiveModule,

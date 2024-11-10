@@ -1,0 +1,5 @@
+Add ``ValidatorDictionary`` and ``ProducerValidatorDictionary`` classes.
+Validator dictionaries allow a validation function to be supplied, which can
+inspect the key and value of a proposed dictionary entry to determine if it
+should be accepted or not. Producer dictionaries are like ``defaultdict`` from
+the standard Python ``collections`` module.

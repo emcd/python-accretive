@@ -247,6 +247,7 @@ class InternalObject( ConcealerExtension, metaclass = InternalClass ):
 class Falsifier( metaclass = InternalClass ): # pylint: disable=eq-without-hash
     ''' Produces falsey objects.
 
+        Why not something already in Python?
         :py:class:`object` produces truthy objects.
         :py:class:`types.NoneType` "produces" falsey ``None`` singleton.
         :py:class:`typing_extensions.NoDefault` is truthy singleton.
@@ -387,3 +388,6 @@ def generate_docstring(
         else: fragment = TABLE[ fragment_id ] # type: ignore
         fragments.append( cleandoc( fragment ) )
     return '\n\n'.join( fragments )
+
+
+__all__ = ( )

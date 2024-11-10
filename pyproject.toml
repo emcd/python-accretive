@@ -307,3 +307,23 @@ directory = 'documentation/towncrier'
 filename = 'changelog.rst'
 package = 'accretive'
 package_dir = 'sources'
+
+[[tool.towncrier.type]]
+directory = 'bugfix'
+name = 'Bugfixes'
+showcontent = true
+
+[[tool.towncrier.type]]
+directory = 'feature'
+name = 'Features'
+showcontent = true
+
+[[tool.towncrier.type]]
+directory = 'platform'
+name = 'Supported Platforms'
+showcontent = true
+
+[[tool.towncrier.type]]
+directory = 'removal'
+name = 'Deprecations and Removals'
+showcontent = true

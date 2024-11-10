@@ -39,8 +39,21 @@ from .namespaces import *
 from .objects import *
 
 
-__version__ = '2.0a1'
+__version__ = '2.0rc0'
 
 
-modules.reclassify_modules( globals( ) )
-__.modules[ __package__ ].__class__ = modules.Module
+_attribute_visibility_includes_ = frozenset( ( '__version__', ) )
+
+class _InternalModule( __.InternalObject, __.Module ): pass # type: ignore
+def _reclassify_modules(
+    attributes: __.cabc.Mapping[ str, __.a.Any ]
+) -> None:
+    from inspect import ismodule
+    for attribute in attributes.values( ):
+        if not ismodule( attribute ): continue
+        if isinstance( attribute, _InternalModule ):
+            continue # pragma: no coverage
+        attribute.__class__ = _InternalModule
+
+_reclassify_modules( globals( ) )
+__.modules[ __package__ ].__class__ = _InternalModule
