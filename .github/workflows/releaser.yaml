@@ -15,7 +15,7 @@ on:
         default: testpypi
 
 env:
-  DISTRIBUTIONS_PATH: .auxiliary/artifacts/hatch-build
+  DISTRIBUTIONS_PATH: '.auxiliary/artifacts/hatch-build'
 
 jobs:
   initialize:
@@ -40,6 +40,7 @@ jobs:
     needs: [initialize, report]
     permissions:
       contents: write
+      id-token: write
       pages: write
     uses: ./.github/workflows/reusable--documenter.yaml
     with:
@@ -50,7 +51,7 @@ jobs:
     needs: [initialize, docsgen]
     uses: ./.github/workflows/reusable--packager.yaml
     with:
-      artifacts-path: ${{ env.DISTRIBUTIONS_PATH }}
+      artifacts-path: '.auxiliary/artifacts/hatch-build' # TODO: Use environment.
       python-version: '${{ fromJSON(needs.initialize.outputs.python-versions)[0] }}'
 
   publish-pypi:
