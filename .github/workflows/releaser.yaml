@@ -51,7 +51,7 @@ jobs:
     needs: [initialize, docsgen]
     uses: ./.github/workflows/reusable--packager.yaml
     with:
-      artifacts-path: '.auxiliary/artifacts/hatch-build'
+      artifacts-path: '.auxiliary/artifacts/hatch-build' # TODO: Use environment.
       python-version: '${{ fromJSON(needs.initialize.outputs.python-versions)[0] }}'
 
   publish-pypi:
