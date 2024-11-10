@@ -1,3 +1,0 @@
-Remove ``complete``, ``concealment``, and ``protection`` subpackages to focus
-on core value of package: accretive data structures. Users can easily make
-their own syntheses as necessary.
