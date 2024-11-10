@@ -92,7 +92,7 @@ def test_102_string_representation( module_qname, class_name ):
     module = cache_import_module( module_qname )
     factory = getattr( module, class_name )
     obj = factory( )
-    assert base.discover_fqname( obj ) in repr( obj )
+    assert base.calculate_fqname( obj ) in repr( obj )
     obj.a = 1
     obj.b = 2
     assert 'a = 1, b = 2' in repr( obj )

@@ -31,9 +31,6 @@ class _Dictionary( # type: ignore
 ): pass
 
 
-_no_value: object = object( )
-
-
 class Dictionary( # pylint: disable=eq-without-hash
     _objects.Object,
     __.a.Generic[ __.H, __.V ], # type: ignore[misc]
@@ -60,7 +57,7 @@ class Dictionary( # pylint: disable=eq-without-hash
 
     def __repr__( self ) -> str:
         return "{fqname}( {contents} )".format(
-            fqname = __.discover_fqname( self ),
+            fqname = __.calculate_fqname( self ),
             contents = str( self._data_ ) )
 
     def __str__( self ) -> str:
@@ -94,7 +91,9 @@ class Dictionary( # pylint: disable=eq-without-hash
         return type( self )( self )
 
     def get(
-        self, key: __.cabc.Hashable, default: __.a.Any = _no_value
+        self,
+        key: __.cabc.Hashable,
+        default: __.Optional[ __.a.Any ] = __.absent,
     ) -> __.a.Annotation[
         __.a.Any,
         __.a.Doc(
@@ -102,7 +101,7 @@ class Dictionary( # pylint: disable=eq-without-hash
             'Else, supplied default value or ``None``.' )
     ]:
         ''' Retrieves entry associated with key, if it exists. '''
-        if _no_value is default: return self._data_.get( key )
+        if __.is_absent( default ): return self._data_.get( key )
         return self._data_.get( key, default )
 
     def update(
@@ -160,7 +159,7 @@ class ProducerDictionary(
 
     def __repr__( self ) -> str:
         return "{fqname}( {producer}, {contents} )".format(
-            fqname = __.discover_fqname( self ),
+            fqname = __.calculate_fqname( self ),
             producer = self._producer_,
             contents = str( self._data_ ) )
 
@@ -206,7 +205,7 @@ class ValidatorDictionary(
 
     def __repr__( self ) -> str:
         return "{fqname}( {validator}, {contents} )".format(
-            fqname = __.discover_fqname( self ),
+            fqname = __.calculate_fqname( self ),
             validator = self._validator_,
             contents = str( self._data_ ) )
 
@@ -275,7 +274,7 @@ class ProducerValidatorDictionary(
 
     def __repr__( self ) -> str:
         return "{fqname}( {producer}, {validator}, {contents} )".format(
-            fqname = __.discover_fqname( self ),
+            fqname = __.calculate_fqname( self ),
             producer = self._producer_,
             validator = self._validator_,
             contents = str( self._data_ ) )

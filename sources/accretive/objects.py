@@ -41,7 +41,7 @@ class Object:
         super( ).__init__( *posargs, **nomargs )
 
     def __repr__( self ) -> str:
-        return "{fqname}( )".format( fqname = __.discover_fqname( self ) )
+        return "{fqname}( )".format( fqname = __.calculate_fqname( self ) )
 
     def __delattr__( self, name: str ) -> None:
         from .exceptions import IndelibleAttributeError

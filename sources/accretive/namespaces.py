@@ -41,7 +41,7 @@ class Namespace( _objects.Object ): # pylint: disable=eq-without-hash
         attributes = ', '.join( tuple(
             f"{key} = {value!r}" for key, value
             in super( ).__getattribute__( '__dict__' ).items( ) ) )
-        fqname = __.discover_fqname( self )
+        fqname = __.calculate_fqname( self )
         if not attributes: return f"{fqname}( )"
         return f"{fqname}( {attributes} )"
 

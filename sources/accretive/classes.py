@@ -30,7 +30,7 @@ ClassDecorators: __.a.TypeAlias = (
     __.cabc.Iterable[ __.cabc.Callable[ [ type ], type ] ] )
 
 
-_behavior = 'accretive'
+_behavior = 'accretion'
 
 
 class Class( type ):
@@ -42,7 +42,7 @@ class Class( type ):
         bases: tuple[ type, ... ],
         namespace: dict[ str, __.a.Any ], *,
         decorators: ClassDecorators = ( ),
-        docstring: str = None, # TODO: Optional
+        docstring: __.Optional[ __.a.Nullable[ str ] ] = __.absent,
         **args: __.a.Any
     ) -> Class:
         class_ = type.__new__(
@@ -78,7 +78,7 @@ class ABCFactory( __.ABCFactory ): # type: ignore
         bases: tuple[ type, ... ],
         namespace: dict[ str, __.a.Any ], *,
         decorators: ClassDecorators = ( ),
-        docstring: str = None, # TODO: Optional
+        docstring: __.Optional[ __.a.Nullable[ str ] ] = __.absent,
         **args: __.a.Any
     ) -> ABCFactory:
         class_ = __.ABCFactory.__new__(
@@ -114,7 +114,7 @@ class ProtocolClass( __.a.Protocol.__class__ ): # type: ignore
         bases: tuple[ type, ... ],
         namespace: dict[ str, __.a.Any ], *,
         decorators: ClassDecorators = ( ),
-        docstring: str = None, # TODO: Optional
+        docstring: __.Optional[ __.a.Nullable[ str ] ] = __.absent,
         **args: __.a.Any
     ) -> ProtocolClass:
         class_ = __.a.Protocol.__class__.__new__(
@@ -144,21 +144,21 @@ ProtocolClass.__doc__ = __.generate_docstring(
 def _class__new__(
     original: type,
     decorators: ClassDecorators = ( ),
-    docstring: str = None, # TODO: Optional
+    docstring: __.Optional[ __.a.Nullable[ str ] ] = __.absent,
 ) -> type:
     # Handle decorators similar to immutable implementation.
     # Some decorators create new classes, which invokes this method again.
     # Short-circuit to prevent recursive decoration and other tangles.
     class_decorators_ = original.__dict__.get( '_class_decorators_', [ ] )
     if class_decorators_: return original
-    if docstring: original.__doc__ = docstring
+    if not __.is_absent( docstring ): original.__doc__ = docstring
     setattr( original, '_class_decorators_', class_decorators_ )
     reproduction = original
     for decorator in decorators:
         class_decorators_.append( decorator )
         reproduction = decorator( original )
         if original is not reproduction:
-            _repair_class_reproduction( original, reproduction )
+            __.repair_class_reproduction( original, reproduction )
         original = reproduction
     class_decorators_.clear( )  # Flag '__init__' to enable accretion
     return reproduction
@@ -190,34 +190,3 @@ def _class__setattr__( class_: type, name: str ) -> bool:
         from .exceptions import IndelibleAttributeError
         raise IndelibleAttributeError( name )
     return False  # Allow setting new attributes
-
-
-def _repair_class_reproduction( original: type, reproduction: type ) -> None:
-    from platform import python_implementation
-    match python_implementation( ):
-        case 'CPython':
-            _repair_cpython_class_closures( original, reproduction )
-
-
-def _repair_cpython_class_closures( # pylint: disable=too-complex
-    oldcls: type, newcls: type
-) -> None:
-    def try_repair_closure( function: __.cabc.Callable ) -> bool:
-        try: index = function.__code__.co_freevars.index( '__class__' )
-        except ValueError: return False
-        closure = function.__closure__[ index ]
-        if oldcls is closure.cell_contents: # pragma: no branch
-            closure.cell_contents = newcls
-            return True
-        return False # pragma: no cover
-
-    from inspect import isfunction, unwrap
-    for attribute in newcls.__dict__.values( ): # pylint: disable=too-many-nested-blocks
-        attribute_ = unwrap( attribute )
-        if isfunction( attribute_ ) and try_repair_closure( attribute_ ):
-            return
-        if isinstance( attribute_, property ):
-            for aname in ( 'fget', 'fset', 'fdel' ):
-                accessor = getattr( attribute_, aname )
-                if None is accessor: continue
-                if try_repair_closure( accessor ): return # pragma: no branch

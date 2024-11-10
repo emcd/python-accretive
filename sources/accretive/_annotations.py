@@ -30,9 +30,10 @@ from typing_extensions import (
     Doc,
     Generic,
     Never,
+    Optional as Nullable,
     Protocol,
     Self,
     TypeAlias,
+    TypeIs,
     TypeVar,
-    cast,
 )

@@ -379,7 +379,7 @@ def test_230_string_representation( module_qname, class_name ):
     cdct = dict( dct )
     assert str( cdct ) == str( dct )
     assert str( cdct ) in repr( dct )
-    assert base.discover_fqname( dct ) in repr( dct )
+    assert base.calculate_fqname( dct ) in repr( dct )
 
 
 @pytest.mark.parametrize(

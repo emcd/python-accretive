@@ -89,8 +89,11 @@ nitpick_ignore = [
     ( 'py:class', "typing_extensions.Annotated" ),
     ( 'py:class', "typing_extensions.Any" ),
     ( 'py:class', "typing_extensions.Never" ),
+    ( 'py:class', "typing_extensions.NoDefault" ),
     ( 'py:class', "typing_extensions.Self" ),
+    ( 'py:class', "typing_extensions.TypeIs" ),
     ( 'py:class', "types.Annotated" ),
+    ( 'py:class', "types.NoneType" ),
     ( 'py:obj', "accretive.__.H" ),
     ( 'py:obj', "accretive.__.V" ),
 ]

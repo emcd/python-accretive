@@ -22,19 +22,10 @@
 
 
 from . import __ # pylint: disable=cyclic-import
-from . import classes as _classes # pylint: disable=cyclic-import
-from . import objects as _objects # pylint: disable=cyclic-import
 
 
-class _Class( __.ClassConcealerExtension, _classes.Class ): pass
-
-
-class Omniexception(
-    __.ConcealerExtension, _objects.Object, BaseException,
-    metaclass = _Class,
-):
+class Omniexception( __.InternalObject, BaseException ):
     ''' Base for all exceptions raised by package API. '''
-    # TODO: Immutable class and object attributes.
 
     _attribute_visibility_includes_: __.cabc.Collection[ str ] = (
         frozenset( ( '__cause__', '__context__', ) ) )
