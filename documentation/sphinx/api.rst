@@ -16,6 +16,8 @@
    |                                                                          |
    +--------------------------------------------------------------------------+
 
+:tocdepth: 3
+
 
 *******************************************************************************
 API
@@ -26,11 +28,34 @@ Package ``accretive``
 ===============================================================================
 
 
-Module ``accretive``
+Module ``accretive.dictionaries``
 -------------------------------------------------------------------------------
 
-.. automodule:: accretive
-   :imported-members:
+.. automodule:: accretive.dictionaries
+
+
+Module ``accretive.namespaces``
+-------------------------------------------------------------------------------
+
+.. automodule:: accretive.namespaces
+
+
+Module ``accretive.modules``
+-------------------------------------------------------------------------------
+
+.. automodule:: accretive.modules
+
+
+Module ``accretive.classes``
+-------------------------------------------------------------------------------
+
+.. automodule:: accretive.classes
+
+
+Module ``accretive.objects``
+-------------------------------------------------------------------------------
+
+.. automodule:: accretive.objects
 
 
 Module ``accretive.exceptions``
