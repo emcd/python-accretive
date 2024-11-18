@@ -107,12 +107,24 @@ the ``update`` method.
 Copies
 -------------------------------------------------------------------------------
 
-Copies can be made of simple dictionaries.
+Copies can be made which preserve behavior and data.
 
 .. doctest:: Dictionary
 
     >>> dct1 = Dictionary( answer = 42 )
     >>> dct2 = dct1.copy( )
+
+Copies can also be made which preserve behavior but replace data. These are
+made using the ``with_data`` method, which creates a new dictionary of the same
+type but with different data. This is particularly useful with producer and
+validator dictionaries (see below)  as it preserves their behavior:
+
+.. doctest:: Dictionary
+
+    >>> base = Dictionary( a = 1, b = 2 )
+    >>> new = base.with_data( x = 3, y = 4 )
+    >>> new
+    accretive.dictionaries.Dictionary( {'x': 3, 'y': 4} )
 
 Comparison
 -------------------------------------------------------------------------------
@@ -173,6 +185,55 @@ The usual methods for producing views on items, keys, and values exist.
     ('csv', 'json', 'xml', 'yaml', 'env', 'hcl', 'ini', 'toml')
     >>> tuple( readers.items( ) ) == tuple( zip( readers.keys( ), readers.values( ) ) )
     True
+
+Unions
+-------------------------------------------------------------------------------
+
+The union operator (``|``) combines entries from two dictionaries or a
+dictionary and a mapping, creating a new dictionary. The operation maintains
+the accretive contract by preventing duplicate keys:
+
+.. doctest:: Dictionary
+
+    >>> formats = Dictionary( csv = csv_reader, json = json_reader )
+    >>> more_formats = Dictionary( yaml = yaml_reader, toml = toml_reader )
+    >>> all_formats = formats | more_formats
+    >>> all_formats
+    accretive.dictionaries.Dictionary( {'csv': <function csv_reader at 0x...>, 'json': <function json_reader at 0x...>, 'yaml': <function yaml_reader at 0x...>, 'toml': <function toml_reader at 0x...>} )
+
+When operands have overlapping keys, an error is raised:
+
+.. doctest:: Dictionary
+
+    >>> conflicting = Dictionary( json = yaml_reader )
+    >>> formats | conflicting
+    Traceback (most recent call last):
+    ...
+    accretive.exceptions.IndelibleEntryError: Cannot update or remove existing entry for 'json'.
+
+Intersections
+-------------------------------------------------------------------------------
+
+The intersection operator (``&``) can be used in two ways:
+
+1. With another mapping to keep entries with matching key-value pairs:
+
+.. doctest:: Dictionary
+
+    >>> d1 = Dictionary( a = 1, b = 2, c = 3 )
+    >>> d2 = Dictionary( a = 1, b = 3, d = 4 )  # Note: b has different value
+    >>> d1 & d2  # Only entries that match exactly
+    accretive.dictionaries.Dictionary( {'a': 1} )
+
+2. With a set or keys view to filter entries by keys:
+
+.. doctest:: Dictionary
+
+    >>> allowed = { 'a', 'b' }
+    >>> d3 = d1 & allowed  # Keep only entries with allowed keys
+    >>> 'c' in d3
+    False
+
 
 Producer Dictionary
 ===============================================================================

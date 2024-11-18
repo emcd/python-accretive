@@ -33,7 +33,10 @@ from __future__ import annotations
 
 import collections.abc as cabc
 
-from abc import ABCMeta as ABCFactory
+from abc import (
+    ABCMeta as ABCFactory,
+    abstractmethod as abstract_member_function,
+)
 from functools import partial as partial_function
 from inspect import cleandoc as clean_docstring
 from sys import modules
@@ -47,7 +50,7 @@ from types import (
 from . import _annotations as a
 
 
-H = a.TypeVar( 'H', bound = cabc.Hashable )
+H = a.TypeVar( 'H', bound = cabc.Hashable ) # Hash Key
 V = a.TypeVar( 'V' ) # Value
 
 
@@ -55,20 +58,13 @@ ClassDecorators: a.TypeAlias = (
     cabc.Iterable[ cabc.Callable[ [ type ], type ] ] )
 ComparisonResult: a.TypeAlias = bool | TypeofNotImplemented
 DictionaryNominativeArgument: a.TypeAlias = a.Annotation[
-    a.Any,
+    V,
     a.Doc(
         'Zero or more keyword arguments from which to initialize '
         'dictionary data.' ),
 ]
-# TODO: Support taking our dictionaries, themselves, as arguments.
-#       Supposed to work via structural typing, but must match protocol.
-#       https://github.com/python/mypy/issues/2922
-#       https://github.com/python/mypy/issues/2922#issuecomment-1186587232
-#       https://github.com/python/typing/discussions/1127#discussioncomment-2538837
-#       https://mypy.readthedocs.io/en/latest/protocols.html
 DictionaryPositionalArgument: a.TypeAlias = a.Annotation[
-        cabc.Mapping[ cabc.Hashable, a.Any ]
-    |   cabc.Iterable[ tuple[ cabc.Hashable, a.Any] ],
+    cabc.Mapping[ H, V ] | cabc.Iterable[ tuple[ H, V ] ],
     a.Doc(
         'Zero or more iterables from which to initialize dictionary data. '
         'Each iterable must be dictionary or sequence of key-value pairs. '
@@ -79,7 +75,7 @@ DictionaryProducer: a.TypeAlias = a.Annotation[
     a.Doc( 'Callable which produces values for absent dictionary entries.' ),
 ]
 DictionaryValidator: a.TypeAlias = a.Annotation[
-    cabc.Callable[ [ cabc.Hashable, a.Any ], bool ],
+    cabc.Callable[ [ H, V ], bool ],
     a.Doc( 'Callable which validates entries before addition to dictionary.' ),
 ]
 ModuleReclassifier: a.TypeAlias = cabc.Callable[
@@ -97,7 +93,7 @@ def repair_class_reproduction( original: type, reproduction: type ) -> None:
 def _repair_cpython_class_closures( # pylint: disable=too-complex
     original: type, reproduction: type
 ) -> None:
-    def try_repair_closure( function: cabc.Callable ) -> bool: # type: ignore
+    def try_repair_closure( function: cabc.Callable ) -> bool:
         try: index = function.__code__.co_freevars.index( '__class__' )
         except ValueError: return False
         closure = function.__closure__[ index ] # type: ignore
@@ -136,8 +132,7 @@ class InternalClass( type ):
         **args: a.Any
     ) -> InternalClass:
         class_ = type.__new__( factory, name, bases, namespace, **args )
-        return _immutable_class__new__( # type: ignore
-            class_, decorators = decorators )
+        return _immutable_class__new__( class_, decorators = decorators )
 
     def __init__( selfclass, *posargs: a.Any, **nomargs: a.Any ):
         super( ).__init__( *posargs, **nomargs )
@@ -283,7 +278,7 @@ def is_absent( value: object ) -> a.TypeIs[ Absent ]:
     return absent is value
 
 
-class CoreDictionary( ConcealerExtension, dict ): # type: ignore[type-arg]
+class CoreDictionary( ConcealerExtension, dict[ H, V ] ):
     ''' Accretive subclass of :py:class:`dict`.
 
         Can be used as an instance dictionary.
@@ -299,11 +294,11 @@ class CoreDictionary( ConcealerExtension, dict ): # type: ignore[type-arg]
         super( ).__init__( )
         self.update( *iterables, **entries )
 
-    def __delitem__( self, key: cabc.Hashable ) -> None:
+    def __delitem__( self, key: H ) -> None:
         from .exceptions import IndelibleEntryError
         raise IndelibleEntryError( key )
 
-    def __setitem__( self, key: cabc.Hashable, value: a.Any ) -> None:
+    def __setitem__( self, key: H, value: V ) -> None:
         from .exceptions import IndelibleEntryError
         if key in self: raise IndelibleEntryError( key )
         super( ).__setitem__( key, value )
@@ -318,7 +313,7 @@ class CoreDictionary( ConcealerExtension, dict ): # type: ignore[type-arg]
         return type( self )( self )
 
     def pop( # pylint: disable=unused-argument
-        self, key: cabc.Hashable, default: Optional[ a.Any ] = absent
+        self, key: H, default: Optional[ V ] = absent
     ) -> a.Never:
         ''' Raises exception. Cannot pop indelible entry. '''
         from .exceptions import InvalidOperationError
@@ -334,7 +329,7 @@ class CoreDictionary( ConcealerExtension, dict ): # type: ignore[type-arg]
         *iterables: DictionaryPositionalArgument,
         **entries: DictionaryNominativeArgument
     ) -> a.Self:
-        ''' Adds new entries as a batch. '''
+        ''' Adds new entries as a batch. Returns self. '''
         from itertools import chain
         # Add values in order received, enforcing no alteration.
         for indicator, value in chain.from_iterable( map(
@@ -385,7 +380,7 @@ def generate_docstring(
     for fragment_id in fragment_ids:
         if isclass( fragment_id ): fragment = getdoc( fragment_id ) or ''
         elif isinstance( fragment_id, Docstring ): fragment = fragment_id
-        else: fragment = TABLE[ fragment_id ] # type: ignore
+        else: fragment = TABLE[ fragment_id ]
         fragments.append( cleandoc( fragment ) )
     return '\n\n'.join( fragments )
 

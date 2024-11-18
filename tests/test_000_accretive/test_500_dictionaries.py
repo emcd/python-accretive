@@ -23,6 +23,7 @@
 # mypy: ignore-errors
 # pylint: disable=attribute-defined-outside-init
 # pylint: disable=invalid-name,magic-value-comparison,protected-access
+# pylint: disable=too-many-locals,too-many-statements,unnecessary-dunder-call
 
 
 import pytest
@@ -170,6 +171,210 @@ def test_200_dictionary_entry_accretion( module_qname, class_name ):
         del dct[ 'baz' ]
     with pytest.raises( exceptions.IndelibleEntryError ):
         dct[ 'baz' ] = 42
+
+
+@pytest.mark.parametrize(
+    'module_qname, class_name',
+    product( THESE_MODULE_QNAMES, THESE_CLASSES_NAMES )
+)
+def test_150_setdefault_preserves_existing_entry( module_qname, class_name ):
+    ''' Setdefault returns existing value without modification. '''
+    module = cache_import_module( module_qname )
+    factory = getattr( module, class_name )
+    posargs, nomargs = select_arguments( class_name )
+    dct = factory( *posargs, **nomargs )
+    # Add initial value
+    if class_name in PRODUCER_NAMES:
+        dct[ 'a' ] = [ 1 ]
+        assert [ 1 ] == dct.setdefault( 'a', [ 42 ] )
+        assert [ 1 ] == dct[ 'a' ]
+    else:
+        dct[ 'a' ] = 1
+        assert 1 == dct.setdefault( 'a', 42 )
+        assert 1 == dct[ 'a' ]
+
+
+@pytest.mark.parametrize(
+    'module_qname, class_name',
+    product( THESE_MODULE_QNAMES, THESE_CLASSES_NAMES )
+)
+def test_151_setdefault_adds_missing_entry( module_qname, class_name ):
+    ''' Setdefault adds new entry for missing key. '''
+    module = cache_import_module( module_qname )
+    factory = getattr( module, class_name )
+    posargs, nomargs = select_arguments( class_name )
+    dct = factory( *posargs, **nomargs )
+    if class_name in PRODUCER_NAMES:
+        assert [ 42 ] == dct.setdefault( 'b', [ 42 ] )
+        assert [ 42 ] == dct[ 'b' ]
+    else:
+        assert 42 == dct.setdefault( 'b', 42 )
+        assert 42 == dct[ 'b' ]
+
+
+@pytest.mark.parametrize(
+    'module_qname, class_name',
+    product( THESE_MODULE_QNAMES, THESE_CLASSES_NAMES )
+)
+def test_160_or_combines_dictionaries( module_qname, class_name ):
+    ''' Dictionary union produces new dictionary with combined entries. '''
+    module = cache_import_module( module_qname )
+    factory = getattr( module, class_name )
+    posargs, nomargs = select_arguments( class_name )
+    d1 = factory( *posargs, **nomargs )
+    d2 = factory( *posargs, **nomargs )
+    d3 = { }
+    if class_name in PRODUCER_VALIDATOR_NAMES:
+        d1[ 'a' ] = [ 1 ]
+        d2[ 'c' ] = [ 4 ]
+        d3.update( d = [ 5 ], e = [ 6 ] )
+    else:
+        d1[ 'a' ] = 1
+        d2[ 'c' ] = 4
+        d3.update( d = 5, e = 6 )
+    d4 = d1 | d2
+    assert isinstance( d4, factory )
+    if class_name in PRODUCER_VALIDATOR_NAMES:
+        assert d4 == { 'a': [ 1 ], 'c': [ 4 ] }
+    else: assert d4 == { 'a': 1, 'c': 4 }
+    d5 = d1 | d3
+    assert isinstance( d5, factory )
+    if class_name in PRODUCER_VALIDATOR_NAMES:
+        assert d5 == { 'a': [ 1 ], 'd': [ 5 ], 'e': [ 6 ] }
+    else: assert d5 == { 'a': 1, 'd': 5, 'e': 6 }
+    d6 = d3 | d1
+    assert isinstance( d6, factory )
+    if class_name in PRODUCER_VALIDATOR_NAMES:
+        assert d6 == { 'a': [ 1 ], 'd': [ 5 ], 'e': [ 6 ] }
+    else: assert d6 == { 'a': 1, 'd': 5, 'e': 6 }
+    d7 = factory( *posargs, **nomargs )
+    if class_name in PRODUCER_VALIDATOR_NAMES:
+        d7[ 'a' ] = [ 2 ]
+    else: d7[ 'a' ] = 2
+    with pytest.raises( exceptions.IndelibleEntryError ):
+        _ = d1 | d7
+
+
+@pytest.mark.parametrize(
+    'module_qname, class_name',
+    product( THESE_MODULE_QNAMES, THESE_CLASSES_NAMES )
+)
+def test_161_or_rejects_invalid_operands( module_qname, class_name ):
+    ''' Dictionary union rejects non-mapping operands. '''
+    module = cache_import_module( module_qname )
+    factory = getattr( module, class_name )
+    posargs, nomargs = select_arguments( class_name )
+    dct = factory( *posargs, **nomargs )
+    assert NotImplemented == dct.__or__( [ ] )
+    assert NotImplemented == dct.__ror__( [ ] )
+
+
+@pytest.mark.parametrize(
+    'module_qname, class_name',
+    product( THESE_MODULE_QNAMES, THESE_CLASSES_NAMES )
+)
+def test_170_and_intersects_mappings( module_qname, class_name ):
+    ''' Dictionary intersection with mapping matches key-value pairs. '''
+    module = cache_import_module( module_qname )
+    factory = getattr( module, class_name )
+    posargs, nomargs = select_arguments( class_name )
+    d1 = factory( *posargs, **nomargs )
+    d2 = factory( *posargs, **nomargs )
+    d3 = { }
+    if class_name in PRODUCER_VALIDATOR_NAMES:
+        d1.update( a = [ 1 ], b = [ 2 ], c = [ 3 ] )
+        d2.update( a = [ 1 ], b = [ 3 ], d = [ 4 ] )
+        d3.update( a = [ 1 ], c = [ 3 ], e = [ 5 ] )
+    else:
+        d1.update( a = 1, b = 2, c = 3 )
+        d2.update( a = 1, b = 3, d = 4 )
+        d3.update( a = 1, c = 3, e = 5 )
+    d4 = d1 & d2
+    assert isinstance( d4, factory )
+    if class_name in PRODUCER_VALIDATOR_NAMES:
+        assert d4 == { 'a': [ 1 ] }
+    else: assert d4 == { 'a': 1 }
+    d5 = d1 & d3
+    assert isinstance( d5, factory )
+    if class_name in PRODUCER_VALIDATOR_NAMES:
+        assert d5 == { 'a': [ 1 ], 'c': [ 3 ] }
+    else: assert d5 == { 'a': 1, 'c': 3 }
+    d6 = d3 & d1
+    assert isinstance( d6, factory )
+    if class_name in PRODUCER_VALIDATOR_NAMES:
+        assert d6 == { 'a': [ 1 ], 'c': [ 3 ] }
+    else: assert d6 == { 'a': 1, 'c': 3 }
+
+
+@pytest.mark.parametrize(
+    'module_qname, class_name',
+    product( THESE_MODULE_QNAMES, THESE_CLASSES_NAMES )
+)
+def test_171_and_filters_by_keys( module_qname, class_name ):
+    ''' Dictionary intersection with set filters by keys. '''
+    module = cache_import_module( module_qname )
+    factory = getattr( module, class_name )
+    posargs, nomargs = select_arguments( class_name )
+    d1 = factory( *posargs, **nomargs )
+    if class_name in PRODUCER_VALIDATOR_NAMES:
+        d1.update( a = [ 1 ], b = [ 2 ], c = [ 3 ] )
+    else: d1.update( a = 1, b = 2, c = 3 )
+    s1 = { 'a', 'b' }
+    d2 = d1 & s1
+    assert isinstance( d2, factory )
+    if class_name in PRODUCER_VALIDATOR_NAMES:
+        assert d2 == { 'a': [ 1 ], 'b': [ 2 ] }
+    else: assert d2 == { 'a': 1, 'b': 2 }
+    d3 = d1 & factory( *posargs, x = [ 0 ], a = [ 9 ], b = [ 8 ] ).keys( )
+    assert isinstance( d3, factory )
+    if class_name in PRODUCER_VALIDATOR_NAMES:
+        assert d3 == { 'a': [ 1 ], 'b': [ 2 ] }
+    else: assert d3 == { 'a': 1, 'b': 2 }
+    d4 = s1 & d1
+    assert isinstance( d4, factory )
+    if class_name in PRODUCER_VALIDATOR_NAMES:
+        assert d4 == { 'a': [ 1 ], 'b': [ 2 ] }
+    else: assert d4 == { 'a': 1, 'b': 2 }
+
+
+@pytest.mark.parametrize(
+    'module_qname, class_name',
+    product( THESE_MODULE_QNAMES, THESE_CLASSES_NAMES )
+)
+def test_172_and_rejects_invalid_operands( module_qname, class_name ):
+    ''' Dictionary intersection rejects invalid operands. '''
+    module = cache_import_module( module_qname )
+    factory = getattr( module, class_name )
+    posargs, nomargs = select_arguments( class_name )
+    dct = factory( *posargs, **nomargs )
+    assert NotImplemented == dct.__and__( [ ] )
+    assert NotImplemented == dct.__rand__( [ ] )
+
+
+@pytest.mark.parametrize(
+    'module_qname, class_name',
+    product( THESE_MODULE_QNAMES, THESE_CLASSES_NAMES )
+)
+def test_180_operations_preserve_accretion( module_qname, class_name ):
+    ''' Dictionary operations maintain accretive contract. '''
+    module = cache_import_module( module_qname )
+    factory = getattr( module, class_name )
+    posargs, nomargs = select_arguments( class_name )
+    d1 = factory( *posargs, **nomargs )
+    d2 = factory( *posargs, **nomargs )
+    if class_name in PRODUCER_VALIDATOR_NAMES:
+        d1[ 'a' ] = [ 1 ]
+        d2[ 'a' ] = [ 2 ]
+    else:
+        d1[ 'a' ] = 1
+        d2[ 'a' ] = 2
+    with pytest.raises( exceptions.IndelibleEntryError ):
+        d1 | d2 # pylint: disable=pointless-statement
+    d4 = d1 & { 'a' }
+    with pytest.raises( exceptions.IndelibleEntryError ):
+        if class_name in PRODUCER_VALIDATOR_NAMES:
+            d4[ 'a' ] = [ 3 ]
+        else: d4[ 'a' ] = 3
 
 
 @pytest.mark.parametrize(
@@ -339,7 +544,7 @@ def test_222_dictionary_measurability( module_qname, class_name ):
     'module_qname, class_name',
     product( THESE_MODULE_QNAMES, THESE_CLASSES_NAMES )
 )
-def test_225_dictionary_equality( # pylint: disable=too-many-locals
+def test_225_dictionary_equality(
     module_qname, class_name
 ):
     ''' Dictionary is equivalent to another dictionary with same values. '''
@@ -409,7 +614,39 @@ def test_240_dictionary_entry_optional_retrieval( module_qname, class_name ):
     'module_qname, class_name',
     product( THESE_MODULE_QNAMES, THESE_CLASSES_NAMES )
 )
-def test_250_subclasses_abc_dictionary( module_qname, class_name ):
+def test_250_with_data( module_qname, class_name ):
+    ''' Dictionary creates new instance with different data. '''
+    module = cache_import_module( module_qname )
+    factory = getattr( module, class_name )
+    posargs, nomargs = select_arguments( class_name )
+    d1 = factory( *posargs, **nomargs )
+    if class_name in PRODUCER_VALIDATOR_NAMES:
+        d1[ 'a' ] = [ 1 ]
+        d1[ 'b' ] = [ 2 ]
+        new_data = { 'c': [ 3 ], 'd': [ 4 ] }
+    else:
+        d1[ 'a' ] = 1
+        d1[ 'b' ] = 2
+        new_data = { 'c': 3, 'd': 4 }
+    d2 = d1.with_data( new_data )
+    assert isinstance( d2, factory )
+    assert type( d1 ) is type( d2 )
+    assert d1 != d2
+    if class_name in PRODUCER_VALIDATOR_NAMES:
+        assert d2 == { 'c': [ 3 ], 'd': [ 4 ] }
+    else: assert d2 == { 'c': 3, 'd': 4 }
+    if class_name in PRODUCER_NAMES:
+        assert isinstance( d2[ 'x' ], list )
+    if class_name in VALIDATOR_NAMES:
+        with pytest.raises( exceptions.EntryValidationError ):
+            d2[ 'y' ] = 'invalid'
+
+
+@pytest.mark.parametrize(
+    'module_qname, class_name',
+    product( THESE_MODULE_QNAMES, THESE_CLASSES_NAMES )
+)
+def test_260_subclasses_abc_dictionary( module_qname, class_name ):
     ''' Subclasses 'collections.abc.Mapping'. '''
     from collections.abc import Mapping as AbstractDictionary
     module = cache_import_module( module_qname )

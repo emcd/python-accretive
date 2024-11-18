@@ -166,13 +166,13 @@ Installation 📦
    :alt: Bandit
    :target: https://github.com/PyCQA/bandit
 
-.. image:: https://www.mypy-lang.org/static/mypy_badge.svg
-   :alt: Mypy
-   :target: https://mypy-lang.org
-
 .. image:: https://img.shields.io/badge/linting-pylint-yellowgreen
    :alt: Pylint
    :target: https://github.com/pylint-dev/pylint
+
+.. image:: https://microsoft.github.io/pyright/img/pyright_badge.svg
+   :alt: Pyright
+   :target: https://microsoft.github.io/pyright/
 
 .. image:: https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json
    :alt: Ruff

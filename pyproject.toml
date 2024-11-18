@@ -105,7 +105,7 @@ linters = [
   'ruff check --quiet sources documentation tests',
   'bandit --configfile pyproject.toml --quiet --recursive sources',
   'tryceratops sources',
-  'mypy sources',
+  # TODO: pyright
   'pylint sources documentation tests',
   'semgrep --config p/python --error --quiet --skip-unknown-extensions sources',
 ]
@@ -140,7 +140,8 @@ cache_dir = '.auxiliary/caches/mypy'
 disable_error_code = [ 'attr-defined', 'name-defined' ]
 implicit_optional = true
 pretty = true
-strict = true
+strict = false
+# TODO: Completely disable.
 
 # https://pylint.pycqa.org/en/latest/user_guide/configuration/index.html
 [tool.pylint.main]
@@ -227,6 +228,7 @@ allow-wildcard-with-all = false
 logging-format-style = 'new'
 [tool.pylint.'messages control']
 disable = [
+  'bad-dunder-name',
   'consider-using-assignment-expr',
   'consider-using-f-string',
   'duplicate-code',  # TODO: Re-enable after heuristic is fixed.
