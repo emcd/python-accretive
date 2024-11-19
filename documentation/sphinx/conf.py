@@ -85,6 +85,8 @@ nitpick_ignore = [
     ( 'py:class', "Doc" ),
     ( 'py:class', "NotImplementedType" ),
     ( 'py:class', "accretive.dictionaries._DictionaryOperations" ),
+    ( 'py:class', "accretive.__._H" ),
+    ( 'py:class', "accretive.__._V" ),
     ( 'py:class', "accretive.__.Annotated" ),
     ( 'py:class', "accretive.__.H" ),
     ( 'py:class', "accretive.__.V" ),
@@ -98,6 +100,8 @@ nitpick_ignore = [
     ( 'py:class', "typing_extensions.TypeIs" ),
     ( 'py:class', "types.Annotated" ),
     ( 'py:class', "types.NoneType" ),
+    ( 'py:obj', "accretive.__._H" ),
+    ( 'py:obj', "accretive.__._V" ),
     ( 'py:obj', "accretive.__.H" ),
     ( 'py:obj', "accretive.__.V" ),
 ]

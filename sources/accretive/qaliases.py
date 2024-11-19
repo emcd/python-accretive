@@ -34,6 +34,7 @@ from .classes import (
     ProtocolClass as        AccretiveProtocolClass,
 )
 from .dictionaries import (
+    AbstractDictionary as           AbstractAccretiveDictionary,
     Dictionary as                   AccretiveDictionary,
     ProducerDictionary as           AccretiveProducerDictionary,
     ProducerValidatorDictionary as  AccretiveProducerValidatorDictionary,

@@ -85,21 +85,22 @@ class AbstractDictionary( __.cabc.Mapping[ __.H, __.V ] ):
 
     def update(
         self,
-        *iterables: __.DictionaryPositionalArgument,
-        **entries: __.DictionaryNominativeArgument,
+        *iterables: __.DictionaryPositionalArgument[ __.H, __.V ],
+        **entries: __.DictionaryNominativeArgument[ __.V ],
     ) -> __.a.Self:
         ''' Adds new entries as a batch. Returns self. '''
         from itertools import chain
-        updates = [ ]
-        for indicator, value in chain.from_iterable( map(
-            lambda element: (
+        updates: list[ tuple[ __.H, __.V ] ] = [ ]
+        for indicator, value in chain.from_iterable( map( # type: ignore
+            lambda element: ( # type: ignore
                 element.items( )
                 if isinstance( element, __.cabc.Mapping )
                 else element
             ),
             ( *iterables, entries )
         ) ):
-            indicator_, value_ = self._pre_setitem_( indicator, value )
+            indicator_, value_ = (
+                self._pre_setitem_( indicator, value ) ) # type: ignore
             if indicator_ in self:
                 from .exceptions import EntryImmutabilityError
                 raise EntryImmutabilityError( indicator_ )
@@ -154,8 +155,8 @@ class _DictionaryOperations( AbstractDictionary[ __.H, __.V ] ):
     @__.abstract_member_function
     def with_data(
         self,
-        *iterables: __.DictionaryPositionalArgument,
-        **entries: __.DictionaryNominativeArgument,
+        *iterables: __.DictionaryPositionalArgument[ __.H, __.V ],
+        **entries: __.DictionaryNominativeArgument[ __.V ],
     ) -> __.a.Self:
         ''' Creates new dictionary with same behavior but different data. '''
         raise NotImplementedError # pragma: no coverage
@@ -174,12 +175,12 @@ class Dictionary( # pylint: disable=eq-without-hash
 
     __slots__ = ( '_data_', )
 
-    _data_: _Dictionary
+    _data_: _Dictionary[ __.H, __.V ]
 
     def __init__(
         self,
-        *iterables: __.DictionaryPositionalArgument,
-        **entries: __.DictionaryNominativeArgument,
+        *iterables: __.DictionaryPositionalArgument[ __.H, __.V ],
+        **entries: __.DictionaryNominativeArgument[ __.V ],
     ) -> None:
         self._data_ = _Dictionary( *iterables, **entries )
         super( ).__init__( )
@@ -227,7 +228,8 @@ class Dictionary( # pylint: disable=eq-without-hash
             'Else, supplied default value or ``None``.' )
     ]:
         ''' Retrieves entry associated with key, if it exists. '''
-        if __.is_absent( default ): return self._data_.get( key )
+        if __.is_absent( default ):
+            return self._data_.get( key ) # type: ignore
         return self._data_.get( key, default )
 
     def keys( self ) -> __.cabc.KeysView[ __.H ]:
@@ -244,8 +246,8 @@ class Dictionary( # pylint: disable=eq-without-hash
 
     def with_data(
         self,
-        *iterables: __.DictionaryPositionalArgument,
-        **entries: __.DictionaryNominativeArgument,
+        *iterables: __.DictionaryPositionalArgument[ __.H, __.V ],
+        **entries: __.DictionaryNominativeArgument[ __.V ],
     ) -> __.a.Self:
         return type( self )( *iterables, **entries )
 
@@ -260,7 +262,7 @@ Dictionary.__doc__ = __.generate_docstring(
 # Register as subclass of Mapping rather than use it as mixin.
 # We directly implement, for the sake of efficiency, the methods which the
 # mixin would provide.
-__.cabc.Mapping.register( Dictionary )
+__.cabc.Mapping.register( Dictionary ) # type: ignore
 
 
 class ProducerDictionary( Dictionary[ __.H, __.V ] ):
@@ -268,14 +270,14 @@ class ProducerDictionary( Dictionary[ __.H, __.V ] ):
 
     __slots__ = ( '_producer_', )
 
-    _producer_: __.DictionaryProducer
+    _producer_: __.DictionaryProducer[ __.V ]
 
     def __init__(
         self,
-        producer: __.DictionaryProducer,
+        producer: __.DictionaryProducer[ __.V ],
         /,
-        *iterables: __.DictionaryPositionalArgument,
-        **entries: __.DictionaryNominativeArgument
+        *iterables: __.DictionaryPositionalArgument[ __.H, __.V ],
+        **entries: __.DictionaryNominativeArgument[ __.V ],
     ):
         # TODO: Validate producer argument.
         self._producer_ = producer
@@ -308,8 +310,8 @@ class ProducerDictionary( Dictionary[ __.H, __.V ] ):
 
     def with_data(
         self,
-        *iterables: __.DictionaryPositionalArgument,
-        **entries: __.DictionaryNominativeArgument,
+        *iterables: __.DictionaryPositionalArgument[ __.H, __.V ],
+        **entries: __.DictionaryNominativeArgument[ __.V ],
     ) -> __.a.Self:
         return type( self )( self._producer_, *iterables, **entries )
 
@@ -326,14 +328,14 @@ class ValidatorDictionary( Dictionary[ __.H, __.V ] ):
 
     __slots__ = ( '_validator_', )
 
-    _validator_: __.DictionaryValidator
+    _validator_: __.DictionaryValidator[ __.H, __.V ]
 
     def __init__(
         self,
-        validator: __.DictionaryValidator,
+        validator: __.DictionaryValidator[ __.H, __.V ],
         /,
-        *iterables: __.DictionaryPositionalArgument,
-        **entries: __.DictionaryNominativeArgument,
+        *iterables: __.DictionaryPositionalArgument[ __.H, __.V ],
+        **entries: __.DictionaryNominativeArgument[ __.V ],
     ) -> None:
         self._validator_ = validator
         super( ).__init__( *iterables, **entries )
@@ -357,8 +359,8 @@ class ValidatorDictionary( Dictionary[ __.H, __.V ] ):
 
     def with_data(
         self,
-        *iterables: __.DictionaryPositionalArgument,
-        **entries: __.DictionaryNominativeArgument,
+        *iterables: __.DictionaryPositionalArgument[ __.H, __.V ],
+        **entries: __.DictionaryNominativeArgument[ __.V ],
     ) -> __.a.Self:
         return type( self )( self._validator_, *iterables, **entries )
 
@@ -375,16 +377,16 @@ class ProducerValidatorDictionary( Dictionary[ __.H, __.V ] ):
 
     __slots__ = ( '_producer_', '_validator_' )
 
-    _producer_: __.DictionaryProducer
-    _validator_: __.DictionaryValidator
+    _producer_: __.DictionaryProducer[ __.V ]
+    _validator_: __.DictionaryValidator[ __.H, __.V ]
 
     def __init__(
         self,
-        producer: __.DictionaryProducer,
-        validator: __.DictionaryValidator,
+        producer: __.DictionaryProducer[ __.V ],
+        validator: __.DictionaryValidator[ __.H, __.V ],
         /,
-        *iterables: __.DictionaryPositionalArgument,
-        **entries: __.DictionaryNominativeArgument,
+        *iterables: __.DictionaryPositionalArgument[ __.H, __.V ],
+        **entries: __.DictionaryNominativeArgument[ __.V ],
     ) -> None:
         self._producer_ = producer
         self._validator_ = validator
@@ -427,8 +429,8 @@ class ProducerValidatorDictionary( Dictionary[ __.H, __.V ] ):
 
     def with_data(
         self,
-        *iterables: __.DictionaryPositionalArgument,
-        **entries: __.DictionaryNominativeArgument,
+        *iterables: __.DictionaryPositionalArgument[ __.H, __.V ],
+        **entries: __.DictionaryNominativeArgument[ __.V ],
     ) -> __.a.Self:
         return type( self )(
             self._producer_, self._validator_, *iterables, **entries )

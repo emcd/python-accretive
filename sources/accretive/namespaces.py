@@ -30,8 +30,8 @@ class Namespace( _objects.Object ): # pylint: disable=eq-without-hash
 
     def __init__(
         self,
-        *iterables: __.DictionaryPositionalArgument,
-        **attributes: __.DictionaryNominativeArgument
+        *iterables: __.DictionaryPositionalArgument[ __.H, __.V ],
+        **attributes: __.DictionaryNominativeArgument[ __.V ],
     ) -> None:
         super( ).__init__( )
         super( ).__getattribute__( '__dict__' ).update(

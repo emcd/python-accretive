@@ -105,7 +105,7 @@ linters = [
   'ruff check --quiet sources documentation tests',
   'bandit --configfile pyproject.toml --quiet --recursive sources',
   'tryceratops sources',
-  # TODO: pyright
+  'pyright sources',
   'pylint sources documentation tests',
   'semgrep --config p/python --error --quiet --skip-unknown-extensions sources',
 ]
@@ -283,7 +283,28 @@ ignored-argument-names = '''_.*'''
 redefining-builtins-modules = [ 'builtins', 'io' ]
 
 [tool.pyright]
+include = [ 'sources' ]
+reportConstantRedefinition = true
+reportInvalidTypeVarUse = true
+reportMatchNotExhaustive = true
+reportMissingImports = true
+reportMissingTypeStubs = true
+reportMissingTypeArgument = true
+reportPrivateUsage = true
 reportSelfClsParameterName = false
+reportUnknownArgumentType = true
+reportUnknownLambdaType = true
+reportUnknownMemberType = true
+reportUnknownParameterType = true
+reportUnknownVariableType = true
+reportUnnecessaryCast = true
+reportUnnecessaryComparison = true
+reportUntypedBaseClass = true
+reportUntypedClassDecorator = true
+reportUntypedFunctionDecorator = true
+reportUntypedNamedTuple = true
+reportUnusedExpression = true
+#strict = [ 'sources' ]
 stubPath = 'sources/accretive/_typedecls'
 
 [tool.pytest.ini_options]

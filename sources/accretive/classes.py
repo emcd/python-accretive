@@ -105,7 +105,8 @@ ABCFactory.__doc__ = __.generate_docstring(
 )
 
 
-class ProtocolClass( __.a.Protocol.__class__ ): # type: ignore
+# pylint: disable=bad-classmethod-argument,no-self-argument
+class ProtocolClass( type( __.a.Protocol ) ):
     ''' Accretive protocol class factory. '''
 
     def __new__( # pylint: disable=too-many-arguments
@@ -117,10 +118,11 @@ class ProtocolClass( __.a.Protocol.__class__ ): # type: ignore
         docstring: __.Optional[ __.a.Nullable[ str ] ] = __.absent,
         **args: __.a.Any
     ) -> ProtocolClass:
-        class_ = __.a.Protocol.__class__.__new__(
-            factory, name, bases, namespace, **args )
-        return _class__new__( # type: ignore
-            class_, decorators = decorators, docstring = docstring )
+        class_ = __.a.Protocol.__class__.__new__( # type: ignore
+            factory, name, bases, namespace, **args ) # type: ignore
+        return _class__new__(
+            class_, # type: ignore
+            decorators = decorators, docstring = docstring )
 
     def __init__( selfclass, *posargs: __.a.Any, **nomargs: __.a.Any ):
         super( ).__init__( *posargs, **nomargs )
@@ -133,6 +135,7 @@ class ProtocolClass( __.a.Protocol.__class__ ): # type: ignore
     def __setattr__( selfclass, name: str, value: __.a.Any ) -> None:
         if not _class__setattr__( selfclass, name ):
             super( ).__setattr__( name, value )
+# pylint: enable=bad-classmethod-argument,no-self-argument
 
 ProtocolClass.__doc__ = __.generate_docstring(
     ProtocolClass,

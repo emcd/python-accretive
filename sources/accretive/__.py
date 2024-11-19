@@ -52,6 +52,8 @@ from . import _annotations as a
 
 H = a.TypeVar( 'H', bound = cabc.Hashable ) # Hash Key
 V = a.TypeVar( 'V' ) # Value
+_H = a.TypeVar( '_H' )
+_V = a.TypeVar( '_V' )
 
 
 ClassDecorators: a.TypeAlias = (
@@ -71,7 +73,7 @@ DictionaryPositionalArgument: a.TypeAlias = a.Annotation[
         'Duplicate keys will result in an error.' ),
 ]
 DictionaryProducer: a.TypeAlias = a.Annotation[
-    cabc.Callable[ [ ], a.Any ],
+    cabc.Callable[ [ ], V ],
     a.Doc( 'Callable which produces values for absent dictionary entries.' ),
 ]
 DictionaryValidator: a.TypeAlias = a.Annotation[
@@ -88,15 +90,17 @@ def repair_class_reproduction( original: type, reproduction: type ) -> None:
     match python_implementation( ):
         case 'CPython': # pragma: no branch
             _repair_cpython_class_closures( original, reproduction )
+        case _: pass # pragma: no cover
 
 
 def _repair_cpython_class_closures( # pylint: disable=too-complex
     original: type, reproduction: type
 ) -> None:
-    def try_repair_closure( function: cabc.Callable ) -> bool:
+    def try_repair_closure( function: cabc.Callable[ ..., a.Any ] ) -> bool:
         try: index = function.__code__.co_freevars.index( '__class__' )
         except ValueError: return False
-        closure = function.__closure__[ index ] # type: ignore
+        if not function.__closure__: return False # pragma: no branch
+        closure = function.__closure__[ index ]
         if original is closure.cell_contents: # pragma: no branch
             closure.cell_contents = reproduction
             return True
@@ -278,7 +282,11 @@ def is_absent( value: object ) -> a.TypeIs[ Absent ]:
     return absent is value
 
 
-class CoreDictionary( ConcealerExtension, dict[ H, V ] ):
+class CoreDictionary(
+    ConcealerExtension,
+    dict[ _H, _V ],
+    a.Generic[ _H, _V ],
+):
     ''' Accretive subclass of :py:class:`dict`.
 
         Can be used as an instance dictionary.
@@ -288,17 +296,17 @@ class CoreDictionary( ConcealerExtension, dict[ H, V ] ):
 
     def __init__(
         self,
-        *iterables: DictionaryPositionalArgument,
-        **entries: DictionaryNominativeArgument
+        *iterables: DictionaryPositionalArgument[ _H, _V ],
+        **entries: DictionaryNominativeArgument[ _V ],
     ):
         super( ).__init__( )
         self.update( *iterables, **entries )
 
-    def __delitem__( self, key: H ) -> None:
+    def __delitem__( self, key: _H ) -> None:
         from .exceptions import EntryImmutabilityError
         raise EntryImmutabilityError( key )
 
-    def __setitem__( self, key: H, value: V ) -> None:
+    def __setitem__( self, key: _H, value: _V ) -> None:
         from .exceptions import EntryImmutabilityError
         if key in self: raise EntryImmutabilityError( key )
         super( ).__setitem__( key, value )
@@ -313,7 +321,7 @@ class CoreDictionary( ConcealerExtension, dict[ H, V ] ):
         return type( self )( self )
 
     def pop( # pylint: disable=unused-argument
-        self, key: H, default: Optional[ V ] = absent
+        self, key: _H, default: Optional[ _V ] = absent
     ) -> a.Never:
         ''' Raises exception. Cannot pop indelible entry. '''
         from .exceptions import OperationValidityError
@@ -324,23 +332,22 @@ class CoreDictionary( ConcealerExtension, dict[ H, V ] ):
         from .exceptions import OperationValidityError
         raise OperationValidityError( 'popitem' )
 
-    def update(
+    def update( # type: ignore
         self,
-        *iterables: DictionaryPositionalArgument,
-        **entries: DictionaryNominativeArgument
-    ) -> a.Self:
-        ''' Adds new entries as a batch. Returns self. '''
+        *iterables: DictionaryPositionalArgument[ _H, _V ],
+        **entries: DictionaryNominativeArgument[ _V ],
+    ) -> None:
+        ''' Adds new entries as a batch. '''
         from itertools import chain
         # Add values in order received, enforcing no alteration.
-        for indicator, value in chain.from_iterable( map(
-            lambda element: (
+        for indicator, value in chain.from_iterable( map( # type: ignore
+            lambda element: ( # type: ignore
                 element.items( )
                 if isinstance( element, cabc.Mapping )
                 else element
             ),
             ( *iterables, entries )
-        ) ): self[ indicator ] = value
-        return self
+        ) ): self[ indicator ] = value # type: ignore
 
 
 class Docstring( str ):
@@ -352,7 +359,7 @@ def calculate_class_fqname( class_: type ) -> str:
     return f"{class_.__module__}.{class_.__qualname__}"
 
 
-def calculate_fqname( obj: a.Any ) -> str:
+def calculate_fqname( obj: object ) -> str:
     ''' Calculates fully-qualified name for class of object. '''
     class_ = type( obj )
     return f"{class_.__module__}.{class_.__qualname__}"
@@ -376,7 +383,7 @@ def generate_docstring(
     ''' Sews together docstring fragments into clean docstring. '''
     from inspect import cleandoc, getdoc, isclass
     from ._docstrings import TABLE
-    fragments = [ ]
+    fragments: list[ str ] = [ ]
     for fragment_id in fragment_ids:
         if isclass( fragment_id ): fragment = getdoc( fragment_id ) or ''
         elif isinstance( fragment_id, Docstring ): fragment = fragment_id

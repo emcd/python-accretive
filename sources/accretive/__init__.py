@@ -56,4 +56,4 @@ def _reclassify_modules(
         attribute.__class__ = _InternalModule
 
 _reclassify_modules( globals( ) )
-__.modules[ __package__ ].__class__ = _InternalModule
+__.modules[ __name__ ].__class__ = _InternalModule

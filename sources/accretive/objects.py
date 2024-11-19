@@ -25,8 +25,8 @@ from . import __
 from . import classes as _classes
 
 
-class _Dictionary( # type: ignore
-    __.CoreDictionary, metaclass = _classes.Class
+class _Dictionary(
+    __.CoreDictionary[ __.H, __.V ], metaclass = _classes.Class
 ): pass
 
 
