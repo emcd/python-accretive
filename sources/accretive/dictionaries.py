@@ -68,13 +68,13 @@ class AbstractDictionary( __.cabc.Mapping[ __.H, __.V ] ):
     def __setitem__( self, key: __.H, value: __.V ) -> None:
         key, value = self._pre_setitem_( key, value )
         if key in self:
-            from .exceptions import IndelibleEntryError
-            raise IndelibleEntryError( key )
+            from .exceptions import EntryImmutabilityError
+            raise EntryImmutabilityError( key )
         self._store_item_( key, value )
 
     def __delitem__( self, key: __.H ) -> None:
-        from .exceptions import IndelibleEntryError
-        raise IndelibleEntryError( key )
+        from .exceptions import EntryImmutabilityError
+        raise EntryImmutabilityError( key )
 
     def setdefault( self, key: __.H, default: __.V ) -> __.V:
         ''' Returns value for key, setting it to default if missing. '''
@@ -101,8 +101,8 @@ class AbstractDictionary( __.cabc.Mapping[ __.H, __.V ] ):
         ) ):
             indicator_, value_ = self._pre_setitem_( indicator, value )
             if indicator_ in self:
-                from .exceptions import IndelibleEntryError
-                raise IndelibleEntryError( indicator_ )
+                from .exceptions import EntryImmutabilityError
+                raise EntryImmutabilityError( indicator_ )
             updates.append( ( indicator_, value_ ) )
         for indicator, value in updates: self._store_item_( indicator, value )
         return self
@@ -346,8 +346,8 @@ class ValidatorDictionary( Dictionary[ __.H, __.V ] ):
 
     def _pre_setitem_( self, key: __.H, value: __.V ) -> tuple[ __.H, __.V ]:
         if not self._validator_( key, value ):
-            from .exceptions import EntryValidationError
-            raise EntryValidationError( key, value )
+            from .exceptions import EntryValidityError
+            raise EntryValidityError( key, value )
         return key, value
 
     def copy( self ) -> __.a.Self:
@@ -401,16 +401,16 @@ class ProducerValidatorDictionary( Dictionary[ __.H, __.V ] ):
         if key not in self:
             value = self._producer_( )
             if not self._validator_( key, value ):
-                from .exceptions import EntryValidationError
-                raise EntryValidationError( key, value )
+                from .exceptions import EntryValidityError
+                raise EntryValidityError( key, value )
             self[ key ] = value
         else: value = super( ).__getitem__( key )
         return value
 
     def _pre_setitem_( self, key: __.H, value: __.V ) -> tuple[ __.H, __.V ]:
         if not self._validator_( key, value ):
-            from .exceptions import EntryValidationError
-            raise EntryValidationError( key, value )
+            from .exceptions import EntryValidityError
+            raise EntryValidityError( key, value )
         return key, value
 
     def copy( self ) -> __.a.Self:

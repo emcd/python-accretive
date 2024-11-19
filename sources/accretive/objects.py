@@ -44,13 +44,13 @@ class Object:
         return "{fqname}( )".format( fqname = __.calculate_fqname( self ) )
 
     def __delattr__( self, name: str ) -> None:
-        from .exceptions import IndelibleAttributeError
-        raise IndelibleAttributeError( name )
+        from .exceptions import AttributeImmutabilityError
+        raise AttributeImmutabilityError( name )
 
     def __setattr__( self, name: str, value: __.a.Any ) -> None:
         if hasattr( self, name ):
-            from .exceptions import IndelibleAttributeError
-            raise IndelibleAttributeError( name )
+            from .exceptions import AttributeImmutabilityError
+            raise AttributeImmutabilityError( name )
         super( ).__setattr__( name, value )
 
 Object.__doc__ = __.generate_docstring(

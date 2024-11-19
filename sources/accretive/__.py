@@ -295,18 +295,18 @@ class CoreDictionary( ConcealerExtension, dict[ H, V ] ):
         self.update( *iterables, **entries )
 
     def __delitem__( self, key: H ) -> None:
-        from .exceptions import IndelibleEntryError
-        raise IndelibleEntryError( key )
+        from .exceptions import EntryImmutabilityError
+        raise EntryImmutabilityError( key )
 
     def __setitem__( self, key: H, value: V ) -> None:
-        from .exceptions import IndelibleEntryError
-        if key in self: raise IndelibleEntryError( key )
+        from .exceptions import EntryImmutabilityError
+        if key in self: raise EntryImmutabilityError( key )
         super( ).__setitem__( key, value )
 
     def clear( self ) -> a.Never:
         ''' Raises exception. Cannot clear indelible entries. '''
-        from .exceptions import InvalidOperationError
-        raise InvalidOperationError( 'clear' )
+        from .exceptions import OperationValidityError
+        raise OperationValidityError( 'clear' )
 
     def copy( self ) -> a.Self:
         ''' Provides fresh copy of dictionary. '''
@@ -316,13 +316,13 @@ class CoreDictionary( ConcealerExtension, dict[ H, V ] ):
         self, key: H, default: Optional[ V ] = absent
     ) -> a.Never:
         ''' Raises exception. Cannot pop indelible entry. '''
-        from .exceptions import InvalidOperationError
-        raise InvalidOperationError( 'pop' )
+        from .exceptions import OperationValidityError
+        raise OperationValidityError( 'pop' )
 
     def popitem( self ) -> a.Never:
         ''' Raises exception. Cannot pop indelible entry. '''
-        from .exceptions import InvalidOperationError
-        raise InvalidOperationError( 'popitem' )
+        from .exceptions import OperationValidityError
+        raise OperationValidityError( 'popitem' )
 
     def update(
         self,

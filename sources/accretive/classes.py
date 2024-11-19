@@ -178,8 +178,8 @@ def _class__delattr__( class_: type, name: str ) -> bool:
     # Consult class attributes dictionary to ignore accretive base classes.
     if _behavior not in class_.__dict__.get( '_class_behaviors_', ( ) ):
         return False
-    from .exceptions import IndelibleAttributeError
-    raise IndelibleAttributeError( name )
+    from .exceptions import AttributeImmutabilityError
+    raise AttributeImmutabilityError( name )
 
 
 def _class__setattr__( class_: type, name: str ) -> bool:
@@ -187,6 +187,6 @@ def _class__setattr__( class_: type, name: str ) -> bool:
     if _behavior not in class_.__dict__.get( '_class_behaviors_', ( ) ):
         return False
     if hasattr( class_, name ):
-        from .exceptions import IndelibleAttributeError
-        raise IndelibleAttributeError( name )
+        from .exceptions import AttributeImmutabilityError
+        raise AttributeImmutabilityError( name )
     return False  # Allow setting new attributes

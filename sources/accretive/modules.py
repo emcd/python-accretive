@@ -28,12 +28,12 @@ class Module( __.Module ): # type: ignore[misc]
     ''' Accretive modules. '''
 
     def __delattr__( self, name: str ) -> None:
-        from .exceptions import IndelibleAttributeError
-        raise IndelibleAttributeError( name )
+        from .exceptions import AttributeImmutabilityError
+        raise AttributeImmutabilityError( name )
 
     def __setattr__( self, name: str, value: __.a.Any ) -> None:
-        from .exceptions import IndelibleAttributeError
-        if hasattr( self, name ): raise IndelibleAttributeError( name )
+        from .exceptions import AttributeImmutabilityError
+        if hasattr( self, name ): raise AttributeImmutabilityError( name )
         super( ).__setattr__( name, value )
 
 Module.__doc__ = __.generate_docstring(

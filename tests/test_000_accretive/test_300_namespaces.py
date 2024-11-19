@@ -75,10 +75,10 @@ def test_101_accretion( module_qname, class_name ):
     Object = getattr( module, class_name )
     obj = Object( )
     obj.attr = 42
-    with pytest.raises( exceptions.IndelibleAttributeError ):
+    with pytest.raises( exceptions.AttributeImmutabilityError ):
         obj.attr = -1
     assert 42 == obj.attr
-    with pytest.raises( exceptions.IndelibleAttributeError ):
+    with pytest.raises( exceptions.AttributeImmutabilityError ):
         del obj.attr
     assert 42 == obj.attr
 

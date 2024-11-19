@@ -94,11 +94,11 @@ forms of initialization.)
 >>> ns.apples = 14    # ❌ Attempted reassignment raises error.
 Traceback (most recent call last):
 ...
-accretive.exceptions.IndelibleAttributeError: Cannot reassign or delete existing attribute 'apples'.
+accretive.exceptions.AttributeImmutabilityError: Cannot reassign or delete existing attribute 'apples'.
 >>> del ns.apples     # ❌ Attempted deletion raises error.
 Traceback (most recent call last):
 ...
-accretive.exceptions.IndelibleAttributeError: Cannot reassign or delete existing attribute 'apples'.
+accretive.exceptions.AttributeImmutabilityError: Cannot reassign or delete existing attribute 'apples'.
 >>> ns
 accretive.namespaces.Namespace( apples = 12, bananas = 6, cherries = 42 )
 
@@ -119,11 +119,11 @@ accretive.dictionaries.Dictionary( {'apples': 12, 'bananas': 6, 'cherries': 42, 
 >>> dct[ 'bananas' ] = 11   # ❌ Attempted alteration raises error.
 Traceback (most recent call last):
 ...
-accretive.exceptions.IndelibleEntryError: Cannot update or remove existing entry for 'bananas'.
+accretive.exceptions.EntryImmutabilityError: Cannot alter or remove existing entry for 'bananas'.
 >>> del dct[ 'bananas' ]    # ❌ Attempted removal raises error.
 Traceback (most recent call last):
 ...
-accretive.exceptions.IndelibleEntryError: Cannot update or remove existing entry for 'bananas'.
+accretive.exceptions.EntryImmutabilityError: Cannot alter or remove existing entry for 'bananas'.
 >>> dct
 accretive.dictionaries.Dictionary( {'apples': 12, 'bananas': 6, 'cherries': 42, 'blueberries': 96, 'strawberries': 24} )
 
