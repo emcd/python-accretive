@@ -2,6 +2,28 @@
 
 .. towncrier release notes start
 
+Accretive 2.1 (2024-11-19)
+==========================
+
+Documentation Improvements
+--------------------------
+
+- Restructure and expand API documentation.
+
+
+Features
+--------
+
+- Add ``AbstractDictionary`` abstract base class to provide a common interface
+  for all dictionary types.
+- Add ``with_data`` method to dictionaries for creating new instances that
+  preserve producer/validator behavior while using different data.
+- Add intersection operation (``&``) to dictionaries for filtering entries by
+  either matching key-value pairs with another mapping or by keys with a set.
+- Add union operation (``|``) to dictionaries for combining entries from two
+  mappings while maintaining the accretive contract.
+
+
 Accretive 2.0 (2024-11-10)
 ==========================
 

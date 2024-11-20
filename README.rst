@@ -66,7 +66,9 @@ Key Features ⭐
   `dataclasses
   <https://docs.python.org/3/library/dataclasses.html#dataclasses.dataclass>`_.
 
-.. IMPORTANT:: 🛡
+
+Note on Immutability 📢
+===============================================================================
 
    Enforcement of immutability is quite difficult in Python. While this library
    encourages immutability by default, it can be circumvented by anyone who has
@@ -74,6 +76,14 @@ Key Features ⭐
    circumvent the immutability. Use the library in the spirit of making
    programs safer, but understand that it cannot truly prevent unwanted state
    tampering.
+
+
+Installation 📦
+===============================================================================
+
+::
+
+    pip install accretive
 
 
 Examples 💡
@@ -137,14 +147,6 @@ Use Cases 🎯
   available from the time of registration to the end of the process.
 * 🔒 **Immutable Collections**: Many scenarios requiring grow-only collections
   with immutability guarantees.
-
-
-Installation 📦
-===============================================================================
-
-::
-
-    pip install accretive
 
 
 `More Flair <https://www.imdb.com/title/tt0151804/characters/nm0431918>`_
