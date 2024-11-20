@@ -18,7 +18,37 @@
 #============================================================================#
 
 
-''' Accretive classes. '''
+# pylint: disable=line-too-long
+''' Accretive classes.
+
+Provides metaclasses for creating classes with accretive attributes. Once a
+class attribute is set, it cannot be reassigned or deleted.
+
+The implementation includes:
+
+* ``Class``: Standard metaclass for accretive classes; derived from
+  :py:class:`type`.
+* ``ABCFactory``: Metaclass for abstract base classes; derived from
+  :py:class:`abc.ABCMeta`.
+* ``ProtocolClass``: Metaclass for protocol classes; derived from
+  :py:class:`typing.Protocol`.
+
+These metaclasses are particularly useful for:
+
+* Creating classes with constant class attributes
+* Defining stable abstract base classes
+* Building protocol classes with fixed interfaces
+
+>>> from accretive import Class
+>>> class Example( metaclass = Class ):
+...     x = 1
+>>> Example.y = 2  # Add new class attribute
+>>> Example.x = 3  # Attempt reassignment
+Traceback (most recent call last):
+    ...
+accretive.exceptions.AttributeImmutabilityError: Cannot reassign or delete attribute 'x'.
+'''
+# pylint: enable=line-too-long
 
 
 from __future__ import annotations

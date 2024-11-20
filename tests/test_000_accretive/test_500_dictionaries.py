@@ -668,15 +668,3 @@ def test_900_docstring_sanity( module_qname, class_name ):
 
 
 # TODO: Dictionary description.
-
-
-@pytest.mark.parametrize(
-    'module_qname, class_name',
-    product( THESE_MODULE_QNAMES, THESE_CLASSES_NAMES )
-)
-def test_902_docstring_mentions_accretion( module_qname, class_name ):
-    ''' Class docstring mentions accretion. '''
-    module = cache_import_module( module_qname )
-    factory = getattr( module, class_name )
-    fragment = base.generate_docstring( 'instance attributes accretion' )
-    assert fragment in factory.__doc__

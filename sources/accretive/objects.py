@@ -18,7 +18,30 @@
 #============================================================================#
 
 
-''' Accretive objects. '''
+# pylint: disable=line-too-long
+''' Accretive objects.
+
+Provides the base class for objects with accretive attributes. Once an
+attribute is set on an instance, it cannot be reassigned or deleted.
+
+The implementation uses a special dictionary type for attribute storage that
+enforces the accretive behavior. This makes it suitable as a base class for:
+
+* Configuration objects
+* Plugin interfaces
+* Immutable data containers
+* Objects requiring attribute stability
+
+>>> from accretive import Object
+>>> obj = Object( )
+>>> obj.x = 1  # Add new instance attribute
+>>> obj.y = 2  # Add another instance attribute
+>>> obj.x = 3  # Attempt modification
+Traceback (most recent call last):
+    ...
+accretive.exceptions.AttributeImmutabilityError: Cannot reassign or delete existing attribute 'x'.
+'''
+# pylint: enable=line-too-long
 
 
 from . import __

@@ -27,6 +27,29 @@ API
 Package ``accretive``
 ===============================================================================
 
+Data structures which can grow but never shrink - once values are set, they
+become immutable. This behavior is useful for configuration registries, plugin
+systems, and other scenarios requiring grow-only collections with immutability
+guarantees.
+
+* ``Dictionary``: A dict-like structure where entries can be added but not
+  modified or removed once set. Variants include:
+
+  - ``ProducerDictionary``: Auto-generates values for missing keys
+  - ``ValidatorDictionary``: Validates entries before addition
+  - ``ProducerValidatorDictionary``: Combines both behaviors
+
+* ``Namespace``: Similar to :py:class:`types.SimpleNamespace` but with
+  immutable attributes after assignment.
+
+* ``Module``: A module type that enforces attribute immutability after
+  assignment.
+
+* ``Object``: Base class for objects with accretive attributes.
+
+* ``Class``: Metaclass for creating classes with accretive class
+  attributes.
+
 
 Module ``accretive.dictionaries``
 -------------------------------------------------------------------------------
