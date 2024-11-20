@@ -54,7 +54,7 @@ Existing attributes cannot be reassigned.
     >>> m.__name__ = 'bar'
     Traceback (most recent call last):
     ...
-    accretive.exceptions.IndelibleAttributeError: Cannot reassign or delete existing attribute '__name__'.
+    accretive.exceptions.AttributeImmutabilityError: Cannot reassign or delete existing attribute '__name__'.
 
 Or deleted.
 
@@ -63,7 +63,7 @@ Or deleted.
     >>> del m.__name__
     Traceback (most recent call last):
     ...
-    accretive.exceptions.IndelibleAttributeError: Cannot reassign or delete existing attribute '__name__'.
+    accretive.exceptions.AttributeImmutabilityError: Cannot reassign or delete existing attribute '__name__'.
 
 Attribute Assignment
 -------------------------------------------------------------------------------
@@ -111,7 +111,7 @@ unsophisticated monkey-patching by reclassifying the module.
     >>> getpass.getpass = pwned_getpass
     Traceback (most recent call last):
     ...
-    accretive.exceptions.IndelibleAttributeError: Cannot reassign or delete existing attribute 'getpass'.
+    accretive.exceptions.AttributeImmutabilityError: Cannot reassign or delete existing attribute 'getpass'.
 
 .. warning::
 

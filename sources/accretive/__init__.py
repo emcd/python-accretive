@@ -39,7 +39,7 @@ from .namespaces import *
 from .objects import *
 
 
-__version__ = '2.0'
+__version__ = '2.1rc0'
 
 
 _attribute_visibility_includes_ = frozenset( ( '__version__', ) )
@@ -56,4 +56,4 @@ def _reclassify_modules(
         attribute.__class__ = _InternalModule
 
 _reclassify_modules( globals( ) )
-__.modules[ __package__ ].__class__ = _InternalModule
+__.modules[ __name__ ].__class__ = _InternalModule

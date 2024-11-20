@@ -18,15 +18,38 @@
 #============================================================================#
 
 
-''' Accretive objects. '''
+# pylint: disable=line-too-long
+''' Accretive objects.
+
+Provides the base class for objects with accretive attributes. Once an
+attribute is set on an instance, it cannot be reassigned or deleted.
+
+The implementation uses a special dictionary type for attribute storage that
+enforces the accretive behavior. This makes it suitable as a base class for:
+
+* Configuration objects
+* Plugin interfaces
+* Immutable data containers
+* Objects requiring attribute stability
+
+>>> from accretive import Object
+>>> obj = Object( )
+>>> obj.x = 1  # Add new instance attribute
+>>> obj.y = 2  # Add another instance attribute
+>>> obj.x = 3  # Attempt modification
+Traceback (most recent call last):
+    ...
+accretive.exceptions.AttributeImmutabilityError: Cannot reassign or delete existing attribute 'x'.
+'''
+# pylint: enable=line-too-long
 
 
 from . import __
 from . import classes as _classes
 
 
-class _Dictionary( # type: ignore
-    __.CoreDictionary, metaclass = _classes.Class
+class _Dictionary(
+    __.CoreDictionary[ __.H, __.V ], metaclass = _classes.Class
 ): pass
 
 
@@ -44,13 +67,13 @@ class Object:
         return "{fqname}( )".format( fqname = __.calculate_fqname( self ) )
 
     def __delattr__( self, name: str ) -> None:
-        from .exceptions import IndelibleAttributeError
-        raise IndelibleAttributeError( name )
+        from .exceptions import AttributeImmutabilityError
+        raise AttributeImmutabilityError( name )
 
     def __setattr__( self, name: str, value: __.a.Any ) -> None:
         if hasattr( self, name ):
-            from .exceptions import IndelibleAttributeError
-            raise IndelibleAttributeError( name )
+            from .exceptions import AttributeImmutabilityError
+            raise AttributeImmutabilityError( name )
         super( ).__setattr__( name, value )
 
 Object.__doc__ = __.generate_docstring(

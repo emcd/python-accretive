@@ -52,7 +52,7 @@ Existing attributes cannot be reassigned.
     >>> Config.host = '127.0.0.1'
     Traceback (most recent call last):
     ...
-    accretive.exceptions.IndelibleAttributeError: Cannot reassign or delete existing attribute 'host'.
+    accretive.exceptions.AttributeImmutabilityError: Cannot reassign or delete existing attribute 'host'.
 
 Or deleted.
 
@@ -61,7 +61,7 @@ Or deleted.
     >>> del Config.port
     Traceback (most recent call last):
     ...
-    accretive.exceptions.IndelibleAttributeError: Cannot reassign or delete existing attribute 'port'.
+    accretive.exceptions.AttributeImmutabilityError: Cannot reassign or delete existing attribute 'port'.
 
 Attribute Assignment
 -------------------------------------------------------------------------------
@@ -94,7 +94,7 @@ can add new attributes, but cannot modify existing ones.
     >>> AppConfig.name = 'NewApp'
     Traceback (most recent call last):
     ...
-    accretive.exceptions.IndelibleAttributeError: Cannot reassign or delete existing attribute 'name'.
+    accretive.exceptions.AttributeImmutabilityError: Cannot reassign or delete existing attribute 'name'.
 
 Dynamic Docstring Assignment
 -------------------------------------------------------------------------------

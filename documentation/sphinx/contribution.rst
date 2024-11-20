@@ -16,7 +16,11 @@
    |                                                                          |
    +--------------------------------------------------------------------------+
 
+:tocdepth: 3
+
+
 .. include:: <isopub.txt>
+
 
 *******************************************************************************
 Contribution
@@ -292,7 +296,7 @@ Release
 3. Run Towncrier. Commit.
    ::
 
-        hatch --env develop run towncrier build --keep
+        hatch --env develop run towncrier build --keep --version ${release_version}
 
 4. Tag.
    ::
@@ -328,7 +332,7 @@ Postrelease Patch
 4. Run Towncrier. Commit.
    ::
 
-        hatch --env develop run towncrier build --keep
+        hatch --env develop run towncrier build --keep --version ${patch_version}
 
 5. Tag.
    ::

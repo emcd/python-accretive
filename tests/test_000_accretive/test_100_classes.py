@@ -77,18 +77,18 @@ def test_101_accretion( module_qname, class_name ):
         ''' test '''
         attr = 42
 
-    with pytest.raises( exceptions.IndelibleAttributeError ):
+    with pytest.raises( exceptions.AttributeImmutabilityError ):
         Object.attr = -1
     assert 42 == Object.attr
-    with pytest.raises( exceptions.IndelibleAttributeError ):
+    with pytest.raises( exceptions.AttributeImmutabilityError ):
         del Object.attr
     assert 42 == Object.attr
     Object.accreted_attr = 'foo'
     assert 'foo' == Object.accreted_attr
-    with pytest.raises( exceptions.IndelibleAttributeError ):
+    with pytest.raises( exceptions.AttributeImmutabilityError ):
         Object.accreted_attr = 'bar'
     assert 'foo' == Object.accreted_attr
-    with pytest.raises( exceptions.IndelibleAttributeError ):
+    with pytest.raises( exceptions.AttributeImmutabilityError ):
         del Object.accreted_attr
     assert 'foo' == Object.accreted_attr
 
@@ -125,9 +125,9 @@ def test_110_class_decorators( module_qname, class_name ):
     assert [ 'decorator1', 'decorator2' ] == decorator_calls
     assert 'value1' == Object.decorator1_attr
     assert 'value2' == Object.decorator2_attr
-    with pytest.raises( exceptions.IndelibleAttributeError ):
+    with pytest.raises( exceptions.AttributeImmutabilityError ):
         Object.decorator1_attr = 'new_value'
-    with pytest.raises( exceptions.IndelibleAttributeError ):
+    with pytest.raises( exceptions.AttributeImmutabilityError ):
         Object.decorator2_attr = 'new_value'
 
 

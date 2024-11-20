@@ -18,7 +18,23 @@
 #============================================================================#
 
 
-''' Accretive modules. '''
+''' Accretive modules.
+
+Provides a module type that enforces attribute immutability after assignment.
+This helps ensure that module-level constants remain constant and that module
+interfaces remain stable during runtime.
+
+The module implementation is derived from :py:class:`types.ModuleType` and adds
+accretive behavior. This makes it particularly useful for:
+
+* Ensuring constants remain constant
+* Preventing accidental modification of module interfaces
+* Creating plugin modules with stable APIs
+
+Also provides a convenience function:
+
+* ``reclassify_modules``: Converts existing modules to accretive modules.
+'''
 
 
 from . import __
@@ -28,12 +44,12 @@ class Module( __.Module ): # type: ignore[misc]
     ''' Accretive modules. '''
 
     def __delattr__( self, name: str ) -> None:
-        from .exceptions import IndelibleAttributeError
-        raise IndelibleAttributeError( name )
+        from .exceptions import AttributeImmutabilityError
+        raise AttributeImmutabilityError( name )
 
     def __setattr__( self, name: str, value: __.a.Any ) -> None:
-        from .exceptions import IndelibleAttributeError
-        if hasattr( self, name ): raise IndelibleAttributeError( name )
+        from .exceptions import AttributeImmutabilityError
+        if hasattr( self, name ): raise AttributeImmutabilityError( name )
         super( ).__setattr__( name, value )
 
 Module.__doc__ = __.generate_docstring(

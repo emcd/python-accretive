@@ -57,7 +57,7 @@ Existing attributes cannot be reassigned.
     >>> config.host = '127.0.0.1'
     Traceback (most recent call last):
     ...
-    accretive.exceptions.IndelibleAttributeError: Cannot reassign or delete existing attribute 'host'.
+    accretive.exceptions.AttributeImmutabilityError: Cannot reassign or delete existing attribute 'host'.
 
 Or deleted.
 
@@ -66,7 +66,7 @@ Or deleted.
     >>> del config.port
     Traceback (most recent call last):
     ...
-    accretive.exceptions.IndelibleAttributeError: Cannot reassign or delete existing attribute 'port'.
+    accretive.exceptions.AttributeImmutabilityError: Cannot reassign or delete existing attribute 'port'.
 
 Attribute Assignment
 -------------------------------------------------------------------------------

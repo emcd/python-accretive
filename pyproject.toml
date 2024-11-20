@@ -105,7 +105,7 @@ linters = [
   'ruff check --quiet sources documentation tests',
   'bandit --configfile pyproject.toml --quiet --recursive sources',
   'tryceratops sources',
-  'mypy sources',
+  'pyright sources',
   'pylint sources documentation tests',
   'semgrep --config p/python --error --quiet --skip-unknown-extensions sources',
 ]
@@ -140,7 +140,8 @@ cache_dir = '.auxiliary/caches/mypy'
 disable_error_code = [ 'attr-defined', 'name-defined' ]
 implicit_optional = true
 pretty = true
-strict = true
+strict = false
+# TODO: Completely disable.
 
 # https://pylint.pycqa.org/en/latest/user_guide/configuration/index.html
 [tool.pylint.main]
@@ -227,6 +228,7 @@ allow-wildcard-with-all = false
 logging-format-style = 'new'
 [tool.pylint.'messages control']
 disable = [
+  'bad-dunder-name',
   'consider-using-assignment-expr',
   'consider-using-f-string',
   'duplicate-code',  # TODO: Re-enable after heuristic is fixed.
@@ -281,7 +283,28 @@ ignored-argument-names = '''_.*'''
 redefining-builtins-modules = [ 'builtins', 'io' ]
 
 [tool.pyright]
+include = [ 'sources' ]
+reportConstantRedefinition = true
+reportInvalidTypeVarUse = true
+reportMatchNotExhaustive = true
+reportMissingImports = true
+reportMissingTypeStubs = true
+reportMissingTypeArgument = true
+reportPrivateUsage = true
 reportSelfClsParameterName = false
+reportUnknownArgumentType = true
+reportUnknownLambdaType = true
+reportUnknownMemberType = true
+reportUnknownParameterType = true
+reportUnknownVariableType = true
+reportUnnecessaryCast = true
+reportUnnecessaryComparison = true
+reportUntypedBaseClass = true
+reportUntypedClassDecorator = true
+reportUntypedFunctionDecorator = true
+reportUntypedNamedTuple = true
+reportUnusedExpression = true
+#strict = [ 'sources' ]
 stubPath = 'sources/accretive/_typedecls'
 
 [tool.pytest.ini_options]
@@ -307,22 +330,22 @@ directory = 'documentation/towncrier'
 filename = 'changelog.rst'
 package = 'accretive'
 package_dir = 'sources'
-
 [[tool.towncrier.type]]
 directory = 'bugfix'
 name = 'Bugfixes'
 showcontent = true
-
+[[tool.towncrier.type]]
+directory = 'docs'
+name = 'Documentation Improvements'
+showcontent = true
 [[tool.towncrier.type]]
 directory = 'feature'
 name = 'Features'
 showcontent = true
-
 [[tool.towncrier.type]]
 directory = 'platform'
 name = 'Supported Platforms'
 showcontent = true
-
 [[tool.towncrier.type]]
 directory = 'removal'
 name = 'Deprecations and Removals'

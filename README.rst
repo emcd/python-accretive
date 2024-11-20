@@ -44,40 +44,43 @@
    :alt: Project License
    :target: https://github.com/emcd/python-accretive/blob/master/LICENSE.txt
 
-A Python library package which provides *accretive data structures*.
 
-Accretive data structures can grow at any time but can never shrink. An
-accretive dictionary accepts new entries, but cannot have existing entries
-altered or removed. Similarly, an accretive namespace accepts new attributes,
-but cannot have existing attributes assigned to new values or deleted.
-
-Accretive data structures are useful as registries, which may be incrementally
-initialized, but should have immutable state, once initialized. In general,
-they are a good compromise between the safety of immutability and the
-convenience of incremental initialization.
-
-.. note::
-
-    Enforcement of immutability is quite difficult in Python. While this
-    library encourages immutability by default, it can be circumvented by
-    anyone who has intermediate knowledge of Python machinery and who is
-    determined to circumvent the immutability. Use the library in the spirit of
-    making programs safer, but understand that it cannot truly prevent unwanted
-    state tampering.
-
-In addition to accretive **dictionaries** (including dictionaries with *default
-entries*) and **namespaces**, this package also provides accretive **classes**
-(including *abstract base classes*), **modules**, and **objects**. Subpackages
-provide variants of all of these with some additional behaviors or constraints.
-Modules of aliases are also provided to satisfy various import styles and
-nomenclatural conventions.
+🔒 A Python library package which provides **accretive data structures** -
+collections which can grow but never shrink.
 
 
-Examples
+Key Features ⭐
+===============================================================================
+
+* 📖 **Accretive Dictionary**: Like a regular `dict
+  <https://docs.python.org/3/library/stdtypes.html#dict>`_, but entries cannot
+  be modified or removed once added. Also has variants with defaults and
+  validation.
+* 🗃️ **Accretive Namespace**: Similar to `SimpleNamespace
+  <https://docs.python.org/3/library/types.html#types.SimpleNamespace>`_, but
+  attributes become immutable after assignment.
+* 🧱 **Additional Types**: Classes (including abstract base classes), modules,
+  and objects with accretive behavior.
+* 🏗️ **Flexible Initialization**: Support for unprotected attributes during
+  initialization; useful for compatibility with class decorators, such as
+  `dataclasses
+  <https://docs.python.org/3/library/dataclasses.html#dataclasses.dataclass>`_.
+
+.. IMPORTANT:: 🛡
+
+   Enforcement of immutability is quite difficult in Python. While this library
+   encourages immutability by default, it can be circumvented by anyone who has
+   intermediate knowledge of Python machinery and who is determined to
+   circumvent the immutability. Use the library in the spirit of making
+   programs safer, but understand that it cannot truly prevent unwanted state
+   tampering.
+
+
+Examples 💡
 ===============================================================================
 
 
-Accretive Namespace
+Accretive Namespace 🗃️
 -------------------------------------------------------------------------------
 
 An accretive namespace, similar to ``types.SimpleNamespace``, is available.
@@ -86,38 +89,21 @@ arguments. (Keyword arguments shown below; see documentation for additional
 forms of initialization.)
 
 >>> from accretive import Namespace
->>> ns = Namespace( apples = 12, bananas = 6, cherries = 42 )
+>>> ns = Namespace( apples = 12, bananas = 6 )
+>>> ns.cherries = 42  # ✅ Allows new attributes.
+>>> ns.apples = 14    # ❌ Attempted reassignment raises error.
+Traceback (most recent call last):
+...
+accretive.exceptions.AttributeImmutabilityError: Cannot reassign or delete existing attribute 'apples'.
+>>> del ns.apples     # ❌ Attempted deletion raises error.
+Traceback (most recent call last):
+...
+accretive.exceptions.AttributeImmutabilityError: Cannot reassign or delete existing attribute 'apples'.
 >>> ns
 accretive.namespaces.Namespace( apples = 12, bananas = 6, cherries = 42 )
 
-Arbitrary attributes can be assigned, as is expected in Python.
 
->>> ns.blueberries = 96
->>> ns.strawberries = 24
->>> ns
-accretive.namespaces.Namespace( apples = 12, bananas = 6, cherries = 42, blueberries = 96, strawberries = 24 )
-
-Since the namespace is accretive, attributes cannot be deleted.
-
->>> del ns.apples
-Traceback (most recent call last):
-...
-accretive.exceptions.IndelibleAttributeError: Cannot reassign or delete existing attribute 'apples'.
-
-Or reassigned.
-
->>> ns.apples = 14
-Traceback (most recent call last):
-...
-accretive.exceptions.IndelibleAttributeError: Cannot reassign or delete existing attribute 'apples'.
-
-The attributes thus retain their original values.
-
->>> ns
-accretive.namespaces.Namespace( apples = 12, bananas = 6, cherries = 42, blueberries = 96, strawberries = 24 )
-
-
-Accretive Dictionary
+Accretive Dictionary 📖
 -------------------------------------------------------------------------------
 
 An accretive dictionary, similar to ``dict``, is available. This dictionary can
@@ -126,38 +112,34 @@ arguments shown below; see documentation for additional forms of
 initialization.)
 
 >>> from accretive import Dictionary
->>> dct = Dictionary( apples = 12, bananas = 6, cherries = 42 )
->>> dct
-accretive.dictionaries.Dictionary( {'apples': 12, 'bananas': 6, 'cherries': 42} )
-
-Entries can be added to the dictionary after initialization. This includes via
-a batch operation, such as ``update``, which can accept the same forms of
-arguments as dictionary initialization.
-
+>>> dct = Dictionary( apples = 12, bananas = 6 )
+>>> dct[ 'cherries' ] = 42  # ✅ Allows new entries.
 >>> dct.update( blueberries = 96, strawberries = 24 )
 accretive.dictionaries.Dictionary( {'apples': 12, 'bananas': 6, 'cherries': 42, 'blueberries': 96, 'strawberries': 24} )
-
-Since the dictionary is accretive, existing entries cannot be removed.
-
->>> del dct[ 'bananas' ]
+>>> dct[ 'bananas' ] = 11   # ❌ Attempted alteration raises error.
 Traceback (most recent call last):
 ...
-accretive.exceptions.IndelibleEntryError: Cannot update or remove existing entry for 'bananas'.
-
-Or altered.
-
->>> dct[ 'bananas' ] = 11
+accretive.exceptions.EntryImmutabilityError: Cannot alter or remove existing entry for 'bananas'.
+>>> del dct[ 'bananas' ]    # ❌ Attempted removal raises error.
 Traceback (most recent call last):
 ...
-accretive.exceptions.IndelibleEntryError: Cannot update or remove existing entry for 'bananas'.
-
-The entries thus remain unchanged.
-
+accretive.exceptions.EntryImmutabilityError: Cannot alter or remove existing entry for 'bananas'.
 >>> dct
 accretive.dictionaries.Dictionary( {'apples': 12, 'bananas': 6, 'cherries': 42, 'blueberries': 96, 'strawberries': 24} )
 
 
-Installation
+Use Cases 🎯
+===============================================================================
+
+* 📝 **Configuration Registries**: Registries which can accumulate entries but
+  never remove them, thereby guaranteeing sticky state.
+* 🔌 **Plugin Systems**: Register extensions which are then guaranteed to be
+  available from the time of registration to the end of the process.
+* 🔒 **Immutable Collections**: Many scenarios requiring grow-only collections
+  with immutability guarantees.
+
+
+Installation 📦
 ===============================================================================
 
 ::
@@ -167,7 +149,6 @@ Installation
 
 `More Flair <https://www.imdb.com/title/tt0151804/characters/nm0431918>`_
 ===============================================================================
-...than the required minimum
 
 .. image:: https://img.shields.io/github/last-commit/emcd/python-accretive
    :alt: GitHub last commit
@@ -185,13 +166,13 @@ Installation
    :alt: Bandit
    :target: https://github.com/PyCQA/bandit
 
-.. image:: https://www.mypy-lang.org/static/mypy_badge.svg
-   :alt: Mypy
-   :target: https://mypy-lang.org
-
 .. image:: https://img.shields.io/badge/linting-pylint-yellowgreen
    :alt: Pylint
    :target: https://github.com/pylint-dev/pylint
+
+.. image:: https://microsoft.github.io/pyright/img/pyright_badge.svg
+   :alt: Pyright
+   :target: https://microsoft.github.io/pyright/
 
 .. image:: https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json
    :alt: Ruff

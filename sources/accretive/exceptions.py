@@ -18,7 +18,25 @@
 #============================================================================#
 
 
-''' Family of exceptions for package API. '''
+''' Family of exceptions for package API.
+
+Provides a hierarchy of exceptions that are raised when accretive behavior is
+violated. The hierarchy is designed to allow both specific and general
+exception handling.
+
+* ``Omniexception``: Base for all package exceptions
+* ``Omnierror``: Base for all package errors
+
+* ``AttributeImmutabilityError``: Raised for attribute modification
+* ``EntryImmutabilityError``: Raised for dictionary entry modification
+* ``EntryValidityError``: Raised for invalid dictionary entries
+* ``OperationValidityError``: Raised for invalid operations
+
+.. note::
+
+    Some exception names from earlier versions are maintained as aliases for
+    backward compatibility but are deprecated.
+'''
 
 
 from . import __ # pylint: disable=cyclic-import
@@ -35,32 +53,71 @@ class Omnierror( Omniexception, Exception ):
     ''' Base for error exceptions raised by package API. '''
 
 
-class EntryValidationError( Omnierror, ValueError ):
-    ''' Attempt to add invalid entry to dictionary. '''
-
-    def __init__( self, key: __.cabc.Hashable, value: __.a.Any ) -> None:
-        super( ).__init__(
-            f"Cannot add invalid entry ( {key!r}, {value!r} ) to dictionary." )
-
-
-class IndelibleAttributeError( Omnierror, AttributeError, TypeError ):
-    ''' Attempt to reassign or delete indelible attribute. '''
+class AttributeImmutabilityError( Omnierror, AttributeError, TypeError ):
+    ''' Attempt to reassign or delete immutable attribute. '''
 
     def __init__( self, name: str ) -> None:
+        super( ).__init__( f"Cannot reassign or delete attribute {name!r}." )
+
+
+class EntryImmutabilityError( Omnierror, TypeError ):
+    ''' Attempt to update or remove immutable dictionary entry. '''
+
+    def __init__( self, indicator: __.cabc.Hashable ) -> None:
         super( ).__init__(
-            f"Cannot reassign or delete existing attribute {name!r}." )
+            f"Cannot alter or remove existing entry for {indicator!r}." )
 
 
-class IndelibleEntryError( Omnierror, TypeError ):
-    ''' Attempt to update or remove indelible dictionary entry. '''
+class EntryValidityError( Omnierror, ValueError ):
+    ''' Attempt to add invalid entry to dictionary. '''
 
-    def __init__( self, indicator: __.a.Any ) -> None:
+    def __init__( self, indicator: __.cabc.Hashable, value: __.a.Any ) -> None:
         super( ).__init__(
-            f"Cannot update or remove existing entry for {indicator!r}." )
+            f"Cannot add invalid entry with key, {indicator!r}, "
+            f"and value, {value!r}, to dictionary." )
 
 
-class InvalidOperationError( Omnierror, RuntimeError, TypeError ):
+class OperationValidityError( Omnierror, RuntimeError, TypeError ):
     ''' Attempt to perform invalid operation. '''
 
     def __init__( self, name: str ) -> None:
-        super( ).__init__( f"Cannot perform operation {name!r}." )
+        super( ).__init__( f"Operation {name!r} is not valid on this object." )
+
+
+## BEGIN: Deprecated Exceptions
+# TODO: release 3.0: Remove.
+
+
+class EntryValidationError( EntryValidityError ):
+    ''' Attempt to add invalid entry to dictionary.
+
+        .. deprecated:: 2.1
+           Please use :py:exc:`EntryValidityError` instead.
+    '''
+
+
+class IndelibleAttributeError( AttributeImmutabilityError ):
+    ''' Attempt to reassign or delete indelible attribute.
+
+        .. deprecated:: 2.1
+           Please use :py:exc:`AttributeImmutabilityError` instead.
+    '''
+
+
+class IndelibleEntryError( EntryImmutabilityError ):
+    ''' Attempt to update or remove indelible dictionary entry.
+
+        .. deprecated:: 2.1
+           Please use :py:exc:`EntryImmutabilityError` instead.
+    '''
+
+    def __init__( self, indicator: __.a.Any ) -> None:
+        super( ).__init__( indicator )
+
+
+class InvalidOperationError( OperationValidityError ):
+    ''' Attempt to perform invalid operation.
+
+        .. deprecated:: 2.1
+           Please use :py:exc:`OperationValidityError` instead.
+    '''

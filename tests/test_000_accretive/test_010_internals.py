@@ -221,14 +221,14 @@ def test_210_core_dictionary_entry_accretion( ):
     ''' Dictionary accretes entries. '''
     factory = module.CoreDictionary
     dct = factory( *dictionary_posargs, **dictionary_nomargs )
-    with pytest.raises( exceptions.IndelibleEntryError ):
+    with pytest.raises( exceptions.EntryImmutabilityError ):
         dct[ 'foo' ] = 42
-    with pytest.raises( exceptions.IndelibleEntryError ):
+    with pytest.raises( exceptions.EntryImmutabilityError ):
         del dct[ 'foo' ]
     dct[ 'baz' ] = 3.1415926535
-    with pytest.raises( exceptions.IndelibleEntryError ):
+    with pytest.raises( exceptions.EntryImmutabilityError ):
         dct[ 'baz' ] = -1
-    with pytest.raises( exceptions.IndelibleEntryError ):
+    with pytest.raises( exceptions.EntryImmutabilityError ):
         del dct[ 'baz' ]
 
 
@@ -237,14 +237,14 @@ def test_211_core_dictionary_entry_accretion_via_update( ):
     factory = module.CoreDictionary
     dct = factory( )
     dct.update( *dictionary_posargs, **dictionary_nomargs )
-    with pytest.raises( exceptions.IndelibleEntryError ):
+    with pytest.raises( exceptions.EntryImmutabilityError ):
         dct[ 'foo' ] = 42
-    with pytest.raises( exceptions.IndelibleEntryError ):
+    with pytest.raises( exceptions.EntryImmutabilityError ):
         del dct[ 'foo' ]
     dct[ 'baz' ] = 3.1415926535
-    with pytest.raises( exceptions.IndelibleEntryError ):
+    with pytest.raises( exceptions.EntryImmutabilityError ):
         dct[ 'baz' ] = -1
-    with pytest.raises( exceptions.IndelibleEntryError ):
+    with pytest.raises( exceptions.EntryImmutabilityError ):
         del dct[ 'baz' ]
 
 
@@ -262,7 +262,7 @@ def test_212_core_dictionary_update_validation( ):
     assert 7 == dct[ 'g' ]
     assert 8 == dct[ 'h' ]
     assert 9 == dct[ 'i' ]
-    with pytest.raises( exceptions.IndelibleEntryError ):
+    with pytest.raises( exceptions.EntryImmutabilityError ):
         dct.update( { 'a': 10 } )
 
 
@@ -270,15 +270,15 @@ def test_220_core_dictionary_operation_prevention( ):
     ''' Dictionary cannot perform entry deletions and mutations. '''
     factory = module.CoreDictionary
     dct = factory( *dictionary_posargs, **dictionary_nomargs )
-    with pytest.raises( exceptions.InvalidOperationError ):
+    with pytest.raises( exceptions.OperationValidityError ):
         dct.clear( )
-    with pytest.raises( exceptions.InvalidOperationError ):
+    with pytest.raises( exceptions.OperationValidityError ):
         dct.pop( 'foo' )
-    with pytest.raises( exceptions.InvalidOperationError ):
+    with pytest.raises( exceptions.OperationValidityError ):
         dct.pop( 'foo', default = -1 )
-    with pytest.raises( exceptions.InvalidOperationError ):
+    with pytest.raises( exceptions.OperationValidityError ):
         dct.pop( 'baz' )
-    with pytest.raises( exceptions.InvalidOperationError ):
+    with pytest.raises( exceptions.OperationValidityError ):
         dct.popitem( )
 
 
@@ -342,3 +342,63 @@ def test_501_docstring_generation_validity( ):
         'foo bar',
         module.generate_docstring( 'class attributes accretion' ) ) )
     assert docstring_expected == docstring_generated
+
+
+def test_800_deprecated_exceptions_inheritance( ):
+    ''' Deprecated exceptions properly inherit from their replacements. '''
+    assert issubclass(
+        exceptions.EntryValidationError,
+        exceptions.EntryValidityError )
+    assert issubclass(
+        exceptions.IndelibleAttributeError,
+        exceptions.AttributeImmutabilityError )
+    assert issubclass(
+        exceptions.IndelibleEntryError,
+        exceptions.EntryImmutabilityError )
+    assert issubclass(
+        exceptions.InvalidOperationError,
+        exceptions.OperationValidityError )
+
+
+def test_801_deprecated_exceptions_messages( ):
+    ''' Deprecated exceptions produce correct error messages. '''
+    with pytest.raises( exceptions.EntryValidationError ) as exc_info:
+        raise exceptions.EntryValidationError( 'key', 'value' )
+    assert (
+        "Cannot add invalid entry with key, 'key', and value, "
+        "'value', to dictionary." == str( exc_info.value ) )
+    with pytest.raises( exceptions.IndelibleAttributeError ) as exc_info:
+        raise exceptions.IndelibleAttributeError( 'test_attr' )
+    assert (
+        "Cannot reassign or delete attribute 'test_attr'."
+        == str( exc_info.value ) )
+    with pytest.raises( exceptions.IndelibleEntryError ) as exc_info:
+        raise exceptions.IndelibleEntryError( 'test_key' )
+    assert (
+        "Cannot alter or remove existing entry for 'test_key'."
+        == str( exc_info.value ) )
+    with pytest.raises( exceptions.InvalidOperationError ) as exc_info:
+        raise exceptions.InvalidOperationError( 'test_op' )
+    assert (
+        "Operation 'test_op' is not valid on this object."
+        == str( exc_info.value ) )
+
+
+def test_802_deprecated_exceptions_catch_hierarchy( ):
+    ''' Deprecated exceptions can be caught as their replacements. '''
+    try:
+        raise exceptions.EntryValidationError( 'key', 'value' ) # noqa: TRY301
+    except exceptions.EntryValidityError as error:
+        assert isinstance( error, exceptions.EntryValidationError )
+    try: # noqa: TRY101
+        raise exceptions.IndelibleAttributeError( 'test_attr' ) # noqa: TRY301
+    except exceptions.AttributeImmutabilityError as error:
+        assert isinstance( error, exceptions.IndelibleAttributeError )
+    try: # noqa: TRY101
+        raise exceptions.IndelibleEntryError( 'test_key' ) # noqa: TRY301
+    except exceptions.EntryImmutabilityError as error:
+        assert isinstance( error, exceptions.IndelibleEntryError )
+    try: # noqa: TRY101
+        raise exceptions.InvalidOperationError( 'test_op' ) # noqa: TRY301
+    except exceptions.OperationValidityError as error:
+        assert isinstance( error, exceptions.InvalidOperationError )

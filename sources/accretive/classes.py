@@ -18,7 +18,37 @@
 #============================================================================#
 
 
-''' Accretive classes. '''
+# pylint: disable=line-too-long
+''' Accretive classes.
+
+Provides metaclasses for creating classes with accretive attributes. Once a
+class attribute is set, it cannot be reassigned or deleted.
+
+The implementation includes:
+
+* ``Class``: Standard metaclass for accretive classes; derived from
+  :py:class:`type`.
+* ``ABCFactory``: Metaclass for abstract base classes; derived from
+  :py:class:`abc.ABCMeta`.
+* ``ProtocolClass``: Metaclass for protocol classes; derived from
+  :py:class:`typing.Protocol`.
+
+These metaclasses are particularly useful for:
+
+* Creating classes with constant class attributes
+* Defining stable abstract base classes
+* Building protocol classes with fixed interfaces
+
+>>> from accretive import Class
+>>> class Example( metaclass = Class ):
+...     x = 1
+>>> Example.y = 2  # Add new class attribute
+>>> Example.x = 3  # Attempt reassignment
+Traceback (most recent call last):
+    ...
+accretive.exceptions.AttributeImmutabilityError: Cannot reassign or delete attribute 'x'.
+'''
+# pylint: enable=line-too-long
 
 
 from __future__ import annotations
@@ -105,7 +135,8 @@ ABCFactory.__doc__ = __.generate_docstring(
 )
 
 
-class ProtocolClass( __.a.Protocol.__class__ ): # type: ignore
+# pylint: disable=bad-classmethod-argument,no-self-argument
+class ProtocolClass( type( __.a.Protocol ) ):
     ''' Accretive protocol class factory. '''
 
     def __new__( # pylint: disable=too-many-arguments
@@ -117,10 +148,11 @@ class ProtocolClass( __.a.Protocol.__class__ ): # type: ignore
         docstring: __.Optional[ __.a.Nullable[ str ] ] = __.absent,
         **args: __.a.Any
     ) -> ProtocolClass:
-        class_ = __.a.Protocol.__class__.__new__(
-            factory, name, bases, namespace, **args )
-        return _class__new__( # type: ignore
-            class_, decorators = decorators, docstring = docstring )
+        class_ = __.a.Protocol.__class__.__new__( # type: ignore
+            factory, name, bases, namespace, **args ) # type: ignore
+        return _class__new__(
+            class_, # type: ignore
+            decorators = decorators, docstring = docstring )
 
     def __init__( selfclass, *posargs: __.a.Any, **nomargs: __.a.Any ):
         super( ).__init__( *posargs, **nomargs )
@@ -133,6 +165,7 @@ class ProtocolClass( __.a.Protocol.__class__ ): # type: ignore
     def __setattr__( selfclass, name: str, value: __.a.Any ) -> None:
         if not _class__setattr__( selfclass, name ):
             super( ).__setattr__( name, value )
+# pylint: enable=bad-classmethod-argument,no-self-argument
 
 ProtocolClass.__doc__ = __.generate_docstring(
     ProtocolClass,
@@ -178,8 +211,8 @@ def _class__delattr__( class_: type, name: str ) -> bool:
     # Consult class attributes dictionary to ignore accretive base classes.
     if _behavior not in class_.__dict__.get( '_class_behaviors_', ( ) ):
         return False
-    from .exceptions import IndelibleAttributeError
-    raise IndelibleAttributeError( name )
+    from .exceptions import AttributeImmutabilityError
+    raise AttributeImmutabilityError( name )
 
 
 def _class__setattr__( class_: type, name: str ) -> bool:
@@ -187,6 +220,6 @@ def _class__setattr__( class_: type, name: str ) -> bool:
     if _behavior not in class_.__dict__.get( '_class_behaviors_', ( ) ):
         return False
     if hasattr( class_, name ):
-        from .exceptions import IndelibleAttributeError
-        raise IndelibleAttributeError( name )
+        from .exceptions import AttributeImmutabilityError
+        raise AttributeImmutabilityError( name )
     return False  # Allow setting new attributes
