@@ -20,22 +20,22 @@
 
 ''' Family of exceptions for package API.
 
-Provides a hierarchy of exceptions that are raised when accretive behavior is
-violated. The hierarchy is designed to allow both specific and general
-exception handling.
+    Provides a hierarchy of exceptions that are raised when accretive behavior
+    is violated. The hierarchy is designed to allow both specific and general
+    exception handling.
 
-* ``Omniexception``: Base for all package exceptions
-* ``Omnierror``: Base for all package errors
+    * ``Omniexception``: Base for all package exceptions
+    * ``Omnierror``: Base for all package errors
 
-* ``AttributeImmutabilityError``: Raised for attribute modification
-* ``EntryImmutabilityError``: Raised for dictionary entry modification
-* ``EntryValidityError``: Raised for invalid dictionary entries
-* ``OperationValidityError``: Raised for invalid operations
+    * ``AttributeImmutabilityError``: Raised for attribute modification
+    * ``EntryImmutabilityError``: Raised for dictionary entry modification
+    * ``EntryValidityError``: Raised for invalid dictionary entries
+    * ``OperationValidityError``: Raised for invalid operations
 
-.. note::
+    .. note::
 
-    Some exception names from earlier versions are maintained as aliases for
-    backward compatibility but are deprecated.
+        Some exception names from earlier versions are maintained as aliases
+        for backward compatibility but are deprecated.
 '''
 
 

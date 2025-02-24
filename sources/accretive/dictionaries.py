@@ -21,58 +21,60 @@
 # pylint: disable=line-too-long
 ''' Accretive dictionaries.
 
-Dictionaries which can grow but never shrink. Once an entry is added, it cannot
-be modified or removed.
+    Dictionaries which can grow but never shrink. Once an entry is added, it
+    cannot be modified or removed.
 
-* :py:class:`AbstractDictionary`:
-  Base class defining the accretive dictionary interface. Implementations must
-  provide ``__getitem__``, ``__iter__``, ``__len__``, and storage methods.
+    * :py:class:`AbstractDictionary`:
+      Base class defining the accretive dictionary interface. Implementations
+      must provide ``__getitem__``, ``__iter__``, ``__len__``, and storage
+      methods.
 
-* :py:class:`Dictionary`:
-  Standard implementation of an accretive dictionary. Supports all usual dict
-  operations except those that would modify or remove existing entries.
+    * :py:class:`Dictionary`:
+      Standard implementation of an accretive dictionary. Supports all usual
+      dict operations except those that would modify or remove existing
+      entries.
 
-* :py:class:`ProducerDictionary`:
-  Automatically generates values for missing keys using a supplied factory
-  function. Similar to :py:class:`collections.defaultdict` but with accretive
-  behavior.
+    * :py:class:`ProducerDictionary`:
+      Automatically generates values for missing keys using a supplied factory
+      function. Similar to :py:class:`collections.defaultdict` but with
+      accretive behavior.
 
-* :py:class:`ValidatorDictionary`:
-  Validates entries before addition using a supplied predicate function.
+    * :py:class:`ValidatorDictionary`:
+      Validates entries before addition using a supplied predicate function.
 
-* :py:class:`ProducerValidatorDictionary`:
-  Combines producer and validator behaviors. Generated values must pass
-  validation before being added.
+    * :py:class:`ProducerValidatorDictionary`:
+      Combines producer and validator behaviors. Generated values must pass
+      validation before being added.
 
->>> from accretive import Dictionary
->>> d = Dictionary( apples = 12, bananas = 6 )
->>> d[ 'cherries' ] = 42  # Add new entry
->>> d[ 'apples' ] = 14    # Attempt modification
-Traceback (most recent call last):
-    ...
-accretive.exceptions.EntryImmutabilityError: Cannot alter or remove existing entry for 'apples'.
->>> del d[ 'bananas' ]    # Attempt removal
-Traceback (most recent call last):
-    ...
-accretive.exceptions.EntryImmutabilityError: Cannot alter or remove existing entry for 'bananas'.
+    >>> from accretive import Dictionary
+    >>> d = Dictionary( apples = 12, bananas = 6 )
+    >>> d[ 'cherries' ] = 42  # Add new entry
+    >>> d[ 'apples' ] = 14    # Attempt modification
+    Traceback (most recent call last):
+        ...
+    accretive.exceptions.EntryImmutabilityError: Cannot alter or remove existing entry for 'apples'.
+    >>> del d[ 'bananas' ]    # Attempt removal
+    Traceback (most recent call last):
+        ...
+    accretive.exceptions.EntryImmutabilityError: Cannot alter or remove existing entry for 'bananas'.
 
->>> from accretive import ProducerDictionary
->>> d = ProducerDictionary( list )  # list() called for missing keys
->>> d[ 'new' ]
-[]
->>> d[ 'new' ].append( 1 )  # List is mutable, but entry is fixed
->>> d[ 'new' ] = [ ]  # Attempt modification
-Traceback (most recent call last):
-    ...
-accretive.exceptions.EntryImmutabilityError: Cannot alter or remove existing entry for 'new'.
+    >>> from accretive import ProducerDictionary
+    >>> d = ProducerDictionary( list )  # list() called for missing keys
+    >>> d[ 'new' ]
+    []
+    >>> d[ 'new' ].append( 1 )  # List is mutable, but entry is fixed
+    >>> d[ 'new' ] = [ ]  # Attempt modification
+    Traceback (most recent call last):
+        ...
+    accretive.exceptions.EntryImmutabilityError: Cannot alter or remove existing entry for 'new'.
 
->>> from accretive import ValidatorDictionary
->>> d = ValidatorDictionary( lambda k, v: isinstance( v, int ) )
->>> d[ 'valid' ] = 42  # Passes validation
->>> d[ 'invalid' ] = 'str'  # Fails validation
-Traceback (most recent call last):
-    ...
-accretive.exceptions.EntryValidityError: Cannot add invalid entry with key, 'invalid', and value, 'str', to dictionary.
+    >>> from accretive import ValidatorDictionary
+    >>> d = ValidatorDictionary( lambda k, v: isinstance( v, int ) )
+    >>> d[ 'valid' ] = 42  # Passes validation
+    >>> d[ 'invalid' ] = 'str'  # Fails validation
+    Traceback (most recent call last):
+        ...
+    accretive.exceptions.EntryValidityError: Cannot add invalid entry with key, 'invalid', and value, 'str', to dictionary.
 '''
 # pylint: enable=line-too-long
 
@@ -216,7 +218,6 @@ class _DictionaryOperations( AbstractDictionary[ __.H, __.V ] ):
     ) -> __.a.Self:
         ''' Creates new dictionary with same behavior but different data. '''
         raise NotImplementedError # pragma: no coverage
-
 
 
 class _Dictionary(

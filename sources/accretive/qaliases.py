@@ -20,19 +20,19 @@
 
 ''' Qualified aliases to accretive data structures.
 
-Provides aliases prefixed with "Accretive" for all core classes. These are
-useful for avoiding namespace collisions when importing from the package,
-particularly with common names like "Dictionary" or "Namespace".
+    Provides aliases prefixed with "Accretive" for all core classes. These are
+    useful for avoiding namespace collisions when importing from the package,
+    particularly with common names like "Dictionary" or "Namespace".
 
-For example, instead of:
+    For example, instead of:
 
->>> from accretive import Dictionary
->>> # Possible conflict with other Dictionary classes
+    >>> from accretive import Dictionary
+    >>> # Possible conflict with other Dictionary classes
 
-you could use:
+    you could use:
 
->>> from accretive.qaliases import AccretiveDictionary
->>> # Clearly indicates the source and behavior
+    >>> from accretive.qaliases import AccretiveDictionary
+    >>> # Clearly indicates the source and behavior
 '''
 
 

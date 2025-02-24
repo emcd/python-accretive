@@ -21,25 +21,25 @@
 # pylint: disable=line-too-long
 ''' Accretive namespaces.
 
-Provides a namespace type that can grow but never shrink. Once an attribute is
-set, it cannot be modified or removed. This provides a simple way to create
-objects with named attributes that become immutable after assignment.
+    Provides a namespace type that can grow but never shrink. Once an attribute is
+    set, it cannot be modified or removed. This provides a simple way to create
+    objects with named attributes that become immutable after assignment.
 
-The namespace implementation is modeled after :py:class:`types.SimpleNamespace`
-but adds accretive behavior. Like :py:class:`types.SimpleNamespace`, it
-provides a simple ``__repr__`` which lists all attributes.
+    The namespace implementation is modeled after :py:class:`types.SimpleNamespace`
+    but adds accretive behavior. Like :py:class:`types.SimpleNamespace`, it
+    provides a simple ``__repr__`` which lists all attributes.
 
->>> from accretive import Namespace
->>> ns = Namespace( apples = 12, bananas = 6 )
->>> ns.cherries = 42  # Add new attribute
->>> ns.apples = 14    # Attempt modification
-Traceback (most recent call last):
-    ...
-accretive.exceptions.AttributeImmutabilityError: Cannot reassign or delete existing attribute 'apples'.
->>> del ns.bananas    # Attempt deletion
-Traceback (most recent call last):
-    ...
-accretive.exceptions.AttributeImmutabilityError: Cannot reassign or delete existing attribute 'bananas'.
+    >>> from accretive import Namespace
+    >>> ns = Namespace( apples = 12, bananas = 6 )
+    >>> ns.cherries = 42  # Add new attribute
+    >>> ns.apples = 14    # Attempt modification
+    Traceback (most recent call last):
+        ...
+    accretive.exceptions.AttributeImmutabilityError: Cannot reassign or delete existing attribute 'apples'.
+    >>> del ns.bananas    # Attempt deletion
+    Traceback (most recent call last):
+        ...
+    accretive.exceptions.AttributeImmutabilityError: Cannot reassign or delete existing attribute 'bananas'.
 '''
 # pylint: enable=line-too-long
 

@@ -51,6 +51,7 @@ def _discover_module_names( package_name ):
         for path in Path( package.__file__ ).parent.glob( '*.py' )
         if '__init__.py' != path.name and path.is_file( ) )
 
+
 MODULES_NAMES_BY_PACKAGE_NAME = DictionaryProxy( {
     name: _discover_module_names( name ) for name in PACKAGES_NAMES } )
 PACKAGES_NAMES_BY_MODULE_QNAME = DictionaryProxy( {

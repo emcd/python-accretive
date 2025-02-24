@@ -312,7 +312,7 @@ class CoreDictionary(
         super( ).__setitem__( key, value )
 
     def clear( self ) -> a.Never:
-        ''' Raises exception. Cannot clear indelible entries. '''
+        ''' Raises exception. Cannot clear immutable entries. '''
         from .exceptions import OperationValidityError
         raise OperationValidityError( 'clear' )
 
@@ -323,12 +323,12 @@ class CoreDictionary(
     def pop( # pylint: disable=unused-argument
         self, key: _H, default: Optional[ _V ] = absent
     ) -> a.Never:
-        ''' Raises exception. Cannot pop indelible entry. '''
+        ''' Raises exception. Cannot pop immutable entry. '''
         from .exceptions import OperationValidityError
         raise OperationValidityError( 'pop' )
 
     def popitem( self ) -> a.Never:
-        ''' Raises exception. Cannot pop indelible entry. '''
+        ''' Raises exception. Cannot pop immutable entry. '''
         from .exceptions import OperationValidityError
         raise OperationValidityError( 'popitem' )
 

@@ -76,14 +76,14 @@ Deprecations and Removals
 Accretive 1.0.1 (2024-07-07)
 ============================
 
-Improved Documentation
-----------------------
+Documentation Improvements
+--------------------------
 
 - Grammar fixes to documentation and update of trove classifier to 'Stable'.
 
 
-Accretive 1.0rc0 (2024-07-04)
-=============================
+Accretive 1.0 (2024-07-04)
+==========================
 
 Features
 --------
