@@ -18,10 +18,13 @@
 #============================================================================#
 
 
-''' Package of tests. '''
+''' Package of tests.
 
-# mypy: ignore-errors
-# pylint: disable=magic-value-comparison
+    Common imports, constants, and utilities for tests.
+'''
+
+
+import types
 
 
 from types import MappingProxyType as DictionaryProxy
@@ -31,7 +34,7 @@ PACKAGE_NAME = 'accretive'
 PACKAGES_NAMES = ( PACKAGE_NAME, )
 
 
-_modules_cache = { }
+_modules_cache: dict[ str, types.ModuleType ] = { }
 def cache_import_module( qname ):
     ''' Imports module from package by name and caches it. '''
     from importlib import import_module
@@ -49,7 +52,8 @@ def _discover_module_names( package_name ):
     return tuple(
         path.stem
         for path in Path( package.__file__ ).parent.glob( '*.py' )
-        if '__init__.py' != path.name and path.is_file( ) )
+        if      path.name not in ( '__init__.py', '__main__.py' )
+            and path.is_file( ) )
 
 
 MODULES_NAMES_BY_PACKAGE_NAME = DictionaryProxy( {

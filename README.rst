@@ -21,7 +21,7 @@
 *******************************************************************************
 
 .. image:: https://img.shields.io/pypi/v/accretive
-   :alt: Project Version
+   :alt: Package Version
    :target: https://pypi.org/project/accretive/
 
 .. image:: https://img.shields.io/pypi/status/accretive
@@ -36,13 +36,13 @@
    :alt: Code Coverage Percentage
    :target: https://github.com/emcd/python-accretive/actions/workflows/tester.yaml
 
+.. image:: https://img.shields.io/github/license/emcd/python-accretive
+   :alt: Project License
+   :target: https://github.com/emcd/python-accretive/blob/master/LICENSE.txt
+
 .. image:: https://img.shields.io/pypi/pyversions/accretive
    :alt: Python Versions
    :target: https://pypi.org/project/accretive/
-
-.. image:: https://img.shields.io/pypi/l/accretive
-   :alt: Project License
-   :target: https://github.com/emcd/python-accretive/blob/master/LICENSE.txt
 
 
 🔒 A Python library package which provides **accretive data structures** -
@@ -156,6 +156,10 @@ Use Cases 🎯
    :alt: GitHub last commit
    :target: https://github.com/emcd/python-accretive
 
+.. image:: https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/copier-org/copier/master/img/badge/badge-grayscale-inverted-border-orange.json
+   :alt: Copier
+   :target: https://github.com/copier-org/copier
+
 .. image:: https://img.shields.io/badge/%F0%9F%A5%9A-Hatch-4051b5.svg
    :alt: Hatch
    :target: https://github.com/pypa/hatch
@@ -174,7 +178,7 @@ Use Cases 🎯
 
 .. image:: https://microsoft.github.io/pyright/img/pyright_badge.svg
    :alt: Pyright
-   :target: https://microsoft.github.io/pyright/
+   :target: https://microsoft.github.io/pyright
 
 .. image:: https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json
    :alt: Ruff

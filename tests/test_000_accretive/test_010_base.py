@@ -18,29 +18,18 @@
 #============================================================================#
 
 
-''' Accretive data structures. '''
+''' Assert correct function of common imports. '''
 
 
-from . import __
-from . import classes
-from . import dictionaries
-from . import modules
-from . import namespaces
-from . import objects
-from . import qaliases
-# --- BEGIN: Injected by Copier ---
-from . import exceptions
-# --- END: Injected by Copier ---
+import pytest
 
-from .classes import *
-from .dictionaries import *
-from .modules import *
-from .namespaces import *
-from .objects import *
+from . import PACKAGE_NAME, cache_import_module
 
 
-__version__ = '2.2a0'
-
-
-_attribute_visibility_includes_ = frozenset( ( '__version__', ) )
-__.reclassify_modules( __name__, recursive = True )
+@pytest.mark.parametrize(
+    'module_name', ( 'cabc', 'types', 'typx' )
+)
+def test_100_exports( module_name ):
+    ''' Module exports expected names. '''
+    module = cache_import_module( f"{PACKAGE_NAME}.__.imports" )
+    assert hasattr( module, module_name )

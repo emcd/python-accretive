@@ -18,29 +18,42 @@
 #============================================================================#
 
 
-''' Accretive data structures. '''
+''' Assert correct function of docstring utilities. '''
 
 
-from . import __
-from . import classes
-from . import dictionaries
-from . import modules
-from . import namespaces
-from . import objects
-from . import qaliases
-# --- BEGIN: Injected by Copier ---
-from . import exceptions
-# --- END: Injected by Copier ---
+import pytest
 
-from .classes import *
-from .dictionaries import *
-from .modules import *
-from .namespaces import *
-from .objects import *
+from . import PACKAGE_NAME, cache_import_module
 
 
-__version__ = '2.2a0'
+MODULE_QNAME = f"{PACKAGE_NAME}.__.docstrings"
 
 
-_attribute_visibility_includes_ = frozenset( ( '__version__', ) )
-__.reclassify_modules( __name__, recursive = True )
+def test_100_container_init( ):
+    ''' Docstring container is a string subclass. '''
+    module = cache_import_module( MODULE_QNAME )
+    doc = module.Docstring( 'test' )
+    assert isinstance( doc, str )
+    assert 'test' == doc
+
+
+def test_200_generator_fragments( ):
+    ''' Docstring generator handles various fragment types. '''
+    class Example:
+        ''' Class docstring. '''
+
+    module = cache_import_module( MODULE_QNAME )
+    result = module.generate_docstring(
+        Example,
+        module.Docstring( 'Container string' ) )
+    assert 'Class docstring. \n\nContainer string' == result
+
+
+def test_210_generator_lookup( ):
+    ''' Docstring generator uses provided lookup table. '''
+    module = cache_import_module( MODULE_QNAME )
+    test_table = { 'test_key': 'Test value' }
+    result = module.generate_docstring( 'test_key', table = test_table )
+    assert 'Test value' == result
+    with pytest.raises( KeyError ):
+        module.generate_docstring( 'nonexistent', table = test_table )

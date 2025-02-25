@@ -18,25 +18,32 @@
 #============================================================================#
 
 
-''' Standard annotations across Python versions. '''
+''' Docstring utilities. '''
 
-# ruff: noqa: F401
-# pylint: disable=unused-import
-
-
-from typing_extensions import (
-    Annotated as Annotation,
-    Any,
-    Doc,
-    Generic,
-    Never,
-    Optional as Nullable,
-    Protocol,
-    Self,
-    TypeAlias,
-    TypeIs,
-    TypeVar,
-)
+# pylint: disable=unused-wildcard-import,wildcard-import
+# ruff: noqa: F403,F405
 
 
-__all__ = ( )
+from __future__ import annotations
+
+from . import doctab
+from .imports import *
+
+
+class Docstring( str ):
+    ''' Dedicated docstring container. '''
+
+
+def generate_docstring(
+    *fragment_ids: type | Docstring | str,
+    table: cabc.Mapping[ str, str ] = doctab.TABLE,
+) -> str:
+    ''' Sews together docstring fragments into clean docstring. '''
+    from inspect import cleandoc, getdoc, isclass
+    fragments: list[ str ] = [ ]
+    for fragment_id in fragment_ids:
+        if isclass( fragment_id ): fragment = getdoc( fragment_id ) or ''
+        elif isinstance( fragment_id, Docstring ): fragment = fragment_id
+        else: fragment = table[ fragment_id ]
+        fragments.append( cleandoc( fragment ) )
+    return '\n\n'.join( fragments )

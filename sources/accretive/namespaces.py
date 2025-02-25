@@ -68,15 +68,15 @@ class Namespace( _objects.Object ): # pylint: disable=eq-without-hash
         if not attributes: return f"{fqname}( )"
         return f"{fqname}( {attributes} )"
 
-    def __eq__( self, other: __.a.Any ) -> __.ComparisonResult:
+    def __eq__( self, other: __.typx.Any ) -> __.ComparisonResult:
         mydict = super( ).__getattribute__( '__dict__' )
-        if isinstance( other, ( Namespace, __.SimpleNamespace ) ):
+        if isinstance( other, ( Namespace, __.types.SimpleNamespace ) ):
             return mydict == other.__dict__
         return NotImplemented
 
-    def __ne__( self, other: __.a.Any ) -> __.ComparisonResult:
+    def __ne__( self, other: __.typx.Any ) -> __.ComparisonResult:
         mydict = super( ).__getattribute__( '__dict__' )
-        if isinstance( other, ( Namespace, __.SimpleNamespace ) ):
+        if isinstance( other, ( Namespace, __.types.SimpleNamespace ) ):
             return mydict != other.__dict__
         return NotImplemented
 

@@ -49,7 +49,7 @@ from . import classes as _classes
 
 
 class _Dictionary(
-    __.CoreDictionary[ __.H, __.V ], metaclass = _classes.Class
+    __.AccretiveDictionary[ __.H, __.V ], metaclass = _classes.Class
 ): pass
 
 
@@ -58,7 +58,9 @@ class Object:
 
     __slots__ = ( '__dict__', )
 
-    def __init__( self, *posargs: __.a.Any, **nomargs: __.a.Any ) -> None:
+    def __init__(
+        self, *posargs: __.typx.Any, **nomargs: __.typx.Any
+    ) -> None:
         super( ).__setattr__( '__dict__', _Dictionary( ) )
         # Pass all arguments down MRO chain without consuming any.
         super( ).__init__( *posargs, **nomargs )
@@ -70,7 +72,7 @@ class Object:
         from .exceptions import AttributeImmutabilityError
         raise AttributeImmutabilityError( name )
 
-    def __setattr__( self, name: str, value: __.a.Any ) -> None:
+    def __setattr__( self, name: str, value: __.typx.Any ) -> None:
         if hasattr( self, name ):
             from .exceptions import AttributeImmutabilityError
             raise AttributeImmutabilityError( name )

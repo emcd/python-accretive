@@ -18,46 +18,28 @@
 #============================================================================#
 
 
-''' Family of exceptions for package API.
+''' Family of exceptions for package internals.
 
-    Provides a hierarchy of exceptions that are raised when accretive behavior
-    is violated. The hierarchy is designed to allow both specific and general
-    exception handling.
-
-    * ``Omniexception``: Base for all package exceptions
-    * ``Omnierror``: Base for all package errors
-
-    * ``AttributeImmutabilityError``: Raised for attribute modification
-    * ``EntryImmutabilityError``: Raised for dictionary entry modification
-    * ``EntryValidityError``: Raised for invalid dictionary entries
-    * ``OperationValidityError``: Raised for invalid operations
-
-    .. note::
-
-        Some exception names from earlier versions are maintained as aliases
-        for backward compatibility but are deprecated.
+    * ``Omniexception``: Base for all internal exceptions
+    * ``Omnierror``: Base for all internals errors
 '''
 
 
-from . import __ # pylint: disable=cyclic-import
+from __future__ import annotations
+
+from . import imports as __
+from . import immutables as _immutables
 
 
-class Omniexception( __.ImmutableObject, BaseException ):
-    ''' Base for all exceptions raised by package API. '''
+class Omniexception( _immutables.ImmutableObject, BaseException ):
+    ''' Base for all exceptions raised internally. '''
 
     _attribute_visibility_includes_: __.cabc.Collection[ str ] = (
         frozenset( ( '__cause__', '__context__', ) ) )
 
 
 class Omnierror( Omniexception, Exception ):
-    ''' Base for error exceptions raised by package API. '''
-
-
-class AttributeImmutabilityError( Omnierror, AttributeError, TypeError ):
-    ''' Attempt to reassign or delete immutable attribute. '''
-
-    def __init__( self, name: str ) -> None:
-        super( ).__init__( f"Cannot reassign or delete attribute {name!r}." )
+    ''' Base for error exceptions raised internally. '''
 
 
 class EntryImmutabilityError( Omnierror, TypeError ):
@@ -68,12 +50,8 @@ class EntryImmutabilityError( Omnierror, TypeError ):
             f"Cannot alter or remove existing entry for {indicator!r}." )
 
 
-class EntryValidityError( Omnierror, ValueError ):
-    ''' Attempt to add invalid entry to dictionary. '''
+class OperationInvalidity( Omnierror, RuntimeError, TypeError ):
+    ''' Attempt to perform invalid operation. '''
 
-    def __init__(
-        self, indicator: __.cabc.Hashable, value: __.typx.Any
-    ) -> None:
-        super( ).__init__(
-            f"Cannot add invalid entry with key, {indicator!r}, "
-            f"and value, {value!r}, to dictionary." )
+    def __init__( self, name: str ) -> None:
+        super( ).__init__( f"Operation {name!r} is not valid on this object." )
