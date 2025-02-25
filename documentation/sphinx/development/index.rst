@@ -17,25 +17,20 @@
    +--------------------------------------------------------------------------+
 
 
-.. include:: ../../README.rst
+:tocdepth: 3
 
 
-Table of Contents
-===============================================================================
+*******************************************************************************
+Development
+*******************************************************************************
 
 .. toctree::
    :maxdepth: 2
 
-   examples/index
-   api
-   changelog
-   contribution/index
-   license
-
-
-Indices
-===============================================================================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
+   environment
+   practices
+   nomenclature
+   style
+   devapi
+   releases
+   maintenance

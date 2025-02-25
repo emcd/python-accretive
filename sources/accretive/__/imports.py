@@ -18,29 +18,21 @@
 #============================================================================#
 
 
-''' Accretive data structures. '''
+''' Common imports and type aliases used throughout the package. '''
+
+# pylint: disable=unused-import
+# ruff: noqa: F401
 
 
-from . import __
-from . import classes
-from . import dictionaries
-from . import modules
-from . import namespaces
-from . import objects
-from . import qaliases
+from __future__ import annotations
+
+import collections.abc as cabc
+import types
+
+import typing_extensions as typx
 # --- BEGIN: Injected by Copier ---
-from . import exceptions
+
 # --- END: Injected by Copier ---
 
-from .classes import *
-from .dictionaries import *
-from .modules import *
-from .namespaces import *
-from .objects import *
 
-
-__version__ = '2.2a0'
-
-
-_attribute_visibility_includes_ = frozenset( ( '__version__', ) )
-__.reclassify_modules( __name__, recursive = True )
+ComparisonResult: typx.TypeAlias = bool | types.NotImplementedType

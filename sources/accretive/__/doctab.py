@@ -18,29 +18,15 @@
 #============================================================================#
 
 
-''' Accretive data structures. '''
+''' Docstrings table for reuse across entities. '''
+
+# pylint: disable=unused-wildcard-import,wildcard-import
+# ruff: noqa: F403,F405
 
 
-from . import __
-from . import classes
-from . import dictionaries
-from . import modules
-from . import namespaces
-from . import objects
-from . import qaliases
-# --- BEGIN: Injected by Copier ---
-from . import exceptions
-# --- END: Injected by Copier ---
+from __future__ import annotations
 
-from .classes import *
-from .dictionaries import *
-from .modules import *
-from .namespaces import *
-from .objects import *
+from .imports import *
 
 
-__version__ = '2.2a0'
-
-
-_attribute_visibility_includes_ = frozenset( ( '__version__', ) )
-__.reclassify_modules( __name__, recursive = True )
+TABLE: types.MappingProxyType[ str, str ] = types.MappingProxyType( { } )

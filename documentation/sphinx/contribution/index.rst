@@ -17,25 +17,19 @@
    +--------------------------------------------------------------------------+
 
 
-.. include:: ../../README.rst
+:tocdepth: 3
 
 
-Table of Contents
-===============================================================================
+*******************************************************************************
+Contribution
+*******************************************************************************
+
+Contribution to this project is welcome! However, it must follow the code of
+conduct for the project.
 
 .. toctree::
    :maxdepth: 2
 
-   examples/index
-   api
-   changelog
-   contribution/index
-   license
-
-
-Indices
-===============================================================================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
+   conduct
+   contacts
+   ../development/index
