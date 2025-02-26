@@ -62,4 +62,5 @@ from .namespaces import (
 )
 from .objects import (
     Object as               AccretiveObject,
+                            accretive,
 )

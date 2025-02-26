@@ -29,7 +29,6 @@ accretive behavior. This makes it particularly useful for:
 
 * Ensuring constants remain constant
 * Preventing accidental modification of module interfaces
-* Creating plugin modules with stable APIs
 
 Also provides a convenience function:
 
@@ -48,8 +47,9 @@ class Module( __.types.ModuleType ):
         raise AttributeImmutabilityError( name )
 
     def __setattr__( self, name: str, value: __.typx.Any ) -> None:
-        from .exceptions import AttributeImmutabilityError
-        if hasattr( self, name ): raise AttributeImmutabilityError( name )
+        if hasattr( self, name ):
+            from .exceptions import AttributeImmutabilityError
+            raise AttributeImmutabilityError( name )
         super( ).__setattr__( name, value )
 
 Module.__doc__ = __.generate_docstring(
@@ -57,12 +57,43 @@ Module.__doc__ = __.generate_docstring(
 
 
 def reclassify_modules(
-    attributes: __.cabc.Mapping[ str, __.typx.Any ],
-    to_class: type[ Module ] = Module
+    attributes: __.typx.Annotated[
+        __.cabc.Mapping[ str, __.typx.Any ] | __.types.ModuleType | str,
+        __.typx.Doc(
+            'Module, module name, or dictionary of object attributes.' ),
+    ],
+    recursive: __.typx.Annotated[
+        bool, __.typx.Doc( 'Recursively reclassify package modules?' ),
+    ] = False,
 ) -> None:
-    ''' Reclassifies modules in dictionary with custom module type. '''
+    ''' Reclassifies modules to be accretive.
+
+        Can operate on individual modules or entire package hierarchies.
+
+        Notes
+        -----
+        * Only converts modules within the same package to prevent unintended
+          modifications to external modules.
+        * When used with a dictionary, converts any module objects found as
+          values if they belong to the same package.
+        * Has no effect on already-accretive modules.
+    '''
     from inspect import ismodule
-    for attribute in attributes.values( ):
-        if not ismodule( attribute ): continue
-        if isinstance( attribute, to_class ): continue
-        attribute.__class__ = to_class
+    from sys import modules
+    if isinstance( attributes, str ):
+        attributes = modules[ attributes ]
+    if isinstance( attributes, __.types.ModuleType ):
+        module = attributes
+        attributes = attributes.__dict__
+    else: module = None
+    package_name = (
+        attributes.get( '__package__' ) or attributes.get( '__name__' ) )
+    if not package_name: return
+    for value in attributes.values( ):
+        if not ismodule( value ): continue
+        if not value.__name__.startswith( f"{package_name}." ): continue
+        if recursive: reclassify_modules( value, recursive = True )
+        if isinstance( value, Module ): continue
+        value.__class__ = Module
+    if module and not isinstance( module, Module ):
+        module.__class__ = Module

@@ -81,7 +81,6 @@
 
 from . import __
 from . import classes as _classes
-from . import objects as _objects
 
 
 class AbstractDictionary( __.cabc.Mapping[ __.H, __.V ] ):
@@ -177,9 +176,13 @@ class _DictionaryOperations( AbstractDictionary[ __.H, __.V ] ):
 
     def __or__( self, other: __.cabc.Mapping[ __.H, __.V ] ) -> __.typx.Self:
         if not isinstance( other, __.cabc.Mapping ): return NotImplemented
-        result = self.copy( ) # pyright: ignore
-        result.update( other ) # pyright: ignore
-        return result # pyright: ignore
+        conflicts = set( self.keys( ) ) & set( other.keys( ) )
+        if conflicts:
+            from .exceptions import EntryImmutabilityError
+            raise EntryImmutabilityError( next( iter( conflicts ) ) )
+        data = dict( self )
+        data.update( other )
+        return self.with_data( data )
 
     def __ror__( self, other: __.cabc.Mapping[ __.H, __.V ] ) -> __.typx.Self:
         if not isinstance( other, __.cabc.Mapping ): return NotImplemented
@@ -228,10 +231,9 @@ class _Dictionary(
 
 
 class Dictionary( # pylint: disable=eq-without-hash
-    _objects.Object, _DictionaryOperations[ __.H, __.V ]
+    _DictionaryOperations[ __.H, __.V ]
 ):
     ''' Accretive dictionary. '''
-    # TODO: version 3.0: Do not subclass from 'Object'.
 
     __slots__ = ( '_data_', )
 
@@ -316,10 +318,6 @@ class Dictionary( # pylint: disable=eq-without-hash
 
 Dictionary.__doc__ = __.generate_docstring(
     Dictionary, 'dictionary entries accretion' )
-# Register as subclass of Mapping rather than use it as mixin.
-# We directly implement, for the sake of efficiency, the methods which the
-# mixin would provide.
-__.cabc.Mapping.register( Dictionary ) # type: ignore
 
 
 class ProducerDictionary( Dictionary[ __.H, __.V ] ):

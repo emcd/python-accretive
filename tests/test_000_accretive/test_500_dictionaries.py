@@ -48,8 +48,6 @@ PRODUCER_VALIDATOR_NAMES = tuple(
     name for name in THESE_CLASSES_NAMES
     if name in PRODUCER_NAMES and name in VALIDATOR_NAMES )
 
-base = cache_import_module( f"{PACKAGE_NAME}.__" )
-exceptions = cache_import_module( f"{PACKAGE_NAME}.exceptions" )
 
 
 def select_arguments( class_name ):
@@ -123,6 +121,7 @@ def test_101_instantiation( module_qname, class_name ):
 def test_102_instantiation( module_qname, class_name ):
     ''' Validator class instantiates. '''
     module = cache_import_module( module_qname )
+    exceptions = cache_import_module( f"{PACKAGE_NAME}.exceptions" )
     factory = getattr( module, class_name )
     posargs, nomargs = select_arguments( class_name )
     dct = factory( *posargs, **nomargs )
@@ -135,30 +134,12 @@ def test_102_instantiation( module_qname, class_name ):
 
 @pytest.mark.parametrize(
     'module_qname, class_name',
-    product( THESE_MODULE_QNAMES, THESE_CLASSES_NAMES )
-)
-def test_110_attribute_accretion( module_qname, class_name ):
-    ''' Dictionary accretes attributes. '''
-    module = cache_import_module( module_qname )
-    factory = getattr( module, class_name )
-    posargs, nomargs = select_arguments( class_name )
-    obj = factory( *posargs, **nomargs )
-    obj.attr = 42
-    with pytest.raises( exceptions.AttributeImmutabilityError ):
-        obj.attr = -1
-    assert 42 == obj.attr
-    with pytest.raises( exceptions.AttributeImmutabilityError ):
-        del obj.attr
-    assert 42 == obj.attr
-
-
-@pytest.mark.parametrize(
-    'module_qname, class_name',
     product( THESE_MODULE_QNAMES, INITARGS_NAMES )
 )
 def test_200_dictionary_entry_accretion( module_qname, class_name ):
     ''' Dictionary accretes entries. '''
     module = cache_import_module( module_qname )
+    exceptions = cache_import_module( f"{PACKAGE_NAME}.exceptions" )
     factory = getattr( module, class_name )
     simple_posargs, simple_nomargs = select_simple_arguments( class_name )
     dct = factory( *simple_posargs, **simple_nomargs )
@@ -219,6 +200,7 @@ def test_151_setdefault_adds_missing_entry( module_qname, class_name ):
 def test_160_or_combines_dictionaries( module_qname, class_name ):
     ''' Dictionary union produces new dictionary with combined entries. '''
     module = cache_import_module( module_qname )
+    exceptions = cache_import_module( f"{PACKAGE_NAME}.exceptions" )
     factory = getattr( module, class_name )
     posargs, nomargs = select_arguments( class_name )
     d1 = factory( *posargs, **nomargs )
@@ -358,6 +340,7 @@ def test_172_and_rejects_invalid_operands( module_qname, class_name ):
 def test_180_operations_preserve_accretion( module_qname, class_name ):
     ''' Dictionary operations maintain accretive contract. '''
     module = cache_import_module( module_qname )
+    exceptions = cache_import_module( f"{PACKAGE_NAME}.exceptions" )
     factory = getattr( module, class_name )
     posargs, nomargs = select_arguments( class_name )
     d1 = factory( *posargs, **nomargs )
@@ -384,6 +367,7 @@ def test_180_operations_preserve_accretion( module_qname, class_name ):
 def test_201_producer_dictionary_entry_accretion( module_qname, class_name ):
     ''' Producer dictionary accretes entries. '''
     module = cache_import_module( module_qname )
+    exceptions = cache_import_module( f"{PACKAGE_NAME}.exceptions" )
     factory = getattr( module, class_name )
     posargs, nomargs = select_arguments( class_name )
     dct = factory( *posargs, **nomargs )
@@ -413,6 +397,7 @@ def test_201_producer_dictionary_entry_accretion( module_qname, class_name ):
 def test_202_validator_dictionary_entry_accretion( module_qname, class_name ):
     ''' Validator dictionary accretes valid entries only. '''
     module = cache_import_module( module_qname )
+    exceptions = cache_import_module( f"{PACKAGE_NAME}.exceptions" )
     factory = getattr( module, class_name )
     posargs, nomargs = select_arguments( class_name )
     dct = factory( *posargs, **nomargs )
@@ -436,6 +421,7 @@ def test_202_validator_dictionary_entry_accretion( module_qname, class_name ):
 def test_205_producer_validator_invalid_production( module_qname, class_name ):
     ''' Producer-validator dictionary rejects invalid produced values. '''
     module = cache_import_module( module_qname )
+    exceptions = cache_import_module( f"{PACKAGE_NAME}.exceptions" )
     factory = getattr( module, class_name )
     # Producer that returns invalid values (not a list)
     dct = factory( lambda: 42, lambda k, v: isinstance( v, list ) )
@@ -450,6 +436,7 @@ def test_205_producer_validator_invalid_production( module_qname, class_name ):
 def test_210_dictionary_entry_accretion_via_update( module_qname, class_name ):
     ''' Dictionary accretes entries via update. '''
     module = cache_import_module( module_qname )
+    exceptions = cache_import_module( f"{PACKAGE_NAME}.exceptions" )
     factory = getattr( module, class_name )
     posargs, nomargs = select_arguments( class_name )
     dct = factory( *posargs, **nomargs )
@@ -478,6 +465,7 @@ def test_211_validator_dictionary_entry_accretion_via_update(
 ):
     ''' Validator dictionary accretes valid entries via update. '''
     module = cache_import_module( module_qname )
+    exceptions = cache_import_module( f"{PACKAGE_NAME}.exceptions" )
     factory = getattr( module, class_name )
     posargs, nomargs = select_arguments( class_name )
     dct = factory( *posargs, **nomargs )
@@ -487,6 +475,97 @@ def test_211_validator_dictionary_entry_accretion_via_update(
         dct.update( bar = 'invalid value' )
     with pytest.raises( exceptions.EntryImmutabilityError ):
         dct[ 'foo' ] = value
+
+
+@pytest.mark.parametrize(
+    'module_qname, class_name',
+    product( THESE_MODULE_QNAMES, THESE_CLASSES_NAMES )
+)
+def test_212_update_with_existing_key_raises_immutability_error(
+    module_qname, class_name
+):
+    ''' Update raises EntryImmutabilityError for existing keys. '''
+    module = cache_import_module( module_qname )
+    exceptions = cache_import_module( f"{PACKAGE_NAME}.exceptions" )
+    factory = getattr( module, class_name )
+    posargs, nomargs = select_arguments( class_name )
+    dictionary = factory( *posargs, **nomargs )
+    if class_name in PRODUCER_VALIDATOR_NAMES:
+        dictionary[ 'existing_key' ] = [ 1 ]
+        new_value = [ 999 ]  # Use a list to pass the validator
+        new_key_value = [ 100 ]  # Use a list for new keys in ProducerValidatorDictionary
+    elif class_name in PRODUCER_NAMES:
+        dictionary[ 'existing_key' ] = [ 1 ]
+        new_value = [ 999 ]  # Use a list for consistency with producer
+        new_key_value = [ 100 ]  # Use a list for new keys in ProducerDictionary
+    else:
+        dictionary[ 'existing_key' ] = 42
+        new_value = 999  # Use integer for non-validator/producer classes
+        new_key_value = 100  # Use integer for new keys in other classes
+    with pytest.raises( exceptions.EntryImmutabilityError ):
+        dictionary.update( [ ( 'existing_key', new_value ) ] )
+    with pytest.raises( exceptions.EntryImmutabilityError ):
+        dictionary.update( existing_key = new_value )
+    with pytest.raises( exceptions.EntryImmutabilityError ):
+        dictionary.update(
+            [ ( 'new_key', new_key_value ), ( 'existing_key', new_value ) ] )
+    assert dictionary[ 'existing_key' ] == (
+        [ 1 ] if class_name in ( PRODUCER_NAMES + PRODUCER_VALIDATOR_NAMES )
+        else 42
+    )
+
+@pytest.mark.parametrize(
+    'module_qname, class_name',
+    product( THESE_MODULE_QNAMES, THESE_CLASSES_NAMES )
+)
+def test_213_update_with_empty_inputs( module_qname, class_name ):
+    ''' Update behavior with empty or no inputs. '''
+    module = cache_import_module( module_qname )
+    factory = getattr( module, class_name )
+    posargs, nomargs = select_arguments( class_name )
+    dictionary = factory( *posargs, **nomargs )
+    initial_length = len( dictionary )
+    dictionary.update( )
+    assert len( dictionary ) == initial_length
+    dictionary.update( [ ], **{ } )
+    assert len( dictionary ) == initial_length
+
+
+@pytest.mark.parametrize(
+    'module_qname, class_name',
+    product( THESE_MODULE_QNAMES, THESE_CLASSES_NAMES )
+)
+def test_214_update_with_invalid_inputs( module_qname, class_name ):
+    ''' Update behavior with invalid (non-iterable/non-mapping) inputs. '''
+    module = cache_import_module( module_qname )
+    factory = getattr( module, class_name )
+    posargs, nomargs = select_arguments( class_name )
+    dictionary = factory( *posargs, **nomargs )
+    with pytest.raises( TypeError ):
+        dictionary.update( 42 )  # Non-iterable input
+    with pytest.raises( TypeError ):
+        dictionary.update( None )  # Non-iterable input (None is not iterable)
+    with pytest.raises( TypeError ):
+        dictionary.update( [ 1, 2, 3 ] )  # List without key-value pairs
+
+
+@pytest.mark.parametrize(
+    'module_qname, class_name',
+    product( THESE_MODULE_QNAMES, THESE_CLASSES_NAMES )
+)
+def test_216_update_with_pre_setitem_modification( module_qname, class_name ):
+    ''' Update behavior with _pre_setitem_ modifying indicator or value. '''
+    module = cache_import_module( module_qname )
+    factory = getattr( module, class_name )
+    posargs, nomargs = select_arguments( class_name )
+
+    class ModifiedDictionary( factory ):
+        def _pre_setitem_( self, key, value ): # pylint: disable=no-self-use
+            return str( key ) if isinstance( key, int ) else key, value + 1
+
+    dictionary = ModifiedDictionary( *posargs, **nomargs )
+    dictionary.update( [ ( 'test_key', 10 ) ] )
+    assert dictionary[ 'test_key' ] == 11
 
 
 @pytest.mark.parametrize(
@@ -576,6 +655,7 @@ def test_225_dictionary_equality(
 def test_230_string_representation( module_qname, class_name ):
     ''' Dictionary has expected string representations. '''
     module = cache_import_module( module_qname )
+    base = cache_import_module( f"{PACKAGE_NAME}.__" )
     factory = getattr( module, class_name )
     posargs, nomargs = select_arguments( class_name )
     dct = factory( *posargs, **nomargs )
@@ -617,6 +697,7 @@ def test_240_dictionary_entry_optional_retrieval( module_qname, class_name ):
 def test_250_with_data( module_qname, class_name ):
     ''' Dictionary creates new instance with different data. '''
     module = cache_import_module( module_qname )
+    exceptions = cache_import_module( f"{PACKAGE_NAME}.exceptions" )
     factory = getattr( module, class_name )
     posargs, nomargs = select_arguments( class_name )
     d1 = factory( *posargs, **nomargs )

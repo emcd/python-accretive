@@ -77,3 +77,12 @@ class EntryValidityError( Omnierror, ValueError ):
         super( ).__init__(
             f"Cannot add invalid entry with key, {indicator!r}, "
             f"and value, {value!r}, to dictionary." )
+
+
+class DecoratorCompatibilityError( Omnierror, TypeError ):
+    ''' Attempt to apply decorator to incompatible class. '''
+
+    def __init__( self, class_name: str, method_name: str ) -> None:
+        super( ).__init__(
+            f"Cannot apply accretive decorator to {class_name!r} "
+            f"because it defines {method_name!r}.")

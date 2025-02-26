@@ -58,7 +58,7 @@ class Namespace( _objects.Object ): # pylint: disable=eq-without-hash
     ) -> None:
         super( ).__init__( )
         super( ).__getattribute__( '__dict__' ).update(
-            *iterables, **attributes )
+            __.AccretiveDictionary( *iterables, **attributes ) )
 
     def __repr__( self ) -> str:
         attributes = ', '.join( tuple(

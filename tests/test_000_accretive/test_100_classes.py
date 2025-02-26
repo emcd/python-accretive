@@ -40,8 +40,6 @@ THESE_MODULE_QNAMES = tuple(
     name for name in MODULES_QNAMES if name.endswith( '.classes' ) )
 THESE_CLASSES_NAMES = ( 'Class', 'ABCFactory', 'ProtocolClass' )
 
-base = cache_import_module( f"{PACKAGE_NAME}.__" )
-exceptions = cache_import_module( f"{PACKAGE_NAME}.exceptions" )
 
 pypy_skip_mark = pytest.mark.skipif(
     'PyPy' == python_implementation( ),
@@ -71,6 +69,7 @@ def test_100_instantiation( module_qname, class_name ):
 def test_101_accretion( module_qname, class_name ):
     ''' Class accretes attributes. '''
     module = cache_import_module( module_qname )
+    exceptions = cache_import_module( f"{PACKAGE_NAME}.exceptions" )
     class_factory_class = getattr( module, class_name )
 
     class Object( metaclass = class_factory_class ):
@@ -100,6 +99,7 @@ def test_101_accretion( module_qname, class_name ):
 def test_110_class_decorators( module_qname, class_name ):
     ''' Class accepts and applies decorators correctly. '''
     module = cache_import_module( module_qname )
+    exceptions = cache_import_module( f"{PACKAGE_NAME}.exceptions" )
     class_factory_class = getattr( module, class_name )
     decorator_calls = [ ]
 
@@ -251,6 +251,35 @@ def test_114_decorator_error_handling( module_qname, class_name ):
     'module_qname, class_name',
     product( THESE_MODULE_QNAMES, THESE_CLASSES_NAMES )
 )
+def test_115_mutable_attributes( module_qname, class_name ):
+    ''' Mutable attributes behavior via mutables parameter. '''
+    module = cache_import_module( module_qname )
+    exceptions = cache_import_module( f"{PACKAGE_NAME}.exceptions" )
+    class_factory_class = getattr( module, class_name )
+
+    class MutableObject(
+        metaclass = class_factory_class, mutables = ( 'mutable_attr', )
+    ):
+        ''' test '''
+        immutable_attr = 42
+        mutable_attr = 100
+
+    with pytest.raises( exceptions.AttributeImmutabilityError ):
+        MutableObject.immutable_attr = 43
+    assert 42 == MutableObject.immutable_attr
+    with pytest.raises( exceptions.AttributeImmutabilityError ):
+        del MutableObject.immutable_attr
+    assert 42 == MutableObject.immutable_attr
+    MutableObject.mutable_attr = 200
+    assert 200 == MutableObject.mutable_attr
+    del MutableObject.mutable_attr
+    assert 'mutable_attr' not in MutableObject.__dict__
+
+
+@pytest.mark.parametrize(
+    'module_qname, class_name',
+    product( THESE_MODULE_QNAMES, THESE_CLASSES_NAMES )
+)
 def test_120_docstring_assignment( module_qname, class_name ):
     ''' Class has dynamically-assigned docstring. '''
     module = cache_import_module( module_qname )
@@ -287,6 +316,7 @@ def test_900_docstring_sanity( module_qname, class_name ):
 def test_901_docstring_describes_cfc( module_qname, class_name ):
     ''' Class docstring describes class factory class. '''
     module = cache_import_module( module_qname )
+    base = cache_import_module( f"{PACKAGE_NAME}.__" )
     class_factory_class = getattr( module, class_name )
     fragment = base.generate_docstring( 'description of class factory class' )
     assert fragment in class_factory_class.__doc__
@@ -299,6 +329,7 @@ def test_901_docstring_describes_cfc( module_qname, class_name ):
 def test_902_docstring_mentions_accretion( module_qname, class_name ):
     ''' Class docstring mentions accretion. '''
     module = cache_import_module( module_qname )
+    base = cache_import_module( f"{PACKAGE_NAME}.__" )
     class_factory_class = getattr( module, class_name )
     fragment = base.generate_docstring( 'class attributes accretion' )
     assert fragment in class_factory_class.__doc__
