@@ -96,6 +96,42 @@ can add new attributes, but cannot modify existing ones.
     ...
     accretive.exceptions.AttributeImmutabilityError: Cannot reassign or delete existing attribute 'name'.
 
+Mutable Attributes
+-------------------------------------------------------------------------------
+
+While accretive classes make attributes immutable by default after assignment,
+you can designate specific attributes as mutable using the ``mutables``
+parameter. This is useful for attributes that need to be updated or removed
+throughout the class lifecycle.
+
+.. doctest:: Class
+
+    >>> class Configuration( metaclass = Class, mutables = ( 'version', ) ):
+    ...     name = 'MyApp'
+    ...     version = '1.0.0'
+    ...     release_date = '2025-01-01'
+
+    >>> # Standard immutable attributes behave as expected
+    >>> Configuration.name = 'NewApp'
+    Traceback (most recent call last):
+    ...
+    accretive.exceptions.AttributeImmutabilityError: Cannot reassign or delete attribute 'name'.
+
+    >>> # Mutable attributes can be modified
+    >>> Configuration.version = '1.0.1'
+    >>> Configuration.version
+    '1.0.1'
+
+    >>> # Mutable attributes can also be deleted
+    >>> del Configuration.version
+    >>> hasattr( Configuration, 'version' )
+    False
+
+    >>> # New mutable attributes can be added later
+    >>> Configuration.version = '1.1.0'
+    >>> Configuration.version
+    '1.1.0'
+
 Dynamic Docstring Assignment
 -------------------------------------------------------------------------------
 

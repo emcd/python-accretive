@@ -20,19 +20,19 @@
 
 ''' Accretive modules.
 
-Provides a module type that enforces attribute immutability after assignment.
-This helps ensure that module-level constants remain constant and that module
-interfaces remain stable during runtime.
+    Provides a module type that enforces attribute immutability after
+    assignment. This helps ensure that module-level constants remain constant
+    and that module interfaces remain stable during runtime.
 
-The module implementation is derived from :py:class:`types.ModuleType` and adds
-accretive behavior. This makes it particularly useful for:
+    The module implementation is derived from :py:class:`types.ModuleType` and
+    adds accretive behavior. This makes it particularly useful for:
 
-* Ensuring constants remain constant
-* Preventing accidental modification of module interfaces
+    * Ensuring constants remain constant
+    * Preventing accidental modification of module interfaces
 
-Also provides a convenience function:
+    Also provides a convenience function:
 
-* ``reclassify_modules``: Converts existing modules to accretive modules.
+    * ``reclassify_modules``: Converts existing modules to accretive modules.
 '''
 
 

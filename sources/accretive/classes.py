@@ -21,32 +21,45 @@
 # pylint: disable=line-too-long
 ''' Accretive classes.
 
-Provides metaclasses for creating classes with accretive attributes. Once a
-class attribute is set, it cannot be reassigned or deleted.
+    Provides metaclasses for creating classes with accretive attributes. Once a
+    class attribute is set, it cannot be reassigned or deleted.
 
-The implementation includes:
+    The implementation includes:
 
-* ``Class``: Standard metaclass for accretive classes; derived from
-  :py:class:`type`.
-* ``ABCFactory``: Metaclass for abstract base classes; derived from
-  :py:class:`abc.ABCMeta`.
-* ``ProtocolClass``: Metaclass for protocol classes; derived from
-  :py:class:`typing.Protocol`.
+    * ``Class``: Standard metaclass for accretive classes; derived from
+      :py:class:`type`.
+    * ``ABCFactory``: Metaclass for abstract base classes; derived from
+      :py:class:`abc.ABCMeta`.
+    * ``ProtocolClass``: Metaclass for protocol classes; derived from
+      :py:class:`typing.Protocol`.
 
-These metaclasses are particularly useful for:
+    These metaclasses are particularly useful for:
 
-* Creating classes with constant class attributes
-* Defining stable abstract base classes
-* Building protocol classes with fixed interfaces
+    * Creating classes with constant class attributes
+    * Defining stable abstract base classes
+    * Building protocol classes with fixed interfaces
 
->>> from accretive import Class
->>> class Example( metaclass = Class ):
-...     x = 1
->>> Example.y = 2  # Add new class attribute
->>> Example.x = 3  # Attempt reassignment
-Traceback (most recent call last):
-    ...
-accretive.exceptions.AttributeImmutabilityError: Cannot reassign or delete attribute 'x'.
+    >>> from accretive import Class
+    >>> class Example( metaclass = Class ):
+    ...     x = 1
+    >>> Example.y = 2  # Add new class attribute
+    >>> Example.x = 3  # Attempt reassignment
+    Traceback (most recent call last):
+        ...
+    accretive.exceptions.AttributeImmutabilityError: Cannot reassign or delete attribute 'x'.
+
+    For cases where some attributes need to remain mutable, use the ``mutables`` parameter:
+
+    >>> class Config( metaclass = Class, mutables = ( 'version', ) ):
+    ...     name = 'MyApp'
+    ...     version = '1.0.0'
+    >>> Config.version = '1.0.1'  # Can modify designated mutable attributes
+    >>> Config.version
+    '1.0.1'
+    >>> Config.name = 'NewApp'    # Other attributes remain immutable
+    Traceback (most recent call last):
+        ...
+    accretive.exceptions.AttributeImmutabilityError: Cannot reassign or delete attribute 'name'.
 '''
 # pylint: enable=line-too-long
 

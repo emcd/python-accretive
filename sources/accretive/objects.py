@@ -21,42 +21,43 @@
 # pylint: disable=line-too-long
 ''' Accretive objects.
 
-Provides the base class for objects with accretive attributes. Once an
-attribute is set on an instance, it cannot be reassigned or deleted.
+    Provides the base class for objects with accretive attributes. Once an
+    attribute is set on an instance, it cannot be reassigned or deleted.
 
-The implementation uses a special dictionary type for attribute storage that
-enforces the accretive behavior. This makes it suitable as a base class for:
+    The implementation uses a special dictionary type for attribute storage
+    that enforces the accretive behavior. This makes it suitable as a base
+    class for:
 
-* Configuration objects
-* Plugin interfaces
-* Immutable data containers
-* Objects requiring attribute stability
+    * Configuration objects
+    * Plugin interfaces
+    * Immutable data containers
+    * Objects requiring attribute stability
 
->>> from accretive import Object
->>> obj = Object( )
->>> obj.x = 1  # Add new instance attribute
->>> obj.y = 2  # Add another instance attribute
->>> obj.x = 3  # Attempt modification
-Traceback (most recent call last):
+    >>> from accretive import Object
+    >>> obj = Object( )
+    >>> obj.x = 1  # Add new instance attribute
+    >>> obj.y = 2  # Add another instance attribute
+    >>> obj.x = 3  # Attempt modification
+    Traceback (most recent call last):
+        ...
+    accretive.exceptions.AttributeImmutabilityError: Cannot reassign or delete existing attribute 'x'.
+
+    The `accretive` decorator can be used to make any class accretive:
+
+    >>> from accretive import accretive
+    >>> @accretive
+    ... class Config:
+    ...     def __init__( self, debug = False ):
+    ...         self.debug = debug
     ...
-accretive.exceptions.AttributeImmutabilityError: Cannot reassign or delete existing attribute 'x'.
-
-The `accretive` decorator can be used to make any class accretive:
-
->>> from accretive import accretive
->>> @accretive
-... class Config:
-...     def __init__( self, debug = False ):
-...         self.debug = debug
-...
->>> config = Config( debug = True )
->>> config.debug  # Access existing attribute
-True
->>> config.verbose = True  # Add new attribute
->>> config.debug = False  # Attempt to modify existing attribute
-Traceback (most recent call last):
-    ...
-accretive.exceptions.AttributeImmutabilityError: Cannot reassign or delete existing attribute 'debug'.
+    >>> config = Config( debug = True )
+    >>> config.debug  # Access existing attribute
+    True
+    >>> config.verbose = True  # Add new attribute
+    >>> config.debug = False  # Attempt to modify existing attribute
+    Traceback (most recent call last):
+        ...
+    accretive.exceptions.AttributeImmutabilityError: Cannot reassign or delete existing attribute 'debug'.
 '''
 # pylint: enable=line-too-long
 

@@ -22,11 +22,6 @@
 
 
 from . import __
-from . import classes
-from . import dictionaries
-from . import modules
-from . import namespaces
-from . import objects
 from . import qaliases
 # --- BEGIN: Injected by Copier ---
 from . import exceptions

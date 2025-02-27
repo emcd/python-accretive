@@ -45,7 +45,7 @@
    :target: https://pypi.org/project/accretive/
 
 
-🔒 A Python library package which provides **accretive data structures** -
+🌌 A Python library package which provides **accretive data structures** -
 collections which can grow but never shrink.
 
 
@@ -136,6 +136,25 @@ Traceback (most recent call last):
 accretive.exceptions.EntryImmutabilityError: Cannot alter or remove existing entry for 'bananas'.
 >>> dct
 accretive.dictionaries.Dictionary( {'apples': 12, 'bananas': 6, 'cherries': 42, 'blueberries': 96, 'strawberries': 24} )
+
+
+Accretive Objects 🧱
+-------------------------------------------------------------------------------
+
+The ``accretive`` decorator can be applied to any class to make its instances enforce attribute immutability after assignment.
+
+>>> from accretive import accretive
+>>> @accretive
+... class Config:
+...     def __init__( self, debug = False ):
+...         self.debug = debug
+...
+>>> config = Config( debug = True )
+>>> config.verbose = True  # ✅ Allows new attributes
+>>> config.debug = False   # ❌ Attempted reassignment raises error
+Traceback (most recent call last):
+...
+accretive.exceptions.AttributeImmutabilityError: Cannot reassign or delete existing attribute 'debug'.
 
 
 Use Cases 🎯

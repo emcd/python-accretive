@@ -18,11 +18,7 @@
 #============================================================================#
 
 
-''' Family of exceptions for package internals.
-
-    * ``Omniexception``: Base for all internal exceptions
-    * ``Omnierror``: Base for all internals errors
-'''
+''' Family of exceptions for package internals. '''
 
 
 from __future__ import annotations

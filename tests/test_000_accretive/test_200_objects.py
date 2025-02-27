@@ -20,14 +20,15 @@
 
 ''' Assert correct function of objects. '''
 
-# mypy: ignore-errors
 # pylint: disable=attribute-defined-outside-init
 # pylint: disable=invalid-name,magic-value-comparison,protected-access
 
 
-import pytest
+import platform
 
 from itertools import product
+
+import pytest
 
 from . import (
     MODULES_QNAMES,
@@ -83,6 +84,21 @@ def test_102_string_representation( module_qname, class_name ):
     factory = getattr( module, class_name )
     obj = factory( )
     assert base.calculate_fqname( obj ) in repr( obj )
+
+
+@pytest.mark.skipif(
+    platform.python_implementation( ) != 'CPython',
+    reason="Layout conflict specific to CPython implementation"
+)
+def test_150_slot_layout_conflict( ):
+    ''' Object with slots cannot be used with built-in types. '''
+    module = cache_import_module( f"{PACKAGE_NAME}.objects" )
+    with pytest.raises( TypeError ) as excinfo:
+
+        class ConflictingClass( BaseException, module.Object ): # pylint: disable=unused-variable
+            ''' This class will fail to create due to layout conflict. '''
+
+    assert "instance lay-out conflict" in str( excinfo.value )
 
 
 def test_200_accretive_decorator( ):

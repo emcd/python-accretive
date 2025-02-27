@@ -88,6 +88,7 @@ nitpick_ignore = [
     ( 'py:class', "accretive.__.dictionaries._H" ),
     ( 'py:class', "accretive.__.dictionaries._V" ),
     ( 'py:class', "accretive.__.imports.Annotated" ),
+    ( 'py:class', "accretive.__.imports.C" ),
     ( 'py:class', "accretive.__.imports.H" ),
     ( 'py:class', "accretive.__.imports.V" ),
     ( 'py:class', "accretive.__._H" ),
