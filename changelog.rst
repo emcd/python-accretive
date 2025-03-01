@@ -2,6 +2,31 @@
 
 .. towncrier release notes start
 
+Accretive 3.0 (2025-03-01)
+==========================
+
+Documentation Improvements
+--------------------------
+
+- Expand documentation with comprehensive examples for accretive objects,
+  improved docstrings for public modules, and new guidance for class attribute
+  mutability.
+
+
+Features
+--------
+
+- Add metaclasses for accretive dataclasses including ``Dataclass``,
+  ``CompleteDataclass``, ``ProtocolDataclass``, and
+  ``CompleteProtocolDataclass``. These factory classes combine Python's dataclass
+  functionality with accretive behavior for type-safe, attribute-stable data
+  containers.
+- Enhance the ``accretive`` decorator to accept optional parameters including
+  ``docstring`` for setting or overriding class documentation and ``mutables``
+  for specifying attributes that should remain modifiable after initial
+  assignment.
+
+
 Accretive 2.1 (2024-11-19)
 ==========================
 
