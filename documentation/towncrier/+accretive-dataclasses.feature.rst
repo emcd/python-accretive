@@ -1,1 +1,5 @@
-Add metaclasses for accretive dataclasses including `Dataclass`, `CompleteDataclass`, `ProtocolDataclass`, and `CompleteProtocolDataclass`. These factory classes combine Python's dataclass functionality with accretive behavior for type-safe, attribute-stable data containers.
+Add metaclasses for accretive dataclasses including ``Dataclass``,
+``CompleteDataclass``, ``ProtocolDataclass``, and
+``CompleteProtocolDataclass``. These factory classes combine Python's dataclass
+functionality with accretive behavior for type-safe, attribute-stable data
+containers.
