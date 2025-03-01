@@ -21,25 +21,25 @@
 # pylint: disable=line-too-long
 ''' Accretive namespaces.
 
-Provides a namespace type that can grow but never shrink. Once an attribute is
-set, it cannot be modified or removed. This provides a simple way to create
-objects with named attributes that become immutable after assignment.
+    Provides a namespace type that can grow but never shrink. Once an attribute is
+    set, it cannot be modified or removed. This provides a simple way to create
+    objects with named attributes that become immutable after assignment.
 
-The namespace implementation is modeled after :py:class:`types.SimpleNamespace`
-but adds accretive behavior. Like :py:class:`types.SimpleNamespace`, it
-provides a simple ``__repr__`` which lists all attributes.
+    The namespace implementation is modeled after :py:class:`types.SimpleNamespace`
+    but adds accretive behavior. Like :py:class:`types.SimpleNamespace`, it
+    provides a simple ``__repr__`` which lists all attributes.
 
->>> from accretive import Namespace
->>> ns = Namespace( apples = 12, bananas = 6 )
->>> ns.cherries = 42  # Add new attribute
->>> ns.apples = 14    # Attempt modification
-Traceback (most recent call last):
-    ...
-accretive.exceptions.AttributeImmutabilityError: Cannot reassign or delete existing attribute 'apples'.
->>> del ns.bananas    # Attempt deletion
-Traceback (most recent call last):
-    ...
-accretive.exceptions.AttributeImmutabilityError: Cannot reassign or delete existing attribute 'bananas'.
+    >>> from accretive import Namespace
+    >>> ns = Namespace( apples = 12, bananas = 6 )
+    >>> ns.cherries = 42  # Add new attribute
+    >>> ns.apples = 14    # Attempt modification
+    Traceback (most recent call last):
+        ...
+    accretive.exceptions.AttributeImmutabilityError: Cannot reassign or delete existing attribute 'apples'.
+    >>> del ns.bananas    # Attempt deletion
+    Traceback (most recent call last):
+        ...
+    accretive.exceptions.AttributeImmutabilityError: Cannot reassign or delete existing attribute 'bananas'.
 '''
 # pylint: enable=line-too-long
 
@@ -58,7 +58,7 @@ class Namespace( _objects.Object ): # pylint: disable=eq-without-hash
     ) -> None:
         super( ).__init__( )
         super( ).__getattribute__( '__dict__' ).update(
-            *iterables, **attributes )
+            __.AccretiveDictionary( *iterables, **attributes ) )
 
     def __repr__( self ) -> str:
         attributes = ', '.join( tuple(
@@ -68,15 +68,15 @@ class Namespace( _objects.Object ): # pylint: disable=eq-without-hash
         if not attributes: return f"{fqname}( )"
         return f"{fqname}( {attributes} )"
 
-    def __eq__( self, other: __.a.Any ) -> __.ComparisonResult:
+    def __eq__( self, other: __.typx.Any ) -> __.ComparisonResult:
         mydict = super( ).__getattribute__( '__dict__' )
-        if isinstance( other, ( Namespace, __.SimpleNamespace ) ):
+        if isinstance( other, ( Namespace, __.types.SimpleNamespace ) ):
             return mydict == other.__dict__
         return NotImplemented
 
-    def __ne__( self, other: __.a.Any ) -> __.ComparisonResult:
+    def __ne__( self, other: __.typx.Any ) -> __.ComparisonResult:
         mydict = super( ).__getattribute__( '__dict__' )
-        if isinstance( other, ( Namespace, __.SimpleNamespace ) ):
+        if isinstance( other, ( Namespace, __.types.SimpleNamespace ) ):
             return mydict != other.__dict__
         return NotImplemented
 

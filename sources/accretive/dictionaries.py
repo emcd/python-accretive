@@ -21,65 +21,66 @@
 # pylint: disable=line-too-long
 ''' Accretive dictionaries.
 
-Dictionaries which can grow but never shrink. Once an entry is added, it cannot
-be modified or removed.
+    Dictionaries which can grow but never shrink. Once an entry is added, it
+    cannot be modified or removed.
 
-* :py:class:`AbstractDictionary`:
-  Base class defining the accretive dictionary interface. Implementations must
-  provide ``__getitem__``, ``__iter__``, ``__len__``, and storage methods.
+    * :py:class:`AbstractDictionary`:
+      Base class defining the accretive dictionary interface. Implementations
+      must provide ``__getitem__``, ``__iter__``, ``__len__``, and storage
+      methods.
 
-* :py:class:`Dictionary`:
-  Standard implementation of an accretive dictionary. Supports all usual dict
-  operations except those that would modify or remove existing entries.
+    * :py:class:`Dictionary`:
+      Standard implementation of an accretive dictionary. Supports all usual
+      dict operations except those that would modify or remove existing
+      entries.
 
-* :py:class:`ProducerDictionary`:
-  Automatically generates values for missing keys using a supplied factory
-  function. Similar to :py:class:`collections.defaultdict` but with accretive
-  behavior.
+    * :py:class:`ProducerDictionary`:
+      Automatically generates values for missing keys using a supplied factory
+      function. Similar to :py:class:`collections.defaultdict` but with
+      accretive behavior.
 
-* :py:class:`ValidatorDictionary`:
-  Validates entries before addition using a supplied predicate function.
+    * :py:class:`ValidatorDictionary`:
+      Validates entries before addition using a supplied predicate function.
 
-* :py:class:`ProducerValidatorDictionary`:
-  Combines producer and validator behaviors. Generated values must pass
-  validation before being added.
+    * :py:class:`ProducerValidatorDictionary`:
+      Combines producer and validator behaviors. Generated values must pass
+      validation before being added.
 
->>> from accretive import Dictionary
->>> d = Dictionary( apples = 12, bananas = 6 )
->>> d[ 'cherries' ] = 42  # Add new entry
->>> d[ 'apples' ] = 14    # Attempt modification
-Traceback (most recent call last):
-    ...
-accretive.exceptions.EntryImmutabilityError: Cannot alter or remove existing entry for 'apples'.
->>> del d[ 'bananas' ]    # Attempt removal
-Traceback (most recent call last):
-    ...
-accretive.exceptions.EntryImmutabilityError: Cannot alter or remove existing entry for 'bananas'.
+    >>> from accretive import Dictionary
+    >>> d = Dictionary( apples = 12, bananas = 6 )
+    >>> d[ 'cherries' ] = 42  # Add new entry
+    >>> d[ 'apples' ] = 14    # Attempt modification
+    Traceback (most recent call last):
+        ...
+    accretive.exceptions.EntryImmutabilityError: Cannot alter or remove existing entry for 'apples'.
+    >>> del d[ 'bananas' ]    # Attempt removal
+    Traceback (most recent call last):
+        ...
+    accretive.exceptions.EntryImmutabilityError: Cannot alter or remove existing entry for 'bananas'.
 
->>> from accretive import ProducerDictionary
->>> d = ProducerDictionary( list )  # list() called for missing keys
->>> d[ 'new' ]
-[]
->>> d[ 'new' ].append( 1 )  # List is mutable, but entry is fixed
->>> d[ 'new' ] = [ ]  # Attempt modification
-Traceback (most recent call last):
-    ...
-accretive.exceptions.EntryImmutabilityError: Cannot alter or remove existing entry for 'new'.
+    >>> from accretive import ProducerDictionary
+    >>> d = ProducerDictionary( list )  # list() called for missing keys
+    >>> d[ 'new' ]
+    []
+    >>> d[ 'new' ].append( 1 )  # List is mutable, but entry is fixed
+    >>> d[ 'new' ] = [ ]  # Attempt modification
+    Traceback (most recent call last):
+        ...
+    accretive.exceptions.EntryImmutabilityError: Cannot alter or remove existing entry for 'new'.
 
->>> from accretive import ValidatorDictionary
->>> d = ValidatorDictionary( lambda k, v: isinstance( v, int ) )
->>> d[ 'valid' ] = 42  # Passes validation
->>> d[ 'invalid' ] = 'str'  # Fails validation
-Traceback (most recent call last):
-    ...
-accretive.exceptions.EntryValidityError: Cannot add invalid entry with key, 'invalid', and value, 'str', to dictionary.
+    >>> from accretive import ValidatorDictionary
+    >>> d = ValidatorDictionary( lambda k, v: isinstance( v, int ) )
+    >>> d[ 'valid' ] = 42  # Passes validation
+    >>> d[ 'invalid' ] = 'str'  # Fails validation
+    Traceback (most recent call last):
+        ...
+    accretive.exceptions.EntryValidityError: Cannot add invalid entry with key, 'invalid', and value, 'str', to dictionary.
 '''
 # pylint: enable=line-too-long
 
 
 from . import __
 from . import classes as _classes
-from . import objects as _objects
 
 
 class AbstractDictionary( __.cabc.Mapping[ __.H, __.V ] ):
@@ -95,15 +96,15 @@ class AbstractDictionary( __.cabc.Mapping[ __.H, __.V ] ):
         - _store_item_ for storage implementation
     '''
 
-    @__.abstract_member_function
+    @__.abc.abstractmethod
     def __iter__( self ) -> __.cabc.Iterator[ __.H ]:
         raise NotImplementedError # pragma: no coverage
 
-    @__.abstract_member_function
+    @__.abc.abstractmethod
     def __len__( self ) -> int:
         raise NotImplementedError # pragma: no coverage
 
-    @__.abstract_member_function
+    @__.abc.abstractmethod
     def __getitem__( self, key: __.H ) -> __.V:
         raise NotImplementedError # pragma: no coverage
 
@@ -116,7 +117,7 @@ class AbstractDictionary( __.cabc.Mapping[ __.H, __.V ] ):
         '''
         return key, value
 
-    @__.abstract_member_function
+    @__.abc.abstractmethod
     def _store_item_( self, key: __.H, value: __.V ) -> None:
         ''' Stores entry in underlying storage. '''
         raise NotImplementedError # pragma: no coverage
@@ -143,7 +144,7 @@ class AbstractDictionary( __.cabc.Mapping[ __.H, __.V ] ):
         self,
         *iterables: __.DictionaryPositionalArgument[ __.H, __.V ],
         **entries: __.DictionaryNominativeArgument[ __.V ],
-    ) -> __.a.Self:
+    ) -> __.typx.Self:
         ''' Adds new entries as a batch. Returns self. '''
         from itertools import chain
         updates: list[ tuple[ __.H, __.V ] ] = [ ]
@@ -168,67 +169,71 @@ class AbstractDictionary( __.cabc.Mapping[ __.H, __.V ] ):
 class _DictionaryOperations( AbstractDictionary[ __.H, __.V ] ):
     ''' Mix-in providing additional dictionary operations. '''
 
-    def __init__( self, *posargs: __.a.Any, **nomargs: __.a.Any ) -> None:
+    def __init__(
+        self, *posargs: __.typx.Any, **nomargs: __.typx.Any
+    ) -> None:
         super( ).__init__( *posargs, **nomargs )
 
-    def __or__( self, other: __.cabc.Mapping[ __.H, __.V ] ) -> __.a.Self:
+    def __or__( self, other: __.cabc.Mapping[ __.H, __.V ] ) -> __.typx.Self:
         if not isinstance( other, __.cabc.Mapping ): return NotImplemented
-        result = self.copy( )
-        result.update( other )
-        return result
+        conflicts = set( self.keys( ) ) & set( other.keys( ) )
+        if conflicts:
+            from .exceptions import EntryImmutabilityError
+            raise EntryImmutabilityError( next( iter( conflicts ) ) )
+        data = dict( self )
+        data.update( other )
+        return self.with_data( data )
 
-    def __ror__( self, other: __.cabc.Mapping[ __.H, __.V ] ) -> __.a.Self:
+    def __ror__( self, other: __.cabc.Mapping[ __.H, __.V ] ) -> __.typx.Self:
         if not isinstance( other, __.cabc.Mapping ): return NotImplemented
         return self | other
 
     def __and__(
         self,
         other: __.cabc.Set[ __.H ] | __.cabc.Mapping[ __.H, __.V ]
-    ) -> __.a.Self:
+    ) -> __.typx.Self:
         if isinstance( other, __.cabc.Mapping ):
-            return self.with_data(
+            return self.with_data( # pyright: ignore
                 ( key, value ) for key, value in self.items( )
                 if key in other and other[ key ] == value )
         if isinstance( other, ( __.cabc.Set, __.cabc.KeysView ) ):
-            return self.with_data(
+            return self.with_data( # pyright: ignore
                 ( key, self[ key ] ) for key in self.keys( ) & other )
         return NotImplemented
 
     def __rand__(
         self,
         other: __.cabc.Set[ __.H ] | __.cabc.Mapping[ __.H, __.V ]
-    ) -> __.a.Self:
+    ) -> __.typx.Self:
         if not isinstance(
             other, ( __.cabc.Mapping, __.cabc.Set, __.cabc.KeysView )
         ): return NotImplemented
         return self & other
 
-    @__.abstract_member_function
-    def copy( self ) -> __.a.Self:
+    @__.abc.abstractmethod
+    def copy( self ) -> __.typx.Self:
         ''' Provides fresh copy of dictionary. '''
         raise NotImplementedError # pragma: no coverage
 
-    @__.abstract_member_function
+    @__.abc.abstractmethod
     def with_data(
         self,
         *iterables: __.DictionaryPositionalArgument[ __.H, __.V ],
         **entries: __.DictionaryNominativeArgument[ __.V ],
-    ) -> __.a.Self:
+    ) -> __.typx.Self:
         ''' Creates new dictionary with same behavior but different data. '''
         raise NotImplementedError # pragma: no coverage
 
 
-
 class _Dictionary(
-    __.CoreDictionary[ __.H, __.V ], metaclass = _classes.Class
+    __.AccretiveDictionary[ __.H, __.V ], metaclass = _classes.Class
 ): pass
 
 
 class Dictionary( # pylint: disable=eq-without-hash
-    _objects.Object, _DictionaryOperations[ __.H, __.V ]
+    _DictionaryOperations[ __.H, __.V ]
 ):
     ''' Accretive dictionary. '''
-    # TODO: version 3.0: Do not subclass from 'Object'.
 
     __slots__ = ( '_data_', )
 
@@ -256,37 +261,37 @@ class Dictionary( # pylint: disable=eq-without-hash
     def __str__( self ) -> str:
         return str( self._data_ )
 
-    def __contains__( self, key: __.a.Any ) -> bool:
+    def __contains__( self, key: __.typx.Any ) -> bool:
         return key in self._data_
 
     def __getitem__( self, key: __.H ) -> __.V:
         return self._data_[ key ]
 
-    def __eq__( self, other: __.a.Any ) -> __.ComparisonResult:
+    def __eq__( self, other: __.typx.Any ) -> __.ComparisonResult:
         if isinstance( other, __.cabc.Mapping ):
             return self._data_ == other
         return NotImplemented
 
-    def __ne__( self, other: __.a.Any ) -> __.ComparisonResult:
+    def __ne__( self, other: __.typx.Any ) -> __.ComparisonResult:
         if isinstance( other, __.cabc.Mapping ):
             return self._data_ != other
         return NotImplemented
 
-    def copy( self ) -> __.a.Self:
+    def copy( self ) -> __.typx.Self:
         ''' Provides fresh copy of dictionary. '''
         return type( self )( self )
 
     def get(
-        self, key: __.H, default: __.Optional[ __.V ] = __.absent
-    ) -> __.a.Annotation[
+        self, key: __.H, default: __.Absential[ __.V ] = __.absent
+    ) -> __.typx.Annotated[
         __.V,
-        __.a.Doc(
+        __.typx.Doc(
             'Value of entry, if it exists. '
             'Else, supplied default value or ``None``.' )
     ]:
         ''' Retrieves entry associated with key, if it exists. '''
         if __.is_absent( default ):
-            return self._data_.get( key ) # type: ignore
+            return self._data_.get( key ) # pyright: ignore
         return self._data_.get( key, default )
 
     def keys( self ) -> __.cabc.KeysView[ __.H ]:
@@ -305,7 +310,7 @@ class Dictionary( # pylint: disable=eq-without-hash
         self,
         *iterables: __.DictionaryPositionalArgument[ __.H, __.V ],
         **entries: __.DictionaryNominativeArgument[ __.V ],
-    ) -> __.a.Self:
+    ) -> __.typx.Self:
         return type( self )( *iterables, **entries )
 
     def _store_item_( self, key: __.H, value: __.V ) -> None:
@@ -313,10 +318,6 @@ class Dictionary( # pylint: disable=eq-without-hash
 
 Dictionary.__doc__ = __.generate_docstring(
     Dictionary, 'dictionary entries accretion' )
-# Register as subclass of Mapping rather than use it as mixin.
-# We directly implement, for the sake of efficiency, the methods which the
-# mixin would provide.
-__.cabc.Mapping.register( Dictionary ) # type: ignore
 
 
 class ProducerDictionary( Dictionary[ __.H, __.V ] ):
@@ -350,7 +351,7 @@ class ProducerDictionary( Dictionary[ __.H, __.V ] ):
         else: value = super( ).__getitem__( key )
         return value
 
-    def copy( self ) -> __.a.Self:
+    def copy( self ) -> __.typx.Self:
         ''' Provides fresh copy of dictionary. '''
         dictionary = type( self )( self._producer_ )
         return dictionary.update( self )
@@ -366,7 +367,7 @@ class ProducerDictionary( Dictionary[ __.H, __.V ] ):
         self,
         *iterables: __.DictionaryPositionalArgument[ __.H, __.V ],
         **entries: __.DictionaryNominativeArgument[ __.V ],
-    ) -> __.a.Self:
+    ) -> __.typx.Self:
         return type( self )( self._producer_, *iterables, **entries )
 
 ProducerDictionary.__doc__ = __.generate_docstring(
@@ -405,7 +406,7 @@ class ValidatorDictionary( Dictionary[ __.H, __.V ] ):
             raise EntryValidityError( key, value )
         return key, value
 
-    def copy( self ) -> __.a.Self:
+    def copy( self ) -> __.typx.Self:
         ''' Provides fresh copy of dictionary. '''
         dictionary = type( self )( self._validator_ )
         return dictionary.update( self )
@@ -414,7 +415,7 @@ class ValidatorDictionary( Dictionary[ __.H, __.V ] ):
         self,
         *iterables: __.DictionaryPositionalArgument[ __.H, __.V ],
         **entries: __.DictionaryNominativeArgument[ __.V ],
-    ) -> __.a.Self:
+    ) -> __.typx.Self:
         return type( self )( self._validator_, *iterables, **entries )
 
 ValidatorDictionary.__doc__ = __.generate_docstring(
@@ -467,7 +468,7 @@ class ProducerValidatorDictionary( Dictionary[ __.H, __.V ] ):
             raise EntryValidityError( key, value )
         return key, value
 
-    def copy( self ) -> __.a.Self:
+    def copy( self ) -> __.typx.Self:
         ''' Provides fresh copy of dictionary. '''
         dictionary = type( self )( self._producer_, self._validator_ )
         return dictionary.update( self )
@@ -483,7 +484,7 @@ class ProducerValidatorDictionary( Dictionary[ __.H, __.V ] ):
         self,
         *iterables: __.DictionaryPositionalArgument[ __.H, __.V ],
         **entries: __.DictionaryNominativeArgument[ __.V ],
-    ) -> __.a.Self:
+    ) -> __.typx.Self:
         return type( self )(
             self._producer_, self._validator_, *iterables, **entries )
 

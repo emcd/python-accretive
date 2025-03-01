@@ -10,19 +10,20 @@ on:
 jobs:
 
   initialize:
-    uses: ./.github/workflows/reusable--initializer.yaml
+    uses: ./.github/workflows/core--initializer.yaml
 
   test:
     needs: [initialize]
-    uses: ./.github/workflows/reusable--tester.yaml
+    uses: emcd/python-project-common/.github/workflows/xrepo--tester.yaml@v1.10
     with:
       matrix-exclusions: '${{ needs.initialize.outputs.matrix-exclusions }}'
       platforms: '${{ needs.initialize.outputs.platforms }}'
-      python-versions: '${{ needs.initialize.outputs.python-versions }}'
       python-descriptors: '${{ needs.initialize.outputs.python-descriptors }}'
+      python-versions: '${{ needs.initialize.outputs.python-versions }}'
+      
 
   report:
     needs: [initialize, test]
-    uses: ./.github/workflows/reusable--reporter.yaml
+    uses: emcd/python-project-common/.github/workflows/xrepo--reporter.yaml@v1.10
     with:
       python-version: '${{ fromJSON(needs.initialize.outputs.python-versions)[0] }}'

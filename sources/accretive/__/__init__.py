@@ -18,24 +18,14 @@
 #============================================================================#
 
 
-''' Accretive data structures. '''
+''' Common constants, imports, and utilities. '''
 
 
-from . import __
-from . import qaliases
-# --- BEGIN: Injected by Copier ---
-from . import exceptions
-# --- END: Injected by Copier ---
-
-from .classes import *
+# Expose everything from internal modules.
 from .dictionaries import *
-from .modules import *
-from .namespaces import *
-from .objects import *
+from .docstrings import *  # Managed by Copier.
+from .immutables import *  # Managed by Copier.
+from .imports import *
 
 
-__version__ = '3.0rc0'
-
-
-_attribute_visibility_includes_ = frozenset( ( '__version__', ) )
-__.reclassify_modules( __name__, recursive = True )
+__all__ = ( )

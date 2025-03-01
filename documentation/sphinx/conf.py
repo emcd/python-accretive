@@ -12,36 +12,33 @@
 # ruff: noqa: E402,F401
 
 
-def _prepare( ):
-    from pathlib import Path
-    from sys import path as module_discovery_locations
-    from tomli import load  # TODO: Python 3.11: tomllib
-    project_location = Path( __file__ ).parent.parent.parent
-    pyproject_location = project_location / 'pyproject.toml'
-    module_discovery_locations.insert( 0, str( project_location / 'sources' ) )
-    with pyproject_location.open( 'rb' ) as project_file:
-        return load( project_file )
-
-
-def _calculate_copyright_notice( information, copyright_holder ):
+def _calculate_copyright_notice( ):
     from datetime import datetime as DateTime
-    first_year = information[ 'tool' ][ 'SELF' ][ 'year-of-origin' ]
+    first_year = 2024
     now_year = DateTime.utcnow( ).year
     if first_year < now_year: year_range = f"{first_year}-{now_year}"
     else: year_range = str( first_year )
-    return f"{year_range}, {copyright_holder}"
+    return f"{year_range}, Eric McDonald"
+
+
+def _import_version( ):
+    from importlib import import_module
+    from pathlib import Path
+    from sys import path
+    project_location = Path( __file__ ).parent.parent.parent
+    path.insert( 0, str( project_location / 'sources' ) )
+    module = import_module( 'accretive' )
+    return module.__version__
 
 
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
-_information = _prepare( )
-
-project = _information[ 'project' ][ 'name' ]
-author = _information[ 'project' ][ 'authors' ][ 0 ][ 'name' ]
+project = 'python-accretive'
+author = 'Eric McDonald'
 copyright = ( # pylint: disable=redefined-builtin
-    _calculate_copyright_notice( _information, author ) )
-from accretive import __version__ as release, __version__ as version
+    _calculate_copyright_notice( ) )
+release = version = _import_version( )
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
@@ -80,17 +77,26 @@ nitpick_ignore = [
     ( 'py:class', "module" ),
     ( 'py:class',
       "v, remove specified key and return the corresponding value." ),
-    # Other weirdnesses. (Something is broken in how Sphinx autodoc processes
-    # certain typing forms.)
+    # Type annotation weirdnesses.
     ( 'py:class', "Doc" ),
     ( 'py:class', "NotImplementedType" ),
-    ( 'py:class', "accretive.dictionaries._DictionaryOperations" ),
-    ( 'py:class', "accretive.__._H" ),
-    ( 'py:class', "accretive.__._V" ),
+    ( 'py:class', "absence.objects.AbsentSingleton" ),
     ( 'py:class', "accretive.__.Annotated" ),
     ( 'py:class', "accretive.__.H" ),
     ( 'py:class', "accretive.__.V" ),
+    ( 'py:class', "accretive.__.dictionaries.Annotated" ),
+    ( 'py:class', "accretive.__.dictionaries._H" ),
+    ( 'py:class', "accretive.__.dictionaries._V" ),
+    ( 'py:class', "accretive.__.imports.Annotated" ),
+    ( 'py:class', "accretive.__.imports.C" ),
+    ( 'py:class', "accretive.__.imports.H" ),
+    ( 'py:class', "accretive.__.imports.V" ),
+    ( 'py:class', "accretive.__._H" ),
+    ( 'py:class', "accretive.__._V" ),
+    ( 'py:class', "accretive.dictionaries._DictionaryOperations" ),
     ( 'py:class', "collections.abc.Annotated" ),
+    ( 'py:class', "types.Annotated" ),
+    ( 'py:class', "types.NoneType" ),
     ( 'py:class', "typing_extensions._ProtocolMeta" ),
     ( 'py:class', "typing_extensions.Annotated" ),
     ( 'py:class', "typing_extensions.Any" ),
@@ -98,22 +104,28 @@ nitpick_ignore = [
     ( 'py:class', "typing_extensions.NoDefault" ),
     ( 'py:class', "typing_extensions.Self" ),
     ( 'py:class', "typing_extensions.TypeIs" ),
-    ( 'py:class', "types.Annotated" ),
-    ( 'py:class', "types.NoneType" ),
-    ( 'py:obj', "accretive.__._H" ),
-    ( 'py:obj', "accretive.__._V" ),
     ( 'py:obj', "accretive.__.H" ),
     ( 'py:obj', "accretive.__.V" ),
+    ( 'py:obj', "accretive.__.dictionaries._H" ),
+    ( 'py:obj', "accretive.__.dictionaries._V" ),
+    ( 'py:obj', "accretive.__.imports.H" ),
+    ( 'py:obj', "accretive.__.imports.V" ),
+    ( 'py:obj', "accretive.__._H" ),
+    ( 'py:obj', "accretive.__._V" ),
 ]
 
 # -- Options for linkcheck builder -------------------------------------------
 
 linkcheck_ignore = [
     # Circular dependency between building HTML and publishing it.
-    # Ideally, we want to warn on failure rather than ignore.
-    fr'https://emcd\.github\.io/.*{project}.*/.*',
+    r'https://emcd\.github\.io/python-accretive/.*',
     # Stack Overflow rate limits too aggressively, which breaks matrix builds.
     r'https://stackoverflow\.com/help/.*',
+    # Repository does not exist during initial development.
+    r'https://github\.com/emcd/python-accretive',
+    r'https://github\.com/emcd/python-accretive/.*',
+    # Package does not exist during initial development.
+    r'https://pypi.org/project/accretive/',
 ]
 
 # -- Options for HTML output -------------------------------------------------

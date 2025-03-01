@@ -17,25 +17,15 @@
    +--------------------------------------------------------------------------+
 
 
-.. include:: ../../README.rst
+:tocdepth: 3
 
 
-Table of Contents
+Internal Development Interface
 ===============================================================================
 
-.. toctree::
-   :maxdepth: 2
 
-   examples/index
-   api
-   changelog
-   contribution/index
-   license
+Module ``accretive.__``
+-------------------------------------------------------------------------------
 
-
-Indices
-===============================================================================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
+.. automodule:: accretive.__
+   :ignore-module-all: true

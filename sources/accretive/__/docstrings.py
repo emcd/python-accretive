@@ -18,24 +18,32 @@
 #============================================================================#
 
 
-''' Accretive data structures. '''
+''' Docstring utilities. '''
+
+# pylint: disable=unused-wildcard-import,wildcard-import
+# ruff: noqa: F403,F405
 
 
-from . import __
-from . import qaliases
-# --- BEGIN: Injected by Copier ---
-from . import exceptions
-# --- END: Injected by Copier ---
+from __future__ import annotations
 
-from .classes import *
-from .dictionaries import *
-from .modules import *
-from .namespaces import *
-from .objects import *
+from . import doctab
+from .imports import *
 
 
-__version__ = '3.0rc0'
+class Docstring( str ):
+    ''' Dedicated docstring container. '''
 
 
-_attribute_visibility_includes_ = frozenset( ( '__version__', ) )
-__.reclassify_modules( __name__, recursive = True )
+def generate_docstring(
+    *fragment_ids: type | Docstring | str,
+    table: cabc.Mapping[ str, str ] = doctab.TABLE,
+) -> str:
+    ''' Sews together docstring fragments into clean docstring. '''
+    from inspect import cleandoc, getdoc, isclass
+    fragments: list[ str ] = [ ]
+    for fragment_id in fragment_ids:
+        if isclass( fragment_id ): fragment = getdoc( fragment_id ) or ''
+        elif isinstance( fragment_id, Docstring ): fragment = fragment_id
+        else: fragment = table[ fragment_id ]
+        fragments.append( cleandoc( fragment ) )
+    return '\n\n'.join( fragments )

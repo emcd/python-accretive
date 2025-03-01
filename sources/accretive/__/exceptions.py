@@ -18,25 +18,36 @@
 #============================================================================#
 
 
-''' Standard annotations across Python versions. '''
-
-# ruff: noqa: F401
-# pylint: disable=unused-import
+''' Family of exceptions for package internals. '''
 
 
-from typing_extensions import (
-    Annotated as Annotation,
-    Any,
-    Doc,
-    Generic,
-    Never,
-    Optional as Nullable,
-    Protocol,
-    Self,
-    TypeAlias,
-    TypeIs,
-    TypeVar,
-)
+from __future__ import annotations
+
+from . import imports as __
+from . import immutables as _immutables
 
 
-__all__ = ( )
+class Omniexception( _immutables.ImmutableObject, BaseException ):
+    ''' Base for all exceptions raised internally. '''
+
+    _attribute_visibility_includes_: __.cabc.Collection[ str ] = (
+        frozenset( ( '__cause__', '__context__', ) ) )
+
+
+class Omnierror( Omniexception, Exception ):
+    ''' Base for error exceptions raised internally. '''
+
+
+class EntryImmutabilityError( Omnierror, TypeError ):
+    ''' Attempt to update or remove immutable dictionary entry. '''
+
+    def __init__( self, indicator: __.cabc.Hashable ) -> None:
+        super( ).__init__(
+            f"Cannot alter or remove existing entry for {indicator!r}." )
+
+
+class OperationInvalidity( Omnierror, RuntimeError, TypeError ):
+    ''' Attempt to perform invalid operation. '''
+
+    def __init__( self, name: str ) -> None:
+        super( ).__init__( f"Operation {name!r} is not valid on this object." )

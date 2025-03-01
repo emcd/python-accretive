@@ -18,13 +18,18 @@
 #============================================================================#
 
 
-''' Docstrings table for reuse across subpackages. '''
+''' Docstrings table for reuse across entities. '''
+
+# pylint: disable=unused-wildcard-import,wildcard-import
+# ruff: noqa: F403,F405
 
 
-from types import MappingProxyType as _DictionaryProxy
+from __future__ import annotations
+
+from .imports import *
 
 
-TABLE: _DictionaryProxy[ str, str ] = _DictionaryProxy( {
+TABLE: types.MappingProxyType[ str, str ] = types.MappingProxyType( {
 
     'class attributes accretion': '''
 Prevents reassignment or deletion of class attributes after they have been

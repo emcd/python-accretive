@@ -21,7 +21,7 @@
 *******************************************************************************
 
 .. image:: https://img.shields.io/pypi/v/accretive
-   :alt: Project Version
+   :alt: Package Version
    :target: https://pypi.org/project/accretive/
 
 .. image:: https://img.shields.io/pypi/status/accretive
@@ -36,16 +36,16 @@
    :alt: Code Coverage Percentage
    :target: https://github.com/emcd/python-accretive/actions/workflows/tester.yaml
 
+.. image:: https://img.shields.io/github/license/emcd/python-accretive
+   :alt: Project License
+   :target: https://github.com/emcd/python-accretive/blob/master/LICENSE.txt
+
 .. image:: https://img.shields.io/pypi/pyversions/accretive
    :alt: Python Versions
    :target: https://pypi.org/project/accretive/
 
-.. image:: https://img.shields.io/pypi/l/accretive
-   :alt: Project License
-   :target: https://github.com/emcd/python-accretive/blob/master/LICENSE.txt
 
-
-🔒 A Python library package which provides **accretive data structures** -
+🌌 A Python library package which provides **accretive data structures** -
 collections which can grow but never shrink.
 
 
@@ -138,6 +138,25 @@ accretive.exceptions.EntryImmutabilityError: Cannot alter or remove existing ent
 accretive.dictionaries.Dictionary( {'apples': 12, 'bananas': 6, 'cherries': 42, 'blueberries': 96, 'strawberries': 24} )
 
 
+Accretive Objects 🧱
+-------------------------------------------------------------------------------
+
+The ``accretive`` decorator can be applied to any class to make its instances enforce attribute immutability after assignment.
+
+>>> from accretive import accretive
+>>> @accretive
+... class Config:
+...     def __init__( self, debug = False ):
+...         self.debug = debug
+...
+>>> config = Config( debug = True )
+>>> config.verbose = True  # ✅ Allows new attributes
+>>> config.debug = False   # ❌ Attempted reassignment raises error
+Traceback (most recent call last):
+...
+accretive.exceptions.AttributeImmutabilityError: Cannot reassign or delete existing attribute 'debug'.
+
+
 Use Cases 🎯
 ===============================================================================
 
@@ -155,6 +174,10 @@ Use Cases 🎯
 .. image:: https://img.shields.io/github/last-commit/emcd/python-accretive
    :alt: GitHub last commit
    :target: https://github.com/emcd/python-accretive
+
+.. image:: https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/copier-org/copier/master/img/badge/badge-grayscale-inverted-border-orange.json
+   :alt: Copier
+   :target: https://github.com/copier-org/copier
 
 .. image:: https://img.shields.io/badge/%F0%9F%A5%9A-Hatch-4051b5.svg
    :alt: Hatch
@@ -174,7 +197,7 @@ Use Cases 🎯
 
 .. image:: https://microsoft.github.io/pyright/img/pyright_badge.svg
    :alt: Pyright
-   :target: https://microsoft.github.io/pyright/
+   :target: https://microsoft.github.io/pyright
 
 .. image:: https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json
    :alt: Ruff

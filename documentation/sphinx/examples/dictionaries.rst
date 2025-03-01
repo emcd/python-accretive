@@ -117,7 +117,7 @@ Copies can be made which preserve behavior and data.
 Copies can also be made which preserve behavior but replace data. These are
 made using the ``with_data`` method, which creates a new dictionary of the same
 type but with different data. This is particularly useful with producer and
-validator dictionaries (see below)  as it preserves their behavior:
+validator dictionaries (see below) as it preserves their behavior:
 
 .. doctest:: Dictionary
 
