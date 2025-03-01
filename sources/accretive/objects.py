@@ -68,13 +68,16 @@
 from . import __
 
 
+_behavior = 'accretion'
+
+
 def _check_behavior( obj: object ) -> bool:
     behaviors: __.cabc.MutableSet[ str ]
     if _check_dict( obj ):
         attributes = getattr( obj, '__dict__' )
         behaviors = attributes.get( '_behaviors_', set( ) )
     else: behaviors = getattr( obj, '_behaviors_', set( ) )
-    return __.behavior_label in behaviors
+    return _behavior in behaviors
 
 
 def _check_dict( obj: object ) -> bool:
@@ -145,12 +148,10 @@ def accretive( # pylint: disable=too-complex,too-many-statements
                 attributes = getattr( self, '__dict__' )
                 behaviors = attributes.get( '_behaviors_', set( ) )
                 if not behaviors: attributes[ '_behaviors_' ] = behaviors
-                setattr(
-                    self, '__dict__', __.AccretiveDictionary( attributes ) )
             else:
                 behaviors = getattr( self, '_behaviors_', set( ) )
                 if not behaviors: setattr( self, '_behaviors_', behaviors )
-            behaviors.add( __.behavior_label )
+            behaviors.add( _behavior )
 
         def __delattr__( self: object, name: str ) -> None:
             if name in mutables_:
