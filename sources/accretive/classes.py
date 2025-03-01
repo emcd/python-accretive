@@ -117,6 +117,67 @@ Class.__doc__ = __.generate_docstring(
     'class attributes accretion' )
 
 
+@__.typx.dataclass_transform( kw_only_default = True )
+class Dataclass( Class ):
+    ''' Accretive dataclass factory. '''
+
+    def __new__( # pylint: disable=too-many-arguments
+        clscls: type[ Dataclass ],
+        name: str,
+        bases: tuple[ type, ... ],
+        namespace: dict[ str, __.typx.Any ], *,
+        decorators: ClassDecorators = ( ),
+        docstring: __.Absential[ __.typx.Optional[ str ] ] = __.absent,
+        mutables: __.cabc.Collection[ str ] = ( ),
+        **args: __.typx.Any
+    ) -> Dataclass:
+        decorators_ = (
+            __.dcls.dataclass( kw_only = True, slots = True ),
+            *decorators )
+        return Class.__new__( # pyright: ignore
+            clscls, name, bases, namespace,
+            decorators = decorators_,
+            docstring = docstring,
+            mutables = mutables,
+            **args )
+
+Dataclass.__doc__ = __.generate_docstring(
+    Dataclass,
+    'description of class factory class',
+    'class attributes accretion' )
+
+
+@__.typx.dataclass_transform( frozen_default = True, kw_only_default = True )
+class CompleteDataclass( Class ):
+    ''' Accretive dataclass factory.
+
+        Dataclasses from this factory produce immutable instances. '''
+    def __new__( # pylint: disable=too-many-arguments
+        clscls: type[ CompleteDataclass ],
+        name: str,
+        bases: tuple[ type, ... ],
+        namespace: dict[ str, __.typx.Any ], *,
+        decorators: ClassDecorators = ( ),
+        docstring: __.Absential[ __.typx.Optional[ str ] ] = __.absent,
+        mutables: __.cabc.Collection[ str ] = ( ),
+        **args: __.typx.Any
+    ) -> CompleteDataclass:
+        decorators_ = (
+            __.dcls.dataclass( frozen = True, kw_only = True, slots = True ),
+            *decorators )
+        return Class.__new__( # pyright: ignore
+            clscls, name, bases, namespace,
+            decorators = decorators_,
+            docstring = docstring,
+            mutables = mutables,
+            **args )
+
+CompleteDataclass.__doc__ = __.generate_docstring(
+    CompleteDataclass,
+    'description of class factory class',
+    'class attributes accretion' )
+
+
 class ABCFactory( __.abc.ABCMeta ):
     ''' Accretive abstract base class factory. '''
 
@@ -193,6 +254,70 @@ class ProtocolClass( type( __.typx.Protocol ) ):
 
 ProtocolClass.__doc__ = __.generate_docstring(
     ProtocolClass,
+    'description of class factory class',
+    'class attributes accretion' )
+
+
+# pylint: disable=bad-classmethod-argument,no-self-argument
+@__.typx.dataclass_transform( kw_only_default = True )
+class ProtocolDataclass( ProtocolClass ):
+    ''' Accretive protocol dataclass factory. '''
+    def __new__( # pylint: disable=too-many-arguments
+        clscls: type[ ProtocolDataclass ],
+        name: str,
+        bases: tuple[ type, ... ],
+        namespace: dict[ str, __.typx.Any ], *,
+        decorators: ClassDecorators = ( ),
+        docstring: __.Absential[ __.typx.Optional[ str ] ] = __.absent,
+        mutables: __.cabc.Collection[ str ] = ( ),
+        **args: __.typx.Any
+    ) -> ProtocolDataclass:
+        decorators_ = (
+            __.dcls.dataclass( kw_only = True, slots = True ),
+            *decorators )
+        return ProtocolClass.__new__( # pyright: ignore
+            clscls, name, bases, namespace,
+            decorators = decorators_,
+            docstring = docstring,
+            mutables = mutables,
+            **args )
+# pylint: enable=bad-classmethod-argument,no-self-argument
+
+ProtocolDataclass.__doc__ = __.generate_docstring(
+    ProtocolDataclass,
+    'description of class factory class',
+    'class attributes accretion' )
+
+
+# pylint: disable=bad-classmethod-argument,no-self-argument
+@__.typx.dataclass_transform( frozen_default = True, kw_only_default = True )
+class CompleteProtocolDataclass( ProtocolClass ):
+    ''' Accretive protocol dataclass factory.
+
+        Dataclasses from this factory produce immutable instances. '''
+    def __new__( # pylint: disable=too-many-arguments
+        clscls: type[ CompleteProtocolDataclass ],
+        name: str,
+        bases: tuple[ type, ... ],
+        namespace: dict[ str, __.typx.Any ], *,
+        decorators: ClassDecorators = ( ),
+        docstring: __.Absential[ __.typx.Optional[ str ] ] = __.absent,
+        mutables: __.cabc.Collection[ str ] = ( ),
+        **args: __.typx.Any
+    ) -> CompleteProtocolDataclass:
+        decorators_ = (
+            __.dcls.dataclass( frozen = True, kw_only = True, slots = True ),
+            *decorators )
+        return ProtocolClass.__new__( # pyright: ignore
+            clscls, name, bases, namespace,
+            decorators = decorators_,
+            docstring = docstring,
+            mutables = mutables,
+            **args )
+# pylint: enable=bad-classmethod-argument,no-self-argument
+
+CompleteProtocolDataclass.__doc__ = __.generate_docstring(
+    CompleteProtocolDataclass,
     'description of class factory class',
     'class attributes accretion' )
 

@@ -28,6 +28,7 @@ from __future__ import annotations
 
 import abc
 import collections.abc as cabc
+import dataclasses as dcls
 import types
 
 import typing_extensions as typx
