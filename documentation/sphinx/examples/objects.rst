@@ -105,6 +105,107 @@ set:
     ...
     accretive.exceptions.AttributeImmutabilityError: Cannot reassign or delete existing attribute 'debug'.
 
+
+Accretive Decorator with Parameters
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The ``accretive`` decorator accepts optional parameters to customize behavior:
+
+.. doctest:: Objects
+
+    >>> # With mutable attributes
+    >>> @accretive( mutables = ( 'version', ) )
+    ... class VersionedConfig:
+    ...     def __init__( self, name, version ):
+    ...         self.name = name
+    ...         self.version = version
+    ...
+    >>> config = VersionedConfig( 'MyApp', '1.0.0' )
+    >>> config.name
+    'MyApp'
+    >>> config.version
+    '1.0.0'
+
+Attributes specified in the ``mutables`` parameter can be modified even after
+initial assignment:
+
+.. doctest:: Objects
+
+    >>> # Modify mutable attribute
+    >>> config.version = '1.0.1'  # This works fine
+    >>> config.version
+    '1.0.1'
+    >>>
+    >>> # Attempt to modify immutable attribute
+    >>> config.name = 'YourApp'
+    Traceback (most recent call last):
+    ...
+    accretive.exceptions.AttributeImmutabilityError: Cannot reassign or delete existing attribute 'name'.
+
+Mutable attributes can also be deleted:
+
+.. doctest:: Objects
+
+    >>> del config.version  # This works with mutable attributes
+    >>> hasattr( config, 'version' )
+    False
+
+
+Custom Docstrings
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The ``accretive`` decorator can set or override the docstring of the
+decorated class:
+
+.. doctest:: Objects
+
+    >>> @accretive( docstring = 'A configuration class with custom documentation.' )
+    ... class DocumentedConfig:
+    ...     '''Original docstring that will be replaced.'''
+    ...     def __init__( self, name ):
+    ...         self.name = name
+    ...
+    >>> print( DocumentedConfig.__doc__ )
+    A configuration class with custom documentation.
+
+
+Combining Parameters
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Multiple parameters can be combined for more flexibility:
+
+.. doctest:: Objects
+
+    >>> @accretive(
+    ...     docstring = 'Advanced configuration with mutable settings.',
+    ...     mutables = ( 'debug', 'log_level' )
+    ... )
+    ... class AdvancedConfig:
+    ...     def __init__( self, name, debug = False, log_level = 'INFO' ):
+    ...         self.name = name
+    ...         self.debug = debug
+    ...         self.log_level = log_level
+    ...
+    >>> advanced = AdvancedConfig( 'ServiceApp' )
+    >>>
+    >>> # Modify mutable attributes
+    >>> advanced.debug = True
+    >>> advanced.log_level = 'DEBUG'
+    >>>
+    >>> # Add new attribute
+    >>> advanced.timeout = 30
+    >>>
+    >>> # All attributes are accessible
+    >>> advanced.name, advanced.debug, advanced.log_level, advanced.timeout
+    ('ServiceApp', True, 'DEBUG', 30)
+    >>>
+    >>> # Only immutable attributes raise errors on modification
+    >>> advanced.name = 'NewName'
+    Traceback (most recent call last):
+    ...
+    accretive.exceptions.AttributeImmutabilityError: Cannot reassign or delete existing attribute 'name'.
+
+
 Working with Data Classes
 -------------------------------------------------------------------------------
 

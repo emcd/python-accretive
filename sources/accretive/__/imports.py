@@ -37,7 +37,7 @@ import typing_extensions as typx
 # --- END: Injected by Copier ---
 
 
-from absence import Absential, absent, is_absent
+from absence import AbsentSingleton, Absential, absent, is_absent
 
 
 C = typx.TypeVar( 'C' )  # Class

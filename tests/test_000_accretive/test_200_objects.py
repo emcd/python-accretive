@@ -193,6 +193,151 @@ def test_220_accretive_class_with_slots( ):
         del obj.value
 
 
+def test_230_accretive_decorator_with_mutables( ):
+    ''' Accretive decorator properly handles mutable attributes. '''
+    module = cache_import_module( f"{PACKAGE_NAME}.objects" )
+    exceptions = cache_import_module( f"{PACKAGE_NAME}.exceptions" )
+
+    @module.accretive( mutables = ( 'version', ) )
+    class ConfigWithMutables:
+        def __init__( self, name, version ):
+            self.name = name
+            self.version = version
+
+    # Create instance
+    config = ConfigWithMutables( 'TestApp', '1.0.0' )
+    assert 'TestApp' == config.name
+    assert '1.0.0' == config.version
+
+    # Test mutable attribute
+    config.version = '1.0.1'  # Should work - version is mutable
+    assert '1.0.1' == config.version
+
+    # Deleting mutable attribute should work
+    del config.version
+    with pytest.raises( AttributeError ):
+        assert config.version
+
+    # Test immutable attribute
+    with pytest.raises( exceptions.AttributeImmutabilityError ):
+        config.name = 'NewName'
+
+
+def test_231_accretive_decorator_with_docstring( ):
+    ''' Accretive decorator sets custom docstring properly. '''
+    module = cache_import_module( f"{PACKAGE_NAME}.objects" )
+
+    custom_doc = 'Custom documentation for test class'
+
+    @module.accretive( docstring = custom_doc )
+    class TestDocstring:
+        ''' Original docstring that should be replaced. '''
+
+    assert custom_doc == TestDocstring.__doc__
+
+    # Test with None docstring
+    @module.accretive( docstring = None )
+    class TestNoneDocstring:
+        ''' Original docstring that should be replaced with None. '''
+
+    assert TestNoneDocstring.__doc__ is None
+
+
+def test_232_accretive_decorator_with_absent_docstring( ):
+    ''' Accretive decorator preserves original docstring. '''
+    module = cache_import_module( f"{PACKAGE_NAME}.objects" )
+    base = cache_import_module( f"{PACKAGE_NAME}.__" )
+
+    # Using the decorator with no docstring parameter should preserve original
+    @module.accretive( )
+    class TestPreserveDocstring:
+        ''' Original docstring that should be preserved. '''
+
+    assert (
+        'Original docstring that should be preserved.'
+        == TestPreserveDocstring.__doc__.strip( ) )
+
+    # Test with explicit absent value
+    @module.accretive( docstring = base.absent )
+    class TestAbsentDocstring:
+        ''' Original docstring should be preserved with explicit absent. '''
+
+    assert (
+        'Original docstring should be preserved with explicit absent.'
+        == TestAbsentDocstring.__doc__.strip( ) )
+
+
+def test_233_accretive_decorator_function_form( ):
+    ''' Accretive decorator works when called with parameters but no class. '''
+    module = cache_import_module( f"{PACKAGE_NAME}.objects" )
+    exceptions = cache_import_module( f"{PACKAGE_NAME}.exceptions" )
+
+    # Create decorator with parameters
+    decorator = module.accretive(
+        mutables = ( 'version', ), docstring = 'Decorated class' )
+
+    # Apply it to a class
+    @decorator
+    class LazyConfig:
+        def __init__( self, name, version ):
+            self.name = name
+            self.version = version
+
+    # Test the behavior
+    config = LazyConfig( 'TestApp', '1.0.0' )
+
+    # Mutable attribute
+    config.version = '2.0.0'
+    assert '2.0.0' == config.version
+
+    # Immutable attribute
+    with pytest.raises( exceptions.AttributeImmutabilityError ):
+        config.name = 'NewName'
+
+    # Docstring set correctly
+    assert 'Decorated class' == LazyConfig.__doc__
+
+
+def test_234_accretive_with_multiple_parameters( ):
+    ''' Accretive decorator handles multiple parameters correctly. '''
+    module = cache_import_module( f"{PACKAGE_NAME}.objects" )
+    exceptions = cache_import_module( f"{PACKAGE_NAME}.exceptions" )
+
+    custom_doc = 'Class with multiple mutable attributes'
+
+    @module.accretive(
+        docstring = custom_doc,
+        mutables = ( 'version', 'debug', 'config' )
+    )
+    class AdvancedConfig:
+        def __init__( self, name, version, debug = False ):
+            self.name = name
+            self.version = version
+            self.debug = debug
+
+    # Check docstring
+    assert custom_doc == AdvancedConfig.__doc__
+
+    # Create instance
+    config = AdvancedConfig( 'TestApp', '1.0.0', True )
+
+    # Add a new mutable attribute
+    config.config = { 'api_key': '12345' }
+
+    # Modify mutable attributes
+    config.version = '1.1.0'
+    config.debug = False
+    config.config = { 'api_key': 'updated' }
+
+    assert '1.1.0' == config.version
+    assert not config.debug
+    assert { 'api_key': 'updated' } == config.config
+
+    # Immutable attribute
+    with pytest.raises( exceptions.AttributeImmutabilityError ):
+        config.name = 'NewName'
+
+
 @pytest.mark.parametrize(
     'module_qname, class_name',
     product( THESE_MODULE_QNAMES, THESE_CLASSES_NAMES )
