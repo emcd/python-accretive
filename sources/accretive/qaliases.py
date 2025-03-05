@@ -42,9 +42,13 @@
 
 from . import __
 from .classes import (
-    ABCFactory as           AccretiveABCFactory,
-    Class as                AccretiveClass,
-    ProtocolClass as        AccretiveProtocolClass,
+    ABCFactory as                   AccretiveABCFactory,
+    Class as                        AccretiveClass,
+    CompleteDataclass as            AccretiveCompleteDataclass,
+    CompleteProtocolDataclass as    AccretiveCompleteProtocolDataclass,
+    Dataclass as                    AccretiveDataclass,
+    ProtocolClass as                AccretiveProtocolClass,
+    ProtocolDataclass as            AccretiveProtocolDataclass,
 )
 from .dictionaries import (
     AbstractDictionary as           AbstractAccretiveDictionary,

@@ -16,25 +16,28 @@
    |                                                                          |
    +--------------------------------------------------------------------------+
 
-Class
+Classes
 ===============================================================================
+
+Standard Classes
+-------------------------------------------------------------------------------
 
 Accretive classes are similar to standard Python classes, but with the added
 property that once an attribute is set, it cannot be altered or removed. This
 makes them useful for defining constants or configurations that should remain
 immutable once defined.
 
-.. doctest:: Class
+.. doctest:: Classes
 
     >>> from accretive import Class
 
 Initialization
--------------------------------------------------------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Accretive classes can be defined using the `Class` metaclass. Attributes can be
 added during class definition.
 
-.. doctest:: Class
+.. doctest:: Classes
 
     >>> class Config( metaclass = Class ):
     ...     host = 'localhost'
@@ -43,11 +46,11 @@ added during class definition.
     'localhost'
 
 Immutability
--------------------------------------------------------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Existing attributes cannot be reassigned.
 
-.. doctest:: Class
+.. doctest:: Classes
 
     >>> Config.host = '127.0.0.1'
     Traceback (most recent call last):
@@ -56,7 +59,7 @@ Existing attributes cannot be reassigned.
 
 Or deleted.
 
-.. doctest:: Class
+.. doctest:: Classes
 
     >>> del Config.port
     Traceback (most recent call last):
@@ -64,23 +67,23 @@ Or deleted.
     accretive.exceptions.AttributeImmutabilityError: Cannot reassign or delete existing attribute 'port'.
 
 Attribute Assignment
--------------------------------------------------------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 However, new attributes can be assigned.
 
-.. doctest:: Class
+.. doctest:: Classes
 
     >>> Config.new_feature = 'enabled'
     >>> Config.new_feature
     'enabled'
 
 Decorator Usage
--------------------------------------------------------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Accretive classes can also use decorators to modify class behavior. Decorators
 can add new attributes, but cannot modify existing ones.
 
-.. doctest:: Class
+.. doctest:: Classes
 
     >>> def add_version( cls ):
     ...     cls.version = '1.0'
@@ -97,14 +100,14 @@ can add new attributes, but cannot modify existing ones.
     accretive.exceptions.AttributeImmutabilityError: Cannot reassign or delete existing attribute 'name'.
 
 Mutable Attributes
--------------------------------------------------------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 While accretive classes make attributes immutable by default after assignment,
 you can designate specific attributes as mutable using the ``mutables``
 parameter. This is useful for attributes that need to be updated or removed
 throughout the class lifecycle.
 
-.. doctest:: Class
+.. doctest:: Classes
 
     >>> class Configuration( metaclass = Class, mutables = ( 'version', ) ):
     ...     name = 'MyApp'
@@ -133,15 +136,101 @@ throughout the class lifecycle.
     '1.1.0'
 
 Dynamic Docstring Assignment
--------------------------------------------------------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Accretive classes support dynamic docstring assignment, allowing for computed
 docstrings to be set at class creation.
 
-.. doctest:: Class
+.. doctest:: Classes
 
     >>> class DocumentedConfig( metaclass = Class, docstring = 'Dynamic docstring' ):
     ...     ''' Static docstring '''
     ...     host = 'localhost'
     >>> DocumentedConfig.__doc__
     'Dynamic docstring'
+
+Abstract Base Classes
+-------------------------------------------------------------------------------
+
+The ``ABCFactory`` metaclass creates accretive abstract base classes. This is
+particularly useful for defining interfaces that can be extended but not
+modified after definition. All of the behaviors mentioned for standard classes
+also apply to these.
+
+.. doctest:: Classes
+
+    >>> from accretive import ABCFactory
+    >>> from abc import abstractmethod
+
+    >>> class DataStore( metaclass = ABCFactory ):
+    ...     @abstractmethod
+    ...     def get( self, key ): pass
+    ...
+    ...     @abstractmethod
+    ...     def put( self, key, value ): pass
+    ...
+    ...     ENCODING = 'utf-8'
+
+The abstract methods and class attributes are protected from modification:
+
+.. doctest:: Classes
+
+    >>> def new_method( self ): pass
+    >>> DataStore.list_keys = new_method  # Attempt to replace
+    >>> # Cannot modify class attributes
+    >>> DataStore.ENCODING = 'ascii'  # Attempt to modify
+    Traceback (most recent call last):
+    ...
+    accretive.exceptions.AttributeImmutabilityError: Cannot reassign or delete existing attribute 'ENCODING'.
+
+However, new abstract methods and class attributes can be added:
+
+.. doctest:: Classes
+
+    >>> # Adding a new abstract method is permitted
+    >>> @abstractmethod
+    ... def delete( self, key ): pass
+    >>> DataStore.delete = delete
+    >>> # Adding a new class attribute is permitted
+    >>> DataStore.TIMEOUT = 30
+
+Protocol Classes
+-------------------------------------------------------------------------------
+
+The ``ProtocolClass`` metaclass creates accretive protocol classes, which is
+useful for defining type interfaces that can be extended but not modified. All
+of the behaviors mentioned for standard classes also apply to these.
+
+.. doctest:: Classes
+
+    >>> from accretive import ProtocolClass
+    >>> from typing import Protocol
+
+    >>> class Comparable( Protocol, metaclass = ProtocolClass ):
+    ...     def __lt__( self, other ) -> bool: ...
+    ...     def __gt__( self, other ) -> bool: ...
+    ...
+    ...     ORDERING = 'natural'
+
+The existing protocol interface is protected from modification:
+
+.. doctest:: Classes
+
+    >>> # Cannot modify existing protocol method
+    >>> def lt( self, other ) -> bool: ...
+    >>> Comparable.__lt__ = lt  # Attempt to replace
+    Traceback (most recent call last):
+    ...
+    accretive.exceptions.AttributeImmutabilityError: Cannot reassign or delete existing attribute '__lt__'.
+    >>> # Cannot modify existing class attributes
+    >>> Comparable.ORDERING = 'reverse'  # Attempt to modify
+    Traceback (most recent call last):
+    ...
+    accretive.exceptions.AttributeImmutabilityError: Cannot reassign or delete existing attribute 'ORDERING'.
+
+However, new protocol methods and class attributes can be added:
+
+.. doctest:: Classes
+
+    >>> # Adding new class attributes is permitted
+    >>> Comparable.COMPARISON_MODE = 'strict'

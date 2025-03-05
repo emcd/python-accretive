@@ -17,8 +17,12 @@
    +--------------------------------------------------------------------------+
 
 
-Simple Dictionary
+Dictionaries
 ===============================================================================
+
+
+Simple Dictionary
+-------------------------------------------------------------------------------
 
 Simple accretive dictionaries have an interface nearly equivalent to
 :py:class:`dict`. Because of their accretive nature, they can be useful as
@@ -52,7 +56,7 @@ Let us illustrate this use case by first defining some handlers to register.
     ...
 
 Initialization
--------------------------------------------------------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Simple dictionaries can be initialized from zero or more other dictionaries
 or iterables over key-value pairs and zero or more keyword arguments.
@@ -64,7 +68,7 @@ or iterables over key-value pairs and zero or more keyword arguments.
     accretive.dictionaries.Dictionary( {'csv': <function csv_reader at 0x...>, 'json': <function json_reader at 0x...>, 'xml': <function xml_reader at 0x...>, 'yaml': <function yaml_reader at 0x...>} )
 
 Immutability
--------------------------------------------------------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Existing entries cannot be altered.
 
@@ -87,7 +91,7 @@ Or removed.
 (Seems like XML is here to stay.)
 
 Updates
--------------------------------------------------------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 However, new entries can be added individually or in bulk. Bulk entry is via
 the ``update`` method.
@@ -105,7 +109,7 @@ the ``update`` method.
     as a fluent setter.
 
 Copies
--------------------------------------------------------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Copies can be made which preserve behavior and data.
 
@@ -127,7 +131,7 @@ validator dictionaries (see below) as it preserves their behavior:
     accretive.dictionaries.Dictionary( {'x': 3, 'y': 4} )
 
 Comparison
--------------------------------------------------------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The copies are equivalent to their originals.
 
@@ -155,7 +159,7 @@ Modifying a copy causes it to become non-equivalent, as expected.
     True
 
 Access of Absent Entries
--------------------------------------------------------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 As with :py:class:`dict`, a missing entry will raise a :py:exc:`KeyError`.
 
@@ -175,7 +179,7 @@ provide a default value if an entry is missing.
     'what is the meaning of life?'
 
 Views
--------------------------------------------------------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The usual methods for producing views on items, keys, and values exist.
 
@@ -187,7 +191,7 @@ The usual methods for producing views on items, keys, and values exist.
     True
 
 Unions
--------------------------------------------------------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The union operator (``|``) combines entries from two dictionaries or a
 dictionary and a mapping, creating a new dictionary. The operation maintains
@@ -212,7 +216,7 @@ When operands have overlapping keys, an error is raised:
     accretive.exceptions.EntryImmutabilityError: Cannot alter or remove existing entry for 'json'.
 
 Intersections
--------------------------------------------------------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The intersection operator (``&``) can be used in two ways:
 
@@ -236,7 +240,7 @@ The intersection operator (``&``) can be used in two ways:
 
 
 Producer Dictionary
-===============================================================================
+-------------------------------------------------------------------------------
 
 Producer dictionaries have an interface nearly equivalent to
 :py:class:`collections.defaultdict`. The first argument to the initializer for
@@ -251,7 +255,7 @@ dictionary, except as noted below.
     >>> from accretive import ProducerDictionary
 
 Initialization
--------------------------------------------------------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 A common use case is to automatically initialize a mutable data structure, such
 as a :py:class:`list`, and add elements or entries to it by merely referencing
@@ -265,7 +269,7 @@ the entry first.
     accretive.dictionaries.ProducerDictionary( <class 'list'>, {} )
 
 Production of Absent Entries
--------------------------------------------------------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. doctest:: ProducerDictionary
 
@@ -278,7 +282,7 @@ Production of Absent Entries
     accretive.dictionaries.ProducerDictionary( <class 'list'>, {'FBI: Most Wanted': [], 'Santa Claus: Naughty': ['Calvin']} )
 
 Updates
--------------------------------------------------------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. doctest:: ProducerDictionary
 
@@ -286,7 +290,7 @@ Updates
     accretive.dictionaries.ProducerDictionary( <class 'list'>, {'FBI: Most Wanted': [], 'Santa Claus: Naughty': ['Calvin'], 'US Commerce: Do Not Call': ['me'], 'Tasks': set()} )
 
 Access of Absent Entries
--------------------------------------------------------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The ``get`` method behaves the same as it does on the simple dictionary. I.e.,
 it does not implcitly create new entries in a producer dictionary. This is the
@@ -301,7 +305,7 @@ same behavior as :py:class:`collections.defaultdict`.
     accretive.dictionaries.ProducerDictionary( <class 'list'>, {'FBI: Most Wanted': [], 'Santa Claus: Naughty': ['Calvin'], 'US Commerce: Do Not Call': ['me'], 'Tasks': set()} )
 
 Copies
--------------------------------------------------------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The ``copy`` method creates a new producer dictionary, which is initialized
 with the same producer and data as the dictionary on which the method is
@@ -317,7 +321,7 @@ invoked.
     accretive.dictionaries.ProducerDictionary( <function <lambda> at 0x...>, {'foo': 1, 'bar': 2, 'orb': True} )
 
 Comparison
--------------------------------------------------------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Equality comparisons may be made against any registered subclass of
 :py:class:`collections.abc.Mapping`. Note that the producer is excluded from
@@ -330,7 +334,7 @@ the equality comparison; only data is compared; this is the same behavior as
     True
 
 Validator Dictionary
-===============================================================================
+-------------------------------------------------------------------------------
 
 Validator dictionaries ensure that all entries satisfy specified criteria. The first
 argument to the initializer must be a callable which accepts a key and value and
@@ -370,7 +374,7 @@ This includes attempts to add invalid entries via update.
     accretive.exceptions.EntryValidityError: Cannot add invalid entry with key, 'phi', and value, 1.618, to dictionary.
 
 Producer-Validator Dictionary
-===============================================================================
+-------------------------------------------------------------------------------
 
 Producer-validator dictionaries combine the behaviors of producer and validator
 dictionaries. The first argument must be a producer callable, and the second

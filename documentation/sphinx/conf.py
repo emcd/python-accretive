@@ -80,6 +80,7 @@ nitpick_ignore = [
     # Type annotation weirdnesses.
     ( 'py:class', "Doc" ),
     ( 'py:class', "NotImplementedType" ),
+    ( 'py:class', "absence.objects.AbsenceFactory" ),
     ( 'py:class', "absence.objects.AbsentSingleton" ),
     ( 'py:class', "accretive.__.Annotated" ),
     ( 'py:class', "accretive.__.H" ),

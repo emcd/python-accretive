@@ -17,8 +17,11 @@
    +--------------------------------------------------------------------------+
 
 
-Namespace
+Namespaces
 ===============================================================================
+
+Namespace Objects
+-------------------------------------------------------------------------------
 
 Accretive namespaces are similar to :py:class:`types.SimpleNamespace`, but with
 the added property that once an attribute is set, it cannot be altered or
@@ -33,7 +36,7 @@ Let us illustrate this use case by defining a configuration namespace for a web
 application.
 
 Initialization
--------------------------------------------------------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Accretive namespaces can be initialized from zero or more dictionaries or
 iterables over key-value pairs and zero or more keyword arguments.
@@ -48,7 +51,7 @@ iterables over key-value pairs and zero or more keyword arguments.
     accretive.namespaces.Namespace( host = 'localhost', port = 8080, debug = True, database = 'sqlite:///app.db', api_key = '12345-ABCDE' )
 
 Immutability
--------------------------------------------------------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Existing attributes cannot be reassigned.
 
@@ -69,7 +72,7 @@ Or deleted.
     accretive.exceptions.AttributeImmutabilityError: Cannot reassign or delete existing attribute 'port'.
 
 Attribute Assignment
--------------------------------------------------------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 However, new attributes can be assigned.
 
@@ -80,7 +83,7 @@ However, new attributes can be assigned.
     accretive.namespaces.Namespace( host = 'localhost', port = 8080, debug = True, database = 'sqlite:///app.db', api_key = '12345-ABCDE', new_feature = 'enabled' )
 
 Copies
--------------------------------------------------------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 To copy an accretive namespace, access its underlying `__dict__` and feed that
 as keyword arguments to a new namespace. This is the same way as how it would
@@ -95,7 +98,7 @@ be done with :py:class:`types.SimpleNamespace`.
     >>> ns = SimpleNamespace( **config.__dict__ ) #**
 
 Comparison
--------------------------------------------------------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The copies are equivalent to their originals.
 
