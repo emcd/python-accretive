@@ -2,6 +2,21 @@
 
 .. towncrier release notes start
 
+Accretive 3.0.1 (2025-03-04)
+============================
+
+Bugfixes
+--------
+
+- Export qualified aliases for convenience metaclasses for dataclasses.
+
+
+Documentation Improvements
+--------------------------
+
+- Update API documentation, examples, and README.
+
+
 Accretive 3.0 (2025-03-01)
 ==========================
 

@@ -16,6 +16,7 @@
    |                                                                          |
    +--------------------------------------------------------------------------+
 
+
 *******************************************************************************
                                   accretive
 *******************************************************************************
@@ -65,6 +66,17 @@ Key Features ⭐
   initialization; useful for compatibility with class decorators, such as
   `dataclasses
   <https://docs.python.org/3/library/dataclasses.html#dataclasses.dataclass>`_.
+* 🔓 **Flexible Mutability**: Support for declaring specific attributes as
+  mutable, enabling selective modification while maintaining immutability for
+  other attributes.
+
+
+Installation 📦
+===============================================================================
+
+::
+
+    pip install accretive
 
 
 Note on Immutability 📢
@@ -78,19 +90,11 @@ Note on Immutability 📢
    tampering.
 
 
-Installation 📦
-===============================================================================
-
-::
-
-    pip install accretive
-
-
 Examples 💡
 ===============================================================================
 
 
-Accretive Namespace 🗃️
+Accretive Namespaces 🗃️
 -------------------------------------------------------------------------------
 
 An accretive namespace, similar to ``types.SimpleNamespace``, is available.
@@ -113,7 +117,7 @@ accretive.exceptions.AttributeImmutabilityError: Cannot reassign or delete exist
 accretive.namespaces.Namespace( apples = 12, bananas = 6, cherries = 42 )
 
 
-Accretive Dictionary 📖
+Accretive Dictionaries 📖
 -------------------------------------------------------------------------------
 
 An accretive dictionary, similar to ``dict``, is available. This dictionary can

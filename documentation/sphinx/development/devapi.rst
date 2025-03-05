@@ -24,8 +24,32 @@ Internal Development Interface
 ===============================================================================
 
 
-Module ``accretive.__``
+Module ``accretive.__.imports``
 -------------------------------------------------------------------------------
 
-.. automodule:: accretive.__
-   :ignore-module-all: true
+.. automodule:: accretive.__.imports
+   :no-index:
+
+
+Module ``accretive.__.exceptions``
+-------------------------------------------------------------------------------
+
+.. automodule:: accretive.__.exceptions
+
+
+Module ``accretive.__.immutables``
+-------------------------------------------------------------------------------
+
+.. automodule:: accretive.__.immutables
+
+
+Module ``accretive.__.dictionaries``
+-------------------------------------------------------------------------------
+
+.. automodule:: accretive.__.dictionaries
+
+
+Module ``accretive.__.docstrings``
+-------------------------------------------------------------------------------
+
+.. automodule:: accretive.__.docstrings
