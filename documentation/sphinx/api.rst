@@ -42,13 +42,18 @@ guarantees.
 * ``Namespace``: Similar to :py:class:`types.SimpleNamespace` but with
   immutable attributes after assignment.
 
+* ``Class``: Metaclass for creating classes with accretive class
+  attributes.
+
 * ``Module``: A module type that enforces attribute immutability after
   assignment.
 
+* ``reclassify_modules``: Convenience function for making modules in a package
+  accretive.
+
 * ``Object``: Base class for objects with accretive attributes.
 
-* ``Class``: Metaclass for creating classes with accretive class
-  attributes.
+* ``accretive``: Decorator for causing classes to produce accretive instances.
 
 
 Module ``accretive.dictionaries``

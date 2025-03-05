@@ -20,16 +20,168 @@
 Objects
 ===============================================================================
 
-Accretive objects allow for the creation of instances where attributes can be
-added but not modified or deleted after assignment. This behavior is valuable
-for configuration objects, immutable data containers, and scenarios where
-attribute stability is required.
+Accretive objects allow for the creation of instances, such that new attributes
+can be assigned at any time, but cannot be reassigned or deleted after
+assignment. Accretive objects can be created via decoration (by ``@accretive``)
+or inheritance (from ``Object``).
 
 .. doctest:: Objects
 
     >>> from accretive import Object, accretive
 
-Object Class
+Decorator
+-------------------------------------------------------------------------------
+
+The ``@accretive`` decorator can apply accretive attribute behavior to any
+class:
+
+.. doctest:: Objects
+
+    >>> @accretive
+    ... class Config:
+    ...     def __init__( self, debug = False ):
+    ...         self.debug = debug
+    ...
+    >>> config = Config( debug = True )
+    >>> config.debug
+    True
+    >>> config.verbose = True  # Add new attribute
+    >>> config.verbose
+    True
+
+As with the ``Object`` class, attributes cannot be modified or deleted once
+set:
+
+.. doctest:: Objects
+
+    >>> config.debug = False
+    Traceback (most recent call last):
+    ...
+    accretive.exceptions.AttributeImmutabilityError: Cannot reassign or delete existing attribute 'debug'.
+
+
+Mutable Attributes
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The ``mutables`` argument can allow some attributes to remain mutable after
+assignment.
+
+.. doctest:: Objects
+
+    >>> @accretive( mutables = ( 'version', ) )
+    ... class VersionedConfig:
+    ...     def __init__( self, name, version ):
+    ...         self.name = name
+    ...         self.version = version
+    ...
+    >>> config = VersionedConfig( 'MyApp', '1.0.0' )
+
+Reassignment of mutable attribute:
+
+.. doctest:: Objects
+
+    >>> config.version = '1.0.1'  # This works fine
+    >>> config.version
+    '1.0.1'
+
+Deletion of mutable attribute:
+
+.. doctest:: Objects
+
+    >>> del config.version  # This works with mutable attributes
+    >>> hasattr( config, 'version' )
+    False
+
+
+Docstrings
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The ``docstring`` argument can set or override the docstring of the decorated
+class. This is useful when docstrings need to be computed dynamically:
+
+.. doctest:: Objects
+
+    >>> @accretive( docstring = 'A configuration class with custom documentation.' )
+    ... class DocumentedConfig:
+    ...     '''Original docstring that will be replaced.'''
+    ...     def __init__( self, name ):
+    ...         self.name = name
+    ...
+    >>> print( DocumentedConfig.__doc__ )
+    A configuration class with custom documentation.
+
+
+Data Classes
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The ``@accretive`` decorator works well with unfrozen Python data classes:
+
+.. doctest:: Objects
+
+    >>> from dataclasses import dataclass
+    >>>
+    >>> @accretive
+    ... @dataclass
+    ... class ServerConfig:
+    ...     host: str
+    ...     port: int = 8080
+    ...
+    >>> server = ServerConfig( host = 'localhost' )
+    >>> server.host
+    'localhost'
+    >>> server.port
+    8080
+    >>> server.secure = True  # Add new attribute
+    >>> server.host = '127.0.0.1'  # Attempt to modify
+    Traceback (most recent call last):
+    ...
+    accretive.exceptions.AttributeImmutabilityError: Cannot reassign or delete existing attribute 'host'.
+
+
+Slotted Classes
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The ``@accretive`` decorator works with classes which use ``__slots__`` for
+attribute storage. Remember to include the ``_behaviors_`` slot:
+
+.. doctest:: Objects
+
+    >>> @accretive
+    ... class SlottedConfig:
+    ...     __slots__ = ( 'debug', '_behaviors_' )
+    ...
+    ...     def __init__( self, debug = False ):
+    ...         self.debug = debug
+    ...
+    >>> config = SlottedConfig( debug = True )
+    >>> config.debug
+    True
+    >>> config.debug = False
+    Traceback (most recent call last):
+    ...
+    accretive.exceptions.AttributeImmutabilityError: Cannot reassign or delete existing attribute 'debug'.
+
+
+Compatibility
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The ``@accretive`` decorator cannot be applied to classes that define their own
+``__setattr__`` or ``__delattr__`` methods, as this would conflict with the
+immutability enforcement:
+
+.. doctest:: Objects
+
+    >>> @accretive  # This will fail
+    ... class Mutable:
+    ...     def __setattr__( self, name, value ):
+    ...         # Custom attribute setting logic
+    ...         super( ).__setattr__( name, value )
+    Traceback (most recent call last):
+    ...
+    accretive.exceptions.DecoratorCompatibilityError: Cannot decorate class 'Mutable' which defines '__setattr__'.
+
+
+Base Class
 -------------------------------------------------------------------------------
 
 The ``Object`` base class provides accretive behavior when instantiated
@@ -75,212 +227,16 @@ New attributes can be added at any time:
     >>> obj.version
     '1.0'
 
-Accretive Decorator
--------------------------------------------------------------------------------
+.. warning::
 
-The ``accretive`` decorator can apply accretive attribute behavior to any
-class:
+    When working with built-in types, such as exception types, in multiple
+    inheritance hierarchies, avoid using the ``Object`` base class which uses
+    ``__slots__``. Instead, apply the ``@accretive`` decorator directly to your
+    class.
 
-.. doctest:: Objects
-
-    >>> @accretive
-    ... class Config:
-    ...     def __init__( self, debug = False ):
-    ...         self.debug = debug
-    ...
-    >>> config = Config( debug = True )
-    >>> config.debug
-    True
-    >>> config.verbose = True  # Add new attribute
-    >>> config.verbose
-    True
-
-As with the ``Object`` class, attributes cannot be modified or deleted once
-set:
-
-.. doctest:: Objects
-
-    >>> config.debug = False
-    Traceback (most recent call last):
-    ...
-    accretive.exceptions.AttributeImmutabilityError: Cannot reassign or delete existing attribute 'debug'.
-
-
-Accretive Decorator with Parameters
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-The ``accretive`` decorator accepts optional parameters to customize behavior:
-
-.. doctest:: Objects
-
-    >>> # With mutable attributes
-    >>> @accretive( mutables = ( 'version', ) )
-    ... class VersionedConfig:
-    ...     def __init__( self, name, version ):
-    ...         self.name = name
-    ...         self.version = version
-    ...
-    >>> config = VersionedConfig( 'MyApp', '1.0.0' )
-    >>> config.name
-    'MyApp'
-    >>> config.version
-    '1.0.0'
-
-Attributes specified in the ``mutables`` parameter can be modified even after
-initial assignment:
-
-.. doctest:: Objects
-
-    >>> # Modify mutable attribute
-    >>> config.version = '1.0.1'  # This works fine
-    >>> config.version
-    '1.0.1'
-    >>>
-    >>> # Attempt to modify immutable attribute
-    >>> config.name = 'YourApp'
-    Traceback (most recent call last):
-    ...
-    accretive.exceptions.AttributeImmutabilityError: Cannot reassign or delete existing attribute 'name'.
-
-Mutable attributes can also be deleted:
-
-.. doctest:: Objects
-
-    >>> del config.version  # This works with mutable attributes
-    >>> hasattr( config, 'version' )
-    False
-
-
-Custom Docstrings
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-The ``accretive`` decorator can set or override the docstring of the
-decorated class:
-
-.. doctest:: Objects
-
-    >>> @accretive( docstring = 'A configuration class with custom documentation.' )
-    ... class DocumentedConfig:
-    ...     '''Original docstring that will be replaced.'''
-    ...     def __init__( self, name ):
-    ...         self.name = name
-    ...
-    >>> print( DocumentedConfig.__doc__ )
-    A configuration class with custom documentation.
-
-
-Combining Parameters
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Multiple parameters can be combined for more flexibility:
-
-.. doctest:: Objects
-
-    >>> @accretive(
-    ...     docstring = 'Advanced configuration with mutable settings.',
-    ...     mutables = ( 'debug', 'log_level' )
-    ... )
-    ... class AdvancedConfig:
-    ...     def __init__( self, name, debug = False, log_level = 'INFO' ):
-    ...         self.name = name
-    ...         self.debug = debug
-    ...         self.log_level = log_level
-    ...
-    >>> advanced = AdvancedConfig( 'ServiceApp' )
-    >>>
-    >>> # Modify mutable attributes
-    >>> advanced.debug = True
-    >>> advanced.log_level = 'DEBUG'
-    >>>
-    >>> # Add new attribute
-    >>> advanced.timeout = 30
-    >>>
-    >>> # All attributes are accessible
-    >>> advanced.name, advanced.debug, advanced.log_level, advanced.timeout
-    ('ServiceApp', True, 'DEBUG', 30)
-    >>>
-    >>> # Only immutable attributes raise errors on modification
-    >>> advanced.name = 'NewName'
-    Traceback (most recent call last):
-    ...
-    accretive.exceptions.AttributeImmutabilityError: Cannot reassign or delete existing attribute 'name'.
-
-
-Working with Data Classes
--------------------------------------------------------------------------------
-
-The ``accretive`` decorator works well with Python's data classes:
-
-.. doctest:: Objects
-
-    >>> from dataclasses import dataclass
-    >>>
-    >>> @accretive
-    ... @dataclass
-    ... class ServerConfig:
-    ...     host: str
-    ...     port: int = 8080
-    ...
-    >>> server = ServerConfig( host = 'localhost' )
-    >>> server.host
-    'localhost'
-    >>> server.port
-    8080
-    >>> server.secure = True  # Add new attribute
-    >>> server.host = '127.0.0.1'  # Attempt to modify
-    Traceback (most recent call last):
-    ...
-    accretive.exceptions.AttributeImmutabilityError: Cannot reassign or delete existing attribute 'host'.
-
-Working with Slotted Classes
--------------------------------------------------------------------------------
-
-The ``accretive`` decorator also works with classes that use ``__slots__``:
-
-.. doctest:: Objects
-
-    >>> @accretive
-    ... class SlottedConfig:
-    ...     __slots__ = ( 'debug', '_behaviors_' )
-    ...
-    ...     def __init__( self, debug = False ):
-    ...         self.debug = debug
-    ...
-    >>> config = SlottedConfig( debug = True )
-    >>> config.debug
-    True
-    >>> config.debug = False
-    Traceback (most recent call last):
-    ...
-    accretive.exceptions.AttributeImmutabilityError: Cannot reassign or delete existing attribute 'debug'.
-
-Exception Classes
--------------------------------------------------------------------------------
-
-The ``accretive`` decorator is particularly useful for creating exception
-hierarchies with accretive properties:
-
-.. doctest:: Objects
-
-    >>> @accretive
-    ... class CustomException( Exception ):
-    ...     ''' Base exception with accretive attributes. '''
-    ...     pass
-    ...
-    >>> try:
-    ...     raise CustomException( 'Operation failed' )
-    ... except CustomException as e:
-    ...     e.error_code = 500
-    ...     print( f"Error {e.error_code}: {e}" )
-    ...     try:
-    ...         e.error_code = 404  # Try to modify
-    ...     except Exception as modify_error:
-    ...         print( f"Modification failed: {type(modify_error).__name__}" )
-    Error 500: Operation failed
-    Modification failed: AttributeImmutabilityError
 
 Multiple Inheritance Considerations
--------------------------------------------------------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 When using the ``Object`` class with multiple inheritance, be aware of
 potential layout conflicts with built-in types that have their own memory
@@ -292,7 +248,10 @@ layout:
     >>> # class InvalidCombination( BaseException, Object ):
     >>> #     pass
 
-    >>> # Instead, use the accretive decorator directly
+Instead, use the ``@accretive`` decorator directly:
+
+.. doctest:: Objects
+
     >>> @accretive
     ... class ValidException( BaseException ):
     ...     ''' An exception with accretive behavior. '''
@@ -302,15 +261,7 @@ layout:
     >>> ex.context = 'Additional information'
     >>> ex.context
     'Additional information'
-    >>> # Cannot modify after setting
     >>> ex.context = 'Changed information'
     Traceback (most recent call last):
     ...
     accretive.exceptions.AttributeImmutabilityError: Cannot reassign or delete existing attribute 'context'.
-
-.. warning::
-
-    When working with built-in types (especially exception types) in multiple
-    inheritance hierarchies, avoid using the ``Object`` base class which
-    uses ``__slots__``. Instead, apply the ``accretive`` decorator directly to
-    your class.

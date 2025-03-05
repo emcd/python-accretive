@@ -17,8 +17,11 @@
    +--------------------------------------------------------------------------+
 
 
-Module
+Modules
 ===============================================================================
+
+Module Objects
+-------------------------------------------------------------------------------
 
 Accretive modules have an interface nearly equivalent to
 :py:class:`types.ModuleType`, i.e., standard Python modules. However, once an
@@ -30,7 +33,7 @@ accretive modules from accidental (or unsophisticated malicious) tampering.
     >>> from accretive import Module
 
 Initialization
--------------------------------------------------------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 While modules are typically initialized during import of their sources, they
 may also be created dynamically. As with standard Python modules, a name is
@@ -43,7 +46,7 @@ required when dynamically creating a module.
     <module 'foo'>
 
 Immutability
--------------------------------------------------------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Existing attributes cannot be reassigned.
 
@@ -66,7 +69,7 @@ Or deleted.
     accretive.exceptions.AttributeImmutabilityError: Cannot reassign or delete existing attribute '__name__'.
 
 Attribute Assignment
--------------------------------------------------------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 However, new attributes can be assigned.
 

@@ -22,7 +22,8 @@
 ''' Accretive classes.
 
     Provides metaclasses for creating classes with accretive attributes. Once a
-    class attribute is set, it cannot be reassigned or deleted.
+    class is initialized, its attributes cannot be reassigned or deleted.
+    However, it may still accrete new attribute assignments.
 
     The implementation includes:
 
@@ -33,11 +34,7 @@
     * ``ProtocolClass``: Metaclass for protocol classes; derived from
       :py:class:`typing.Protocol`.
 
-    These metaclasses are particularly useful for:
-
-    * Creating classes with constant class attributes
-    * Defining stable abstract base classes
-    * Building protocol classes with fixed interfaces
+    Additionally, metaclasses for dataclasses are provided as a convenience.
 
     >>> from accretive import Class
     >>> class Example( metaclass = Class ):
@@ -386,4 +383,4 @@ def _class__setattr__( class_: type, name: str ) -> bool:
     if hasattr( class_, name ):
         from .exceptions import AttributeImmutabilityError
         raise AttributeImmutabilityError( name )
-    return False  # Allow setting new attributes
+    return False  # Allow setting new attributes.
