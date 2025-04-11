@@ -109,12 +109,14 @@ def accretive( # pylint: disable=too-complex,too-many-statements
 
         1. Simple decorator:
 
+           >>> from accretive import accretive
            >>> @accretive
            ... class Config:
            ...     pass
 
         2. With parameters:
 
+           >>> from accretive import accretive
            >>> @accretive( mutables = ( 'version', ) )
            ... class Config:
            ...     pass
