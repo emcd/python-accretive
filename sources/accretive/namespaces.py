@@ -18,7 +18,6 @@
 #============================================================================#
 
 
-# pylint: disable=line-too-long
 ''' Accretive namespaces.
 
     Provides a namespace type that can grow but never shrink. Once an attribute is
@@ -40,15 +39,14 @@
     Traceback (most recent call last):
         ...
     accretive.exceptions.AttributeImmutabilityError: Cannot reassign or delete existing attribute 'bananas'.
-'''
-# pylint: enable=line-too-long
+''' # noqa: E501
 
 
 from . import __
 from . import objects as _objects
 
 
-class Namespace( _objects.Object ): # pylint: disable=eq-without-hash
+class Namespace( _objects.Object ):
     ''' Accretive namespaces. '''
 
     def __init__(

@@ -20,10 +20,6 @@
 
 ''' Assert correct function of modules. '''
 
-# mypy: ignore-errors
-# pylint: disable=attribute-defined-outside-init
-# pylint: disable=invalid-name,magic-value-comparison,protected-access
-
 
 import sys
 import types
@@ -212,8 +208,7 @@ def test_520_module_reclassification_recursive( ):
     child1_module = children[ 'child1' ]
     child2_module = children[ 'child2' ]
     all_modules = [ parent_name ]
-    for child_name in ( f"{parent_name}.child1", f"{parent_name}.child2" ):
-        all_modules.append( child_name )
+    all_modules.extend( ( f"{parent_name}.child1", f"{parent_name}.child2" ) )
     try:
         assert not isinstance( parent_module, Module )
         assert not isinstance( child1_module, Module )
@@ -234,7 +229,7 @@ def test_520_module_reclassification_recursive( ):
     finally: cleanup_temp_modules( *all_modules )
 
 
-def test_530_module_reclassification_non_recursive( ): # pylint: disable=too-many-locals,too-many-statements
+def test_530_module_reclassification_non_recursive( ):
     ''' Module reclassification respects non-recursive mode. '''
     module = cache_import_module(f"{PACKAGE_NAME}.modules")
     Module = module.Module
@@ -312,7 +307,7 @@ def test_550_module_with_self_reference( ):
         assert not isinstance( test_module, Module )
         module.reclassify_modules( test_module )
         assert isinstance( test_module, Module )
-        assert test_module.self is test_module # pylint: disable=no-member
+        assert test_module.self is test_module
     finally: cleanup_temp_modules( test_module_name )
 
 

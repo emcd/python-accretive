@@ -17,17 +17,25 @@
    +--------------------------------------------------------------------------+
 
 
-*******************************************************************************
-Project Contacts
-*******************************************************************************
+.. include:: ../README.rst
 
-Ways to Contribute
+
+Table of Contents
 ===============================================================================
 
-* File bug reports and feature requests in the `issue tracker
-  <https://github.com/emcd/python-accretive/issues>`_. (Please try
-  to avoid duplicate issues.)
+.. toctree::
+   :maxdepth: 2
 
-* Fork the repository and submit `pull requests
-  <https://github.com/emcd/python-accretive/pulls>`_ to improve the
-  library or its documentation.
+   examples/index
+   api
+   changelog
+   contribution
+   license
+
+
+Indices
+===============================================================================
+
+* :ref:`genindex`
+* :ref:`modindex`
+* :ref:`search`

@@ -20,7 +20,6 @@
 
 ''' Internal dictionary. '''
 
-# pylint: disable=unused-import
 # ruff: noqa: F401
 
 
@@ -76,7 +75,7 @@ class AccretiveDictionary(
         ''' Provides fresh copy of dictionary. '''
         return type( self )( self )
 
-    def pop( # pylint: disable=unused-argument
+    def pop( # pyright: ignore
         self, key: _H, default: __.Absential[ _V ] = __.absent
     ) -> __.typx.Never:
         ''' Raises exception. Cannot pop immutable entry. '''
@@ -88,7 +87,7 @@ class AccretiveDictionary(
         from .exceptions import OperationInvalidity
         raise OperationInvalidity( 'popitem' )
 
-    def update( # type: ignore
+    def update( # pyright: ignore
         self,
         *iterables: __.DictionaryPositionalArgument[ _H, _V ],
         **entries: __.DictionaryNominativeArgument[ _V ],
@@ -96,11 +95,11 @@ class AccretiveDictionary(
         ''' Adds new entries as a batch. '''
         from itertools import chain
         # Add values in order received, enforcing no alteration.
-        for indicator, value in chain.from_iterable( map( # type: ignore
+        for indicator, value in chain.from_iterable( map( # pyright: ignore
             lambda element: ( # pyright: ignore
                 element.items( )
                 if isinstance( element, __.cabc.Mapping )
                 else element
             ),
             ( *iterables, entries )
-        ) ): self[ indicator ] = value # type: ignore
+        ) ): self[ indicator ] = value # pyright: ignore

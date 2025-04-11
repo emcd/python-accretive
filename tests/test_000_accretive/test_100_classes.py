@@ -20,14 +20,12 @@
 
 ''' Assert correct function of class factory classes. '''
 
-# mypy: ignore-errors
-# pylint: disable=magic-value-comparison,protected-access
-
-
-import pytest
 
 from itertools import product
 from platform import python_implementation
+
+import pytest
+import typing_extensions as typx
 
 from . import (
     MODULES_QNAMES,
@@ -120,7 +118,7 @@ def test_110_class_decorators( module_qname, class_name ):
         ''' test '''
         attr = 42
 
-        _class_behaviors_ = { 'foo' }
+        _class_behaviors_: typx.ClassVar[ set[ str ] ] = { 'foo' }
 
     assert [ 'decorator1', 'decorator2' ] == decorator_calls
     assert 'value1' == Object.decorator1_attr
@@ -217,7 +215,7 @@ def test_113_class_decorator_reproduction_no_cell( module_qname, class_name ):
         ''' test '''
         value: str = 'test'
 
-        def method_without_cell( self ): # pylint: disable=no-self-use
+        def method_without_cell( self ):
             ''' Operates without class cell on CPython. '''
             return 'no_cell'
 
@@ -233,14 +231,13 @@ def test_113_class_decorator_reproduction_no_cell( module_qname, class_name ):
 def test_114_decorator_error_handling( module_qname, class_name ):
     ''' Class handles decorator errors appropriately. '''
     module = cache_import_module( module_qname )
-    class_factory_class = ( # pylint: disable=unused-variable
-        getattr( module, class_name ) )
+    class_factory_class = ( getattr( module, class_name ) )
 
     def failing_decorator( cls ):
-        raise ValueError( "Decorator failure" ) # noqa
+        raise ValueError( "Decorator failure" )
 
     with pytest.raises( ValueError, match = "Decorator failure" ):
-        class Object( # pylint: disable=unused-variable
+        class Object(
             metaclass = class_factory_class,
             decorators = ( failing_decorator, )
         ):

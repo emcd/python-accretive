@@ -7,15 +7,13 @@
         https://jareddillard.com/blog/common-ways-to-customize-sphinx-themes.html
 '''
 
-# mypy: ignore-errors
-# pylint: disable=consider-using-namedtuple-or-dataclass
 # ruff: noqa: E402,F401
 
 
 def _calculate_copyright_notice( ):
-    from datetime import datetime as DateTime
+    from datetime import datetime as DateTime, timezone as TimeZone
     first_year = 2024
-    now_year = DateTime.utcnow( ).year
+    now_year = DateTime.now( TimeZone.utc ).year
     if first_year < now_year: year_range = f"{first_year}-{now_year}"
     else: year_range = str( first_year )
     return f"{year_range}, Eric McDonald"
@@ -25,7 +23,7 @@ def _import_version( ):
     from importlib import import_module
     from pathlib import Path
     from sys import path
-    project_location = Path( __file__ ).parent.parent.parent
+    project_location = Path( __file__ ).parent.parent
     path.insert( 0, str( project_location / 'sources' ) )
     module = import_module( 'accretive' )
     return module.__version__
@@ -36,7 +34,7 @@ def _import_version( ):
 
 project = 'python-accretive'
 author = 'Eric McDonald'
-copyright = ( # pylint: disable=redefined-builtin
+copyright = ( # noqa: A001
     _calculate_copyright_notice( ) )
 release = version = _import_version( )
 

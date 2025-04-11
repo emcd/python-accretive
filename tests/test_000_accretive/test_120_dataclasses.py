@@ -20,9 +20,6 @@
 
 ''' Assert correct function of dataclass factory classes. '''
 
-# pylint: disable=invalid-field-call,no-member,unused-variable
-# pylint: disable=magic-value-comparison,protected-access
-
 
 import pytest
 
@@ -88,20 +85,13 @@ def test_201_dataclass_features( module_qname, class_name ):
         optional: int = 42
         cls_var: ClassVar[str] = 'class_level'
 
-    # Test instantiation with required arguments
     instance = TestDataclass( value = 'test' )
     assert 'test' == instance.value
     assert 42 == instance.optional
-
-    # Test instantiation with all arguments
     instance2 = TestDataclass( value = 'test2', optional = 100 )
     assert 'test2' == instance2.value
     assert 100 == instance2.optional
-
-    # Test that class variables are accessible
     assert 'class_level' == TestDataclass.cls_var
-    # In this implementation, ClassVar fields may still be accessible on instances
-    # but they should be the same value as the class attribute
     if hasattr(instance, 'cls_var'):
         assert TestDataclass.cls_var == instance.cls_var
 
@@ -120,9 +110,8 @@ def test_202_kw_only( module_qname, class_name ):
         value: str
         optional: int = 42
 
-    # Test that positional arguments are not allowed
     with pytest.raises( TypeError ):
-        TestDataclass( 'test' )  # type: ignore
+        TestDataclass( 'test' )
 
 
 @pytest.mark.parametrize(
@@ -194,17 +183,8 @@ def test_205_slots( module_qname, class_name ):
         optional: int = 42
 
     instance = TestDataclass( value = 'test' )
-
-    # Test that __slots__ exists (though it might be in a parent class)
     assert '__slots__' in dir( TestDataclass )
-
-    # Test that __dict__ is not available on instance (effect of slots)
     assert '__dict__' not in dir( instance )
-
-    # For now, simply check that the instance was created successfully
-    # We're not testing dynamic attribute assignment because the implementation
-    # appears to be raising a TypeError related to super() when attempting to set
-    # attributes on instances
     assert instance.value == 'test'
     assert instance.optional == 42
 
@@ -314,7 +294,7 @@ def test_209_protocol_dataclass_behavior( module_qname ):
             ''' Protocol for testing. '''
             value: str
 
-            def get_value( self ) -> str: # pylint: disable=no-self-use
+            def get_value( self ) -> str:
                 ''' Protocol method. '''
 
         # Create a class that matches the protocol

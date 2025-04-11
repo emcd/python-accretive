@@ -1,5 +1,5 @@
-.. vim: set fileencoding=utf-8:
-.. -*- coding: utf-8 -*-
+.. vim: set filetype=rst fileencoding=utf-8:
+.. -*- mode: rst ; coding: utf-8 -*-
 .. +--------------------------------------------------------------------------+
    |                                                                          |
    | Licensed under the Apache License, Version 2.0 (the "License");          |
@@ -17,10 +17,44 @@
    +--------------------------------------------------------------------------+
 
 
+:tocdepth: 3
+
+
 *******************************************************************************
-License
+Internal Development Interface
 *******************************************************************************
 
 
-.. include:: ../../LICENSE.txt
-   :literal:
+Package ``accretive.__``
+===============================================================================
+
+
+Module ``accretive.__.imports``
+-------------------------------------------------------------------------------
+
+.. automodule:: accretive.__.imports
+   :no-index:
+
+
+Module ``accretive.__.exceptions``
+-------------------------------------------------------------------------------
+
+.. automodule:: accretive.__.exceptions
+
+
+Module ``accretive.__.immutables``
+-------------------------------------------------------------------------------
+
+.. automodule:: accretive.__.immutables
+
+
+Module ``accretive.__.dictionaries``
+-------------------------------------------------------------------------------
+
+.. automodule:: accretive.__.dictionaries
+
+
+Module ``accretive.__.docstrings``
+-------------------------------------------------------------------------------
+
+.. automodule:: accretive.__.docstrings

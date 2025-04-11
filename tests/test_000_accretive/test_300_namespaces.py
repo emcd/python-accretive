@@ -20,10 +20,6 @@
 
 ''' Assert correct function of namespaces. '''
 
-# mypy: ignore-errors
-# pylint: disable=attribute-defined-outside-init
-# pylint: disable=invalid-name,magic-value-comparison,protected-access
-
 
 import pytest
 
@@ -114,7 +110,7 @@ def test_105_dictionary_equality( module_qname, class_name ):
     assert ns2 == ns1
     assert ns1 == ns3
     assert ns3 == ns1
-    assert not ( ns1 == -1 ) # pylint: disable=superfluous-parens
+    assert not ( ns1 == -1 ) # noqa: SIM201
     assert ns1 != -1
     assert ns1 != ( )
     ns2.baz = 43

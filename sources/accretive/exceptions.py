@@ -26,7 +26,7 @@
 '''
 
 
-from . import __ # pylint: disable=cyclic-import
+from . import __
 
 
 class Omniexception( __.ImmutableObject, BaseException ):

@@ -20,7 +20,6 @@
 
 ''' Common imports and type aliases used throughout the package. '''
 
-# pylint: disable=unused-import
 # ruff: noqa: F401
 
 
@@ -33,7 +32,6 @@ import types
 
 import typing_extensions as typx
 # --- BEGIN: Injected by Copier ---
-
 # --- END: Injected by Copier ---
 
 

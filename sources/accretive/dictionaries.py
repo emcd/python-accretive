@@ -18,7 +18,6 @@
 #============================================================================#
 
 
-# pylint: disable=line-too-long
 ''' Accretive dictionaries.
 
     Dictionaries which can grow but never shrink. Once an entry is added, it
@@ -75,8 +74,7 @@
     Traceback (most recent call last):
         ...
     accretive.exceptions.EntryValidityError: Cannot add invalid entry with key, 'invalid', and value, 'str', to dictionary.
-'''
-# pylint: enable=line-too-long
+''' # noqa: E501
 
 
 from . import __
@@ -108,7 +106,7 @@ class AbstractDictionary( __.cabc.Mapping[ __.H, __.V ] ):
     def __getitem__( self, key: __.H ) -> __.V:
         raise NotImplementedError # pragma: no coverage
 
-    def _pre_setitem_( # pylint: disable=no-self-use
+    def _pre_setitem_(
         self, key: __.H, value: __.V
     ) -> tuple[ __.H, __.V ]:
         ''' Validates and/or prepares entry before addition.
@@ -148,8 +146,8 @@ class AbstractDictionary( __.cabc.Mapping[ __.H, __.V ] ):
         ''' Adds new entries as a batch. Returns self. '''
         from itertools import chain
         updates: list[ tuple[ __.H, __.V ] ] = [ ]
-        for indicator, value in chain.from_iterable( map( # type: ignore
-            lambda element: ( # type: ignore
+        for indicator, value in chain.from_iterable( map( # pyright: ignore
+            lambda element: ( # pyright: ignore
                 element.items( )
                 if isinstance( element, __.cabc.Mapping )
                 else element
@@ -157,7 +155,7 @@ class AbstractDictionary( __.cabc.Mapping[ __.H, __.V ] ):
             ( *iterables, entries )
         ) ):
             indicator_, value_ = (
-                self._pre_setitem_( indicator, value ) ) # type: ignore
+                self._pre_setitem_( indicator, value ) ) # pyright: ignore
             if indicator_ in self:
                 from .exceptions import EntryImmutabilityError
                 raise EntryImmutabilityError( indicator_ )
@@ -230,7 +228,7 @@ class _Dictionary(
 ): pass
 
 
-class Dictionary( # pylint: disable=eq-without-hash
+class Dictionary(
     _DictionaryOperations[ __.H, __.V ]
 ):
     ''' Accretive dictionary. '''
@@ -281,7 +279,7 @@ class Dictionary( # pylint: disable=eq-without-hash
         ''' Provides fresh copy of dictionary. '''
         return type( self )( self )
 
-    def get(
+    def get( # pyright: ignore
         self, key: __.H, default: __.Absential[ __.V ] = __.absent
     ) -> __.typx.Annotated[
         __.V,

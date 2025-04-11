@@ -20,11 +20,6 @@
 
 ''' Assert correct function of dictionaries. '''
 
-# mypy: ignore-errors
-# pylint: disable=attribute-defined-outside-init
-# pylint: disable=invalid-name,magic-value-comparison,protected-access
-# pylint: disable=too-many-locals,too-many-statements,unnecessary-dunder-call
-
 
 import pytest
 
@@ -351,8 +346,7 @@ def test_180_operations_preserve_accretion( module_qname, class_name ):
     else:
         d1[ 'a' ] = 1
         d2[ 'a' ] = 2
-    with pytest.raises( exceptions.EntryImmutabilityError ):
-        d1 | d2 # pylint: disable=pointless-statement
+    with pytest.raises( exceptions.EntryImmutabilityError ): d1 | d2
     d4 = d1 & { 'a' }
     with pytest.raises( exceptions.EntryImmutabilityError ):
         if class_name in PRODUCER_VALIDATOR_NAMES:
@@ -490,18 +484,14 @@ def test_212_update_with_existing_key_raises_immutability_error(
     factory = getattr( module, class_name )
     posargs, nomargs = select_arguments( class_name )
     dictionary = factory( *posargs, **nomargs )
-    if class_name in PRODUCER_VALIDATOR_NAMES:
+    if class_name in PRODUCER_NAMES:
         dictionary[ 'existing_key' ] = [ 1 ]
-        new_value = [ 999 ]  # Use a list to pass the validator
-        new_key_value = [ 100 ]  # Use a list for new keys in ProducerValidatorDictionary
-    elif class_name in PRODUCER_NAMES:
-        dictionary[ 'existing_key' ] = [ 1 ]
-        new_value = [ 999 ]  # Use a list for consistency with producer
-        new_key_value = [ 100 ]  # Use a list for new keys in ProducerDictionary
+        new_value = [ 999 ]
+        new_key_value = [ 100 ]
     else:
         dictionary[ 'existing_key' ] = 42
-        new_value = 999  # Use integer for non-validator/producer classes
-        new_key_value = 100  # Use integer for new keys in other classes
+        new_value = 999
+        new_key_value = 100
     with pytest.raises( exceptions.EntryImmutabilityError ):
         dictionary.update( [ ( 'existing_key', new_value ) ] )
     with pytest.raises( exceptions.EntryImmutabilityError ):
@@ -510,9 +500,7 @@ def test_212_update_with_existing_key_raises_immutability_error(
         dictionary.update(
             [ ( 'new_key', new_key_value ), ( 'existing_key', new_value ) ] )
     assert dictionary[ 'existing_key' ] == (
-        [ 1 ] if class_name in ( PRODUCER_NAMES + PRODUCER_VALIDATOR_NAMES )
-        else 42
-    )
+        [ 1 ] if class_name in PRODUCER_NAMES else 42 )
 
 @pytest.mark.parametrize(
     'module_qname, class_name',
@@ -560,7 +548,7 @@ def test_216_update_with_pre_setitem_modification( module_qname, class_name ):
     posargs, nomargs = select_arguments( class_name )
 
     class ModifiedDictionary( factory ):
-        def _pre_setitem_( self, key, value ): # pylint: disable=no-self-use
+        def _pre_setitem_( self, key, value ):
             return str( key ) if isinstance( key, int ) else key, value + 1
 
     dictionary = ModifiedDictionary( *posargs, **nomargs )
@@ -639,7 +627,7 @@ def test_225_dictionary_equality(
     assert dct2 == dct1
     assert dct1 == dct3
     assert dct3 == dct1
-    assert not ( dct1 == -1 ) # pylint: disable=superfluous-parens
+    assert not ( dct1 == -1 ) # noqa: SIM201
     assert dct1 != -1
     assert dct1 != ( )
     if class_name not in PRODUCER_VALIDATOR_NAMES: dct2[ 'baz' ] = 43

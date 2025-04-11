@@ -20,9 +20,6 @@
 
 ''' Assert correct function of objects. '''
 
-# pylint: disable=attribute-defined-outside-init
-# pylint: disable=invalid-name,magic-value-comparison,protected-access
-
 
 import platform
 
@@ -95,7 +92,7 @@ def test_150_slot_layout_conflict( ):
     module = cache_import_module( f"{PACKAGE_NAME}.objects" )
     with pytest.raises( TypeError ) as excinfo:
 
-        class ConflictingClass( BaseException, module.Object ): # pylint: disable=unused-variable
+        class ConflictingClass( BaseException, module.Object ):
             ''' This class will fail to create due to layout conflict. '''
 
     assert "instance lay-out conflict" in str( excinfo.value )
@@ -160,14 +157,14 @@ def test_210_accretive_decorator_compatibility_error():
 
     with pytest.raises(exceptions.DecoratorCompatibilityError) as excinfo:
         @module.accretive
-        class TestSetattr: # pylint: disable=unused-variable
+        class TestSetattr:
             def __setattr__(self, name, value):
                 pass
     assert "__setattr__" in str(excinfo.value)
 
     with pytest.raises(exceptions.DecoratorCompatibilityError) as excinfo:
         @module.accretive
-        class TestDelattr: # pylint: disable=unused-variable
+        class TestDelattr:
             def __delattr__(self, name):
                 pass
     assert "__delattr__" in str(excinfo.value)
@@ -180,7 +177,7 @@ def test_220_accretive_class_with_slots( ):
 
     @module.accretive
     class SlottedClass:
-        __slots__ = ( 'value', '_behaviors_' )
+        __slots__ = ( '_behaviors_', 'value' )
 
         def __init__( self, value = 42 ):
             self.value = value
