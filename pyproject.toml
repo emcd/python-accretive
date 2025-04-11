@@ -97,7 +97,7 @@ dependencies = [
   'coverage[toml]',
   'emcd-projects',
   'furo',
-  'icecream-truck',
+  'icecream',
   'packaging',
   'pre-commit',
   'pyright',
