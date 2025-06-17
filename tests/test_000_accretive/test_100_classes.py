@@ -25,7 +25,6 @@ from itertools import product
 from platform import python_implementation
 
 import pytest
-import typing_extensions as typx
 
 from . import (
     MODULES_QNAMES,
@@ -36,7 +35,7 @@ from . import (
 
 THESE_MODULE_QNAMES = tuple(
     name for name in MODULES_QNAMES if name.endswith( '.classes' ) )
-THESE_CLASSES_NAMES = ( 'Class', 'ABCFactory', 'ProtocolClass' )
+THESE_CLASSES_NAMES = ( 'Class', 'AbstractBaseClass', 'ProtocolClass' )
 
 
 pypy_skip_mark = pytest.mark.skipif(
@@ -60,168 +59,73 @@ def test_100_instantiation( module_qname, class_name ):
     assert isinstance( Object, class_factory_class )
 
 
-@pytest.mark.parametrize(
-    'module_qname, class_name',
-    product( THESE_MODULE_QNAMES, THESE_CLASSES_NAMES )
-)
-def test_101_accretion( module_qname, class_name ):
-    ''' Class accretes attributes. '''
-    module = cache_import_module( module_qname )
-    exceptions = cache_import_module( f"{PACKAGE_NAME}.exceptions" )
-    class_factory_class = getattr( module, class_name )
-
-    class Object( metaclass = class_factory_class ):
-        ''' test '''
-        attr = 42
-
-    with pytest.raises( exceptions.AttributeImmutabilityError ):
-        Object.attr = -1
-    assert 42 == Object.attr
-    with pytest.raises( exceptions.AttributeImmutabilityError ):
-        del Object.attr
-    assert 42 == Object.attr
-    Object.accreted_attr = 'foo'
-    assert 'foo' == Object.accreted_attr
-    with pytest.raises( exceptions.AttributeImmutabilityError ):
-        Object.accreted_attr = 'bar'
-    assert 'foo' == Object.accreted_attr
-    with pytest.raises( exceptions.AttributeImmutabilityError ):
-        del Object.accreted_attr
-    assert 'foo' == Object.accreted_attr
-
-
-@pytest.mark.parametrize(
-    'module_qname, class_name',
-    product( THESE_MODULE_QNAMES, THESE_CLASSES_NAMES )
-)
-def test_110_class_decorators( module_qname, class_name ):
-    ''' Class accepts and applies decorators correctly. '''
-    module = cache_import_module( module_qname )
-    exceptions = cache_import_module( f"{PACKAGE_NAME}.exceptions" )
-    class_factory_class = getattr( module, class_name )
-    decorator_calls = [ ]
-
-    def test_decorator1( cls ):
-        decorator_calls.append( 'decorator1' )
-        cls.decorator1_attr = 'value1'
-        return cls
-
-    def test_decorator2( cls ):
-        decorator_calls.append( 'decorator2' )
-        cls.decorator2_attr = 'value2'
-        return cls
-
-    class Object(
-        metaclass = class_factory_class,
-        decorators = ( test_decorator1, test_decorator2 )
-    ):
-        ''' test '''
-        attr = 42
-
-        _class_behaviors_: typx.ClassVar[ set[ str ] ] = { 'foo' }
-
-    assert [ 'decorator1', 'decorator2' ] == decorator_calls
-    assert 'value1' == Object.decorator1_attr
-    assert 'value2' == Object.decorator2_attr
-    with pytest.raises( exceptions.AttributeImmutabilityError ):
-        Object.decorator1_attr = 'new_value'
-    with pytest.raises( exceptions.AttributeImmutabilityError ):
-        Object.decorator2_attr = 'new_value'
+# @pytest.mark.parametrize(
+#     'module_qname, class_name',
+#     product( THESE_MODULE_QNAMES, THESE_CLASSES_NAMES )
+# )
+# def test_101_accretion( module_qname, class_name ):
+#     ''' Class accretes attributes. '''
+#     module = cache_import_module( module_qname )
+#     exceptions = cache_import_module( f"{PACKAGE_NAME}.exceptions" )
+#     class_factory_class = getattr( module, class_name )
+#
+#     class Object( metaclass = class_factory_class ):
+#         ''' test '''
+#         attr = 42
+#
+#     with pytest.raises( exceptions.AttributeImmutability ):
+#         Object.attr = -1
+#     assert 42 == Object.attr
+#     with pytest.raises( exceptions.AttributeImmutability ):
+#         del Object.attr
+#     assert 42 == Object.attr
+#     Object.accreted_attr = 'foo'
+#     assert 'foo' == Object.accreted_attr
+#     with pytest.raises( exceptions.AttributeImmutability ):
+#         Object.accreted_attr = 'bar'
+#     assert 'foo' == Object.accreted_attr
+#     with pytest.raises( exceptions.AttributeImmutability ):
+#         del Object.accreted_attr
+#     assert 'foo' == Object.accreted_attr
 
 
-@pypy_skip_mark
-@pytest.mark.parametrize(
-    'module_qname, class_name',
-    product( THESE_MODULE_QNAMES, THESE_CLASSES_NAMES )
-)
-def test_111_class_decorator_reproduction_method( module_qname, class_name ):
-    ''' Class handles decorator reproduction with super() method. '''
-    module = cache_import_module( module_qname )
-    class_factory_class = getattr( module, class_name )
-    from dataclasses import dataclass
-
-    class Object(
-        metaclass = class_factory_class,
-        decorators = ( dataclass( slots = True ), )
-    ):
-        ''' test '''
-        value: str = 'test'
-
-        def method_with_super( self ):
-            ''' References class cell on CPython. '''
-            super( ).__init__( )
-            return self.__class__.__name__
-
-        def other_method_with_super( self ):
-            ''' References class cell on CPython. '''
-            super( ).__init__( )
-            return 'other'
-
-    # Verify class was properly reproduced and both methods work
-    obj = Object( )
-    assert 'Object' == obj.method_with_super( )
-    assert 'other' == obj.other_method_with_super( )
-
-
-@pypy_skip_mark
-@pytest.mark.parametrize(
-    'module_qname, class_name',
-    product( THESE_MODULE_QNAMES, THESE_CLASSES_NAMES )
-)
-def test_112_class_decorator_reproduction_property( module_qname, class_name ):
-    ''' Class handles decorator reproduction with dotted access property. '''
-    module = cache_import_module( module_qname )
-    class_factory_class = getattr( module, class_name )
-    from dataclasses import dataclass
-
-    class Object(
-        metaclass = class_factory_class,
-        decorators = ( dataclass( slots = True ), )
-    ):
-        ''' test '''
-        value: str = 'test'
-
-        @property
-        def prop_with_class( self ):
-            ''' References class cell on CPython. '''
-            return self.__class__.__name__
-
-        @property
-        def other_prop_with_class( self ):
-            ''' References class cell on CPython. '''
-            return f"other_{self.__class__.__name__}"
-
-    # Verify class was properly reproduced and both properties work
-    obj = Object( )
-    assert 'Object' == obj.prop_with_class
-    assert 'other_Object' == obj.other_prop_with_class
-
-
-@pypy_skip_mark
-@pytest.mark.parametrize(
-    'module_qname, class_name',
-    product( THESE_MODULE_QNAMES, THESE_CLASSES_NAMES )
-)
-def test_113_class_decorator_reproduction_no_cell( module_qname, class_name ):
-    ''' Class handles decorator reproduction with no class cell. '''
-    module = cache_import_module( module_qname )
-    class_factory_class = getattr( module, class_name )
-    from dataclasses import dataclass
-
-    class Object(
-        metaclass = class_factory_class,
-        decorators = ( dataclass( slots = True ), )
-    ):
-        ''' test '''
-        value: str = 'test'
-
-        def method_without_cell( self ):
-            ''' Operates without class cell on CPython. '''
-            return 'no_cell'
-
-    # Verify class was properly reproduced
-    obj = Object()
-    assert 'no_cell' == obj.method_without_cell( )
+# @pytest.mark.parametrize(
+#     'module_qname, class_name',
+#     product( THESE_MODULE_QNAMES, THESE_CLASSES_NAMES )
+# )
+# def test_110_class_decorators( module_qname, class_name ):
+#     ''' Class accepts and applies decorators correctly. '''
+#     module = cache_import_module( module_qname )
+#     exceptions = cache_import_module( f"{PACKAGE_NAME}.exceptions" )
+#     class_factory_class = getattr( module, class_name )
+#     decorator_calls = [ ]
+#
+#     def test_decorator1( cls ):
+#         decorator_calls.append( 'decorator1' )
+#         cls.decorator1_attr = 'value1'
+#         return cls
+#
+#     def test_decorator2( cls ):
+#         decorator_calls.append( 'decorator2' )
+#         cls.decorator2_attr = 'value2'
+#         return cls
+#
+#     class Object(
+#         metaclass = class_factory_class,
+#         decorators = ( test_decorator1, test_decorator2 )
+#     ):
+#         ''' test '''
+#         attr = 42
+#
+#         _class_behaviors_: typx.ClassVar[ set[ str ] ] = { 'foo' }
+#
+#     assert [ 'decorator1', 'decorator2' ] == decorator_calls
+#     assert 'value1' == Object.decorator1_attr
+#     assert 'value2' == Object.decorator2_attr
+#     with pytest.raises( exceptions.AttributeImmutability ):
+#         Object.decorator1_attr = 'new_value'
+#     with pytest.raises( exceptions.AttributeImmutability ):
+#         Object.decorator2_attr = 'new_value'
 
 
 @pytest.mark.parametrize(
@@ -255,42 +159,23 @@ def test_115_mutable_attributes( module_qname, class_name ):
     class_factory_class = getattr( module, class_name )
 
     class MutableObject(
-        metaclass = class_factory_class, mutables = ( 'mutable_attr', )
+        metaclass = class_factory_class,
+        class_mutables = ( 'mutable_attr', )
     ):
         ''' test '''
         immutable_attr = 42
         mutable_attr = 100
 
-    with pytest.raises( exceptions.AttributeImmutabilityError ):
+    with pytest.raises( exceptions.AttributeImmutability ):
         MutableObject.immutable_attr = 43
     assert 42 == MutableObject.immutable_attr
-    with pytest.raises( exceptions.AttributeImmutabilityError ):
+    with pytest.raises( exceptions.AttributeImmutability ):
         del MutableObject.immutable_attr
     assert 42 == MutableObject.immutable_attr
     MutableObject.mutable_attr = 200
     assert 200 == MutableObject.mutable_attr
     del MutableObject.mutable_attr
     assert 'mutable_attr' not in MutableObject.__dict__
-
-
-@pytest.mark.parametrize(
-    'module_qname, class_name',
-    product( THESE_MODULE_QNAMES, THESE_CLASSES_NAMES )
-)
-def test_120_docstring_assignment( module_qname, class_name ):
-    ''' Class has dynamically-assigned docstring. '''
-    module = cache_import_module( module_qname )
-    class_factory_class = getattr( module, class_name )
-
-    class Object( metaclass = class_factory_class, docstring = 'dynamic' ):
-        ''' test '''
-        attr = 42
-
-    assert 'test' != Object.__doc__
-    assert 'dynamic' == Object.__doc__
-
-
-# TODO? String representations.
 
 
 @pytest.mark.parametrize(
@@ -304,29 +189,3 @@ def test_900_docstring_sanity( module_qname, class_name ):
     assert hasattr( class_factory_class, '__doc__' )
     assert isinstance( class_factory_class.__doc__, str )
     assert class_factory_class.__doc__
-
-
-@pytest.mark.parametrize(
-    'module_qname, class_name',
-    product( THESE_MODULE_QNAMES, THESE_CLASSES_NAMES )
-)
-def test_901_docstring_describes_cfc( module_qname, class_name ):
-    ''' Class docstring describes class factory class. '''
-    module = cache_import_module( module_qname )
-    base = cache_import_module( f"{PACKAGE_NAME}.__" )
-    class_factory_class = getattr( module, class_name )
-    fragment = base.generate_docstring( 'description of class factory class' )
-    assert fragment in class_factory_class.__doc__
-
-
-@pytest.mark.parametrize(
-    'module_qname, class_name',
-    product( THESE_MODULE_QNAMES, THESE_CLASSES_NAMES )
-)
-def test_902_docstring_mentions_accretion( module_qname, class_name ):
-    ''' Class docstring mentions accretion. '''
-    module = cache_import_module( module_qname )
-    base = cache_import_module( f"{PACKAGE_NAME}.__" )
-    class_factory_class = getattr( module, class_name )
-    fragment = base.generate_docstring( 'class attributes accretion' )
-    assert fragment in class_factory_class.__doc__

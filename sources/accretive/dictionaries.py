@@ -51,11 +51,11 @@
     >>> d[ 'apples' ] = 14    # Attempt modification
     Traceback (most recent call last):
         ...
-    accretive.exceptions.EntryImmutabilityError: Cannot alter or remove existing entry for 'apples'.
+    accretive.exceptions.EntryImmutability: Could not alter or remove existing entry for 'apples'.
     >>> del d[ 'bananas' ]    # Attempt removal
     Traceback (most recent call last):
         ...
-    accretive.exceptions.EntryImmutabilityError: Cannot alter or remove existing entry for 'bananas'.
+    accretive.exceptions.EntryImmutability: Could not alter or remove existing entry for 'bananas'.
 
     >>> from accretive import ProducerDictionary
     >>> d = ProducerDictionary( list )  # list() called for missing keys
@@ -65,7 +65,7 @@
     >>> d[ 'new' ] = [ ]  # Attempt modification
     Traceback (most recent call last):
         ...
-    accretive.exceptions.EntryImmutabilityError: Cannot alter or remove existing entry for 'new'.
+    accretive.exceptions.EntryImmutability: Could not alter or remove existing entry for 'new'.
 
     >>> from accretive import ValidatorDictionary
     >>> d = ValidatorDictionary( lambda k, v: isinstance( v, int ) )
@@ -73,7 +73,7 @@
     >>> d[ 'invalid' ] = 'str'  # Fails validation
     Traceback (most recent call last):
         ...
-    accretive.exceptions.EntryValidityError: Cannot add invalid entry with key, 'invalid', and value, 'str', to dictionary.
+    accretive.exceptions.EntryInvalidity: Could not add invalid entry with key, 'invalid', and value, 'str', to dictionary.
 ''' # noqa: E501
 
 
@@ -123,13 +123,13 @@ class AbstractDictionary( __.cabc.Mapping[ __.H, __.V ] ):
     def __setitem__( self, key: __.H, value: __.V ) -> None:
         key, value = self._pre_setitem_( key, value )
         if key in self:
-            from .exceptions import EntryImmutabilityError
-            raise EntryImmutabilityError( key )
+            from .exceptions import EntryImmutability
+            raise EntryImmutability( key )
         self._store_item_( key, value )
 
     def __delitem__( self, key: __.H ) -> None:
-        from .exceptions import EntryImmutabilityError
-        raise EntryImmutabilityError( key )
+        from .exceptions import EntryImmutability
+        raise EntryImmutability( key )
 
     def setdefault( self, key: __.H, default: __.V ) -> __.V:
         ''' Returns value for key, setting it to default if missing. '''
@@ -157,8 +157,8 @@ class AbstractDictionary( __.cabc.Mapping[ __.H, __.V ] ):
             indicator_, value_ = (
                 self._pre_setitem_( indicator, value ) ) # pyright: ignore
             if indicator_ in self:
-                from .exceptions import EntryImmutabilityError
-                raise EntryImmutabilityError( indicator_ )
+                from .exceptions import EntryImmutability
+                raise EntryImmutability( indicator_ )
             updates.append( ( indicator_, value_ ) )
         for indicator, value in updates: self._store_item_( indicator, value )
         return self
@@ -176,8 +176,8 @@ class _DictionaryOperations( AbstractDictionary[ __.H, __.V ] ):
         if not isinstance( other, __.cabc.Mapping ): return NotImplemented
         conflicts = set( self.keys( ) ) & set( other.keys( ) )
         if conflicts:
-            from .exceptions import EntryImmutabilityError
-            raise EntryImmutabilityError( next( iter( conflicts ) ) )
+            from .exceptions import EntryImmutability
+            raise EntryImmutability( next( iter( conflicts ) ) )
         data = dict( self )
         data.update( other )
         return self.with_data( data )
@@ -223,27 +223,26 @@ class _DictionaryOperations( AbstractDictionary[ __.H, __.V ] ):
         raise NotImplementedError # pragma: no coverage
 
 
-class _Dictionary(
-    __.AccretiveDictionary[ __.H, __.V ], metaclass = _classes.Class
-): pass
-
-
 class Dictionary(
-    _DictionaryOperations[ __.H, __.V ]
+    _DictionaryOperations[ __.H, __.V ],
+    metaclass = _classes.AbstractBaseClass,
 ):
     ''' Accretive dictionary. '''
 
     __slots__ = ( '_data_', )
 
-    _data_: _Dictionary[ __.H, __.V ]
+    _data_: __.AccretiveDictionary[ __.H, __.V ]
+    _dynadoc_fragments_ = ( 'dictionary entries accrete', )
 
     def __init__(
         self,
         *iterables: __.DictionaryPositionalArgument[ __.H, __.V ],
         **entries: __.DictionaryNominativeArgument[ __.V ],
     ) -> None:
-        self._data_ = _Dictionary( *iterables, **entries )
+        self._data_ = __.AccretiveDictionary( *iterables, **entries )
         super( ).__init__( )
+
+    __hash__ = None
 
     def __iter__( self ) -> __.cabc.Iterator[ __.H ]:
         return iter( self._data_ )
@@ -253,7 +252,7 @@ class Dictionary(
 
     def __repr__( self ) -> str:
         return "{fqname}( {contents} )".format(
-            fqname = __.calculate_fqname( self ),
+            fqname = __.ccutils.qualify_class_name( type( self ) ),
             contents = str( self._data_ ) )
 
     def __str__( self ) -> str:
@@ -314,15 +313,14 @@ class Dictionary(
     def _store_item_( self, key: __.H, value: __.V ) -> None:
         self._data_[ key ] = value
 
-Dictionary.__doc__ = __.generate_docstring(
-    Dictionary, 'dictionary entries accretion' )
-
 
 class ProducerDictionary( Dictionary[ __.H, __.V ] ):
     ''' Accretive dictionary with default value for missing entries. '''
 
     __slots__ = ( '_producer_', )
 
+    _dynadoc_fragments_ = (
+        'dictionary entries accrete', 'dictionary entries produce' )
     _producer_: __.DictionaryProducer[ __.V ]
 
     def __init__(
@@ -338,7 +336,7 @@ class ProducerDictionary( Dictionary[ __.H, __.V ] ):
 
     def __repr__( self ) -> str:
         return "{fqname}( {producer}, {contents} )".format(
-            fqname = __.calculate_fqname( self ),
+            fqname = __.ccutils.qualify_class_name( type( self ) ),
             producer = self._producer_,
             contents = str( self._data_ ) )
 
@@ -368,18 +366,14 @@ class ProducerDictionary( Dictionary[ __.H, __.V ] ):
     ) -> __.typx.Self:
         return type( self )( self._producer_, *iterables, **entries )
 
-ProducerDictionary.__doc__ = __.generate_docstring(
-    ProducerDictionary,
-    'dictionary entries accretion',
-    'dictionary entries production',
-)
-
 
 class ValidatorDictionary( Dictionary[ __.H, __.V ] ):
     ''' Accretive dictionary with validation of new entries. '''
 
     __slots__ = ( '_validator_', )
 
+    _dynadoc_fragments_ = (
+        'dictionary entries accrete', 'dictionary entries validate' )
     _validator_: __.DictionaryValidator[ __.H, __.V ]
 
     def __init__(
@@ -394,14 +388,14 @@ class ValidatorDictionary( Dictionary[ __.H, __.V ] ):
 
     def __repr__( self ) -> str:
         return "{fqname}( {validator}, {contents} )".format(
-            fqname = __.calculate_fqname( self ),
+            fqname = __.ccutils.qualify_class_name( type( self ) ),
             validator = self._validator_,
             contents = str( self._data_ ) )
 
     def _pre_setitem_( self, key: __.H, value: __.V ) -> tuple[ __.H, __.V ]:
         if not self._validator_( key, value ):
-            from .exceptions import EntryValidityError
-            raise EntryValidityError( key, value )
+            from .exceptions import EntryInvalidity
+            raise EntryInvalidity( key, value )
         return key, value
 
     def copy( self ) -> __.typx.Self:
@@ -416,18 +410,16 @@ class ValidatorDictionary( Dictionary[ __.H, __.V ] ):
     ) -> __.typx.Self:
         return type( self )( self._validator_, *iterables, **entries )
 
-ValidatorDictionary.__doc__ = __.generate_docstring(
-    ValidatorDictionary,
-    'dictionary entries accretion',
-    'dictionary entries validation',
-)
-
 
 class ProducerValidatorDictionary( Dictionary[ __.H, __.V ] ):
     ''' Accretive dictionary with defaults and validation. '''
 
     __slots__ = ( '_producer_', '_validator_' )
 
+    _dynadoc_fragments_ = (
+        'dictionary entries accrete',
+        'dictionary entries produce',
+        'dictionary entries validate' )
     _producer_: __.DictionaryProducer[ __.V ]
     _validator_: __.DictionaryValidator[ __.H, __.V ]
 
@@ -445,7 +437,7 @@ class ProducerValidatorDictionary( Dictionary[ __.H, __.V ] ):
 
     def __repr__( self ) -> str:
         return "{fqname}( {producer}, {validator}, {contents} )".format(
-            fqname = __.calculate_fqname( self ),
+            fqname = __.ccutils.qualify_class_name( type( self ) ),
             producer = self._producer_,
             validator = self._validator_,
             contents = str( self._data_ ) )
@@ -454,16 +446,16 @@ class ProducerValidatorDictionary( Dictionary[ __.H, __.V ] ):
         if key not in self:
             value = self._producer_( )
             if not self._validator_( key, value ):
-                from .exceptions import EntryValidityError
-                raise EntryValidityError( key, value )
+                from .exceptions import EntryInvalidity
+                raise EntryInvalidity( key, value )
             self[ key ] = value
         else: value = super( ).__getitem__( key )
         return value
 
     def _pre_setitem_( self, key: __.H, value: __.V ) -> tuple[ __.H, __.V ]:
         if not self._validator_( key, value ):
-            from .exceptions import EntryValidityError
-            raise EntryValidityError( key, value )
+            from .exceptions import EntryInvalidity
+            raise EntryInvalidity( key, value )
         return key, value
 
     def copy( self ) -> __.typx.Self:
@@ -485,10 +477,3 @@ class ProducerValidatorDictionary( Dictionary[ __.H, __.V ] ):
     ) -> __.typx.Self:
         return type( self )(
             self._producer_, self._validator_, *iterables, **entries )
-
-ProducerValidatorDictionary.__doc__ = __.generate_docstring(
-    ProducerValidatorDictionary,
-    'dictionary entries accretion',
-    'dictionary entries production',
-    'dictionary entries validation',
-)

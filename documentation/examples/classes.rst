@@ -55,7 +55,7 @@ Existing attributes cannot be reassigned.
     >>> Config.host = '127.0.0.1'
     Traceback (most recent call last):
     ...
-    accretive.exceptions.AttributeImmutabilityError: Cannot reassign or delete existing attribute 'host'.
+    accretive.exceptions.AttributeImmutability: Could not assign or delete existing attribute 'host'.
 
 Or deleted.
 
@@ -64,7 +64,7 @@ Or deleted.
     >>> del Config.port
     Traceback (most recent call last):
     ...
-    accretive.exceptions.AttributeImmutabilityError: Cannot reassign or delete existing attribute 'port'.
+    accretive.exceptions.AttributeImmutability: Could not assign or delete existing attribute 'port'.
 
 Attribute Assignment
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -97,7 +97,7 @@ can add new attributes, but cannot modify existing ones.
     >>> AppConfig.name = 'NewApp'
     Traceback (most recent call last):
     ...
-    accretive.exceptions.AttributeImmutabilityError: Cannot reassign or delete existing attribute 'name'.
+    accretive.exceptions.AttributeImmutability: Could not assign or delete existing attribute 'name'.
 
 Mutable Attributes
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -109,7 +109,7 @@ throughout the class lifecycle.
 
 .. doctest:: Classes
 
-    >>> class Configuration( metaclass = Class, mutables = ( 'version', ) ):
+    >>> class Configuration( metaclass = Class, class_mutables = ( 'version', ) ):
     ...     name = 'MyApp'
     ...     version = '1.0.0'
     ...     release_date = '2025-01-01'
@@ -118,7 +118,7 @@ throughout the class lifecycle.
     >>> Configuration.name = 'NewApp'
     Traceback (most recent call last):
     ...
-    accretive.exceptions.AttributeImmutabilityError: Cannot reassign or delete attribute 'name'.
+    accretive.exceptions.AttributeImmutability: Could not assign or delete attribute 'name'.
 
     >>> # Mutable attributes can be modified
     >>> Configuration.version = '1.0.1'
@@ -135,34 +135,20 @@ throughout the class lifecycle.
     >>> Configuration.version
     '1.1.0'
 
-Dynamic Docstring Assignment
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Accretive classes support dynamic docstring assignment, allowing for computed
-docstrings to be set at class creation.
-
-.. doctest:: Classes
-
-    >>> class DocumentedConfig( metaclass = Class, docstring = 'Dynamic docstring' ):
-    ...     ''' Static docstring '''
-    ...     host = 'localhost'
-    >>> DocumentedConfig.__doc__
-    'Dynamic docstring'
-
 Abstract Base Classes
 -------------------------------------------------------------------------------
 
-The ``ABCFactory`` metaclass creates accretive abstract base classes. This is
-particularly useful for defining interfaces that can be extended but not
-modified after definition. All of the behaviors mentioned for standard classes
-also apply to these.
+The ``AbstractBaseClass`` metaclass creates accretive abstract base classes.
+This is particularly useful for defining interfaces that can be extended but
+not modified after definition. All of the behaviors mentioned for standard
+classes also apply to these.
 
 .. doctest:: Classes
 
-    >>> from accretive import ABCFactory
+    >>> from accretive import AbstractBaseClass
     >>> from abc import abstractmethod
 
-    >>> class DataStore( metaclass = ABCFactory ):
+    >>> class DataStore( metaclass = AbstractBaseClass ):
     ...     @abstractmethod
     ...     def get( self, key ): pass
     ...
@@ -181,7 +167,7 @@ The abstract methods and class attributes are protected from modification:
     >>> DataStore.ENCODING = 'ascii'  # Attempt to modify
     Traceback (most recent call last):
     ...
-    accretive.exceptions.AttributeImmutabilityError: Cannot reassign or delete existing attribute 'ENCODING'.
+    accretive.exceptions.AttributeImmutability: Could not assign or delete existing attribute 'ENCODING'.
 
 However, new abstract methods and class attributes can be added:
 
@@ -221,12 +207,12 @@ The existing protocol interface is protected from modification:
     >>> Comparable.__lt__ = lt  # Attempt to replace
     Traceback (most recent call last):
     ...
-    accretive.exceptions.AttributeImmutabilityError: Cannot reassign or delete existing attribute '__lt__'.
+    accretive.exceptions.AttributeImmutability: Could not assign or delete existing attribute '__lt__'.
     >>> # Cannot modify existing class attributes
     >>> Comparable.ORDERING = 'reverse'  # Attempt to modify
     Traceback (most recent call last):
     ...
-    accretive.exceptions.AttributeImmutabilityError: Cannot reassign or delete existing attribute 'ORDERING'.
+    accretive.exceptions.AttributeImmutability: Could not assign or delete existing attribute 'ORDERING'.
 
 However, new protocol methods and class attributes can be added:
 

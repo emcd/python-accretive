@@ -18,357 +18,339 @@
 #============================================================================#
 
 
-''' Accretive classes.
+''' Accretive classes. '''
 
-    Provides metaclasses for creating classes with accretive attributes. Once a
-    class is initialized, its attributes cannot be reassigned or deleted.
-    However, it may still accrete new attribute assignments.
+# ruff: noqa: F811
 
-    The implementation includes:
-
-    * ``Class``: Standard metaclass for accretive classes; derived from
-      :py:class:`type`.
-    * ``ABCFactory``: Metaclass for abstract base classes; derived from
-      :py:class:`abc.ABCMeta`.
-    * ``ProtocolClass``: Metaclass for protocol classes; derived from
-      :py:class:`typing.Protocol`.
-
-    Additionally, metaclasses for dataclasses are provided as a convenience.
-
-    >>> from accretive import Class
-    >>> class Example( metaclass = Class ):
-    ...     x = 1
-    >>> Example.y = 2  # Add new class attribute
-    >>> Example.x = 3  # Attempt reassignment
-    Traceback (most recent call last):
-        ...
-    accretive.exceptions.AttributeImmutabilityError: Cannot reassign or delete attribute 'x'.
-
-    For cases where some attributes need to remain mutable, use the ``mutables`` parameter:
-
-    >>> class Config( metaclass = Class, mutables = ( 'version', ) ):
-    ...     name = 'MyApp'
-    ...     version = '1.0.0'
-    >>> Config.version = '1.0.1'  # Can modify designated mutable attributes
-    >>> Config.version
-    '1.0.1'
-    >>> Config.name = 'NewApp'    # Other attributes remain immutable
-    Traceback (most recent call last):
-        ...
-    accretive.exceptions.AttributeImmutabilityError: Cannot reassign or delete attribute 'name'.
-''' # noqa: E501
-
-# TODO? Allow predicate functions and regex patterns as mutability checkers.
-
-
-from __future__ import annotations
 
 from . import __
+from . import iclasses as _iclasses
 
 
-ClassDecorators: __.typx.TypeAlias = (
-    __.cabc.Iterable[ __.cabc.Callable[ [ type ], type ] ] )
+mutables_default = _iclasses.mutables_default
+visibles_default = _iclasses.visibles_default
 
 
-_behavior = 'accretion'
+_class_factory = __.funct.partial(
+    __.ccstd.class_factory,
+    assigner_core = _iclasses.assign_attribute_if_absent_mutable,
+    attributes_namer = __.calculate_attrname,
+    dynadoc_configuration = _iclasses.dynadoc_configuration,
+    error_class_provider = _iclasses.provide_error_class )
 
 
+@_class_factory( )
 class Class( type ):
-    ''' Accretive class factory. '''
+    ''' Metaclass for standard classes. '''
 
-    def __new__( # noqa: PLR0913
-        clscls: type[ Class ],
+    _dynadoc_fragments_ = (
+        'cfc class conceal', 'cfc class accrete', 'cfc dynadoc',
+        'cfc instance conceal', 'cfc instance protect' )
+
+    def __new__( # Typechecker stub.
+        clscls: type[ __.T ],
         name: str,
         bases: tuple[ type, ... ],
         namespace: dict[ str, __.typx.Any ], *,
-        decorators: ClassDecorators = ( ),
-        docstring: __.Absential[ __.typx.Optional[ str ] ] = __.absent,
-        mutables: __.cabc.Collection[ str ] = ( ),
-        **args: __.typx.Any
-    ) -> Class:
-        class_ = type.__new__(
-            clscls, name, bases, namespace, **args )
-        return _class__new__(
-            class_,
-            decorators = decorators,
-            docstring = docstring,
-            mutables = mutables )
-
-    def __init__( selfclass, *posargs: __.typx.Any, **nomargs: __.typx.Any ):
-        super( ).__init__( *posargs, **nomargs )
-        _class__init__( selfclass )
-
-    def __delattr__( selfclass, name: str ) -> None:
-        if not _class__delattr__( selfclass, name ):
-            super( ).__delattr__( name )
-
-    def __setattr__( selfclass, name: str, value: __.typx.Any ) -> None:
-        if not _class__setattr__( selfclass, name ):
-            super( ).__setattr__( name, value )
-
-Class.__doc__ = __.generate_docstring(
-    Class,
-    'description of class factory class',
-    'class attributes accretion' )
+        decorators: __.ClassDecorators[ __.T ] = ( ),
+        **arguments: __.typx.Unpack[ __.ccstd.ClassFactoryExtraArguments ],
+    ) -> __.T:
+        return super( ).__new__( clscls, name, bases, namespace )
 
 
-@__.typx.dataclass_transform( kw_only_default = True )
-class Dataclass( Class ):
-    ''' Accretive dataclass factory. '''
-
-    def __new__( # noqa: PLR0913
-        clscls: type[ Dataclass ],
-        name: str,
-        bases: tuple[ type, ... ],
-        namespace: dict[ str, __.typx.Any ], *,
-        decorators: ClassDecorators = ( ),
-        docstring: __.Absential[ __.typx.Optional[ str ] ] = __.absent,
-        mutables: __.cabc.Collection[ str ] = ( ),
-        **args: __.typx.Any
-    ) -> Dataclass:
-        decorators_ = (
-            __.dcls.dataclass( kw_only = True, slots = True ),
-            *decorators )
-        return Class.__new__( # pyright: ignore
-            clscls, name, bases, namespace,
-            decorators = decorators_,
-            docstring = docstring,
-            mutables = mutables,
-            **args )
-
-Dataclass.__doc__ = __.generate_docstring(
-    Dataclass,
-    'description of class factory class',
-    'class attributes accretion' )
-
-
+@_class_factory( )
 @__.typx.dataclass_transform( frozen_default = True, kw_only_default = True )
-class CompleteDataclass( Class ):
-    ''' Accretive dataclass factory.
+class Dataclass( type ):
+    ''' Metaclass for standard dataclasses. '''
 
-        Dataclasses from this factory produce immutable instances. '''
-    def __new__( # noqa: PLR0913
-        clscls: type[ CompleteDataclass ],
+    _dynadoc_fragments_ = (
+        'cfc produce dataclass',
+        'cfc class conceal', 'cfc class accrete', 'cfc dynadoc',
+        'cfc instance conceal', 'cfc instance protect' )
+
+    def __new__( # Typechecker stub.
+        clscls: type[ __.T ],
         name: str,
         bases: tuple[ type, ... ],
         namespace: dict[ str, __.typx.Any ], *,
-        decorators: ClassDecorators = ( ),
-        docstring: __.Absential[ __.typx.Optional[ str ] ] = __.absent,
-        mutables: __.cabc.Collection[ str ] = ( ),
-        **args: __.typx.Any
-    ) -> CompleteDataclass:
-        decorators_ = (
-            __.dcls.dataclass( frozen = True, kw_only = True, slots = True ),
-            *decorators )
-        return Class.__new__( # pyright: ignore
-            clscls, name, bases, namespace,
-            decorators = decorators_,
-            docstring = docstring,
-            mutables = mutables,
-            **args )
-
-CompleteDataclass.__doc__ = __.generate_docstring(
-    CompleteDataclass,
-    'description of class factory class',
-    'class attributes accretion' )
+        decorators: __.ClassDecorators[ __.T ] = ( ),
+        **arguments: __.typx.Unpack[ __.ccstd.ClassFactoryExtraArguments ],
+    ) -> __.T:
+        return super( ).__new__( clscls, name, bases, namespace )
 
 
-class ABCFactory( __.abc.ABCMeta ):
-    ''' Accretive abstract base class factory. '''
+@_class_factory( )
+@__.typx.dataclass_transform( kw_only_default = True )
+class DataclassMutable( type ):
+    ''' Metaclass for dataclasses with mutable instance attributes. '''
 
-    def __new__( # noqa: PLR0913
-        clscls: type[ ABCFactory ],
+    _dynadoc_fragments_ = (
+        'cfc produce dataclass',
+        'cfc class conceal', 'cfc class accrete', 'cfc dynadoc',
+        'cfc instance conceal' )
+
+    def __new__( # Typechecker stub.
+        clscls: type[ __.T ],
         name: str,
         bases: tuple[ type, ... ],
         namespace: dict[ str, __.typx.Any ], *,
-        decorators: ClassDecorators = ( ),
-        docstring: __.Absential[ __.typx.Optional[ str ] ] = __.absent,
-        mutables: __.cabc.Collection[ str ] = ( ),
-        **args: __.typx.Any
-    ) -> ABCFactory:
-        class_ = __.abc.ABCMeta.__new__(
-            clscls, name, bases, namespace, **args )
-        return _class__new__(
-            class_,
-            decorators = decorators,
-            docstring = docstring,
-            mutables = mutables )
-
-    def __init__( selfclass, *posargs: __.typx.Any, **nomargs: __.typx.Any ):
-        super( ).__init__( *posargs, **nomargs )
-        _class__init__( selfclass )
-
-    def __delattr__( selfclass, name: str ) -> None:
-        if not _class__delattr__( selfclass, name ):
-            super( ).__delattr__( name )
-
-    def __setattr__( selfclass, name: str, value: __.typx.Any ) -> None:
-        if not _class__setattr__( selfclass, name ):
-            super( ).__setattr__( name, value )
-
-ABCFactory.__doc__ = __.generate_docstring(
-    ABCFactory,
-    'description of class factory class',
-    'class attributes accretion' )
+        decorators: __.ClassDecorators[ __.T ] = ( ),
+        **arguments: __.typx.Unpack[ __.ccstd.ClassFactoryExtraArguments ],
+    ) -> __.T:
+        return super( ).__new__( clscls, name, bases, namespace )
 
 
+@_class_factory( )
+class AbstractBaseClass( __.abc.ABCMeta ):
+    ''' Metaclass for standard abstract base classes. '''
+
+    _dynadoc_fragments_ = (
+        'cfc produce abstract base class',
+        'cfc class conceal', 'cfc class accrete', 'cfc dynadoc',
+        'cfc instance conceal', 'cfc instance protect' )
+
+    def __new__( # Typechecker stub.
+        clscls: type[ __.T ],
+        name: str,
+        bases: tuple[ type, ... ],
+        namespace: dict[ str, __.typx.Any ], *,
+        decorators: __.ClassDecorators[ __.T ] = ( ),
+        **arguments: __.typx.Unpack[ __.ccstd.ClassFactoryExtraArguments ],
+    ) -> __.T:
+        return super( ).__new__( clscls, name, bases, namespace )
+
+
+@_class_factory( )
 class ProtocolClass( type( __.typx.Protocol ) ):
-    ''' Accretive protocol class factory. '''
+    ''' Metaclass for standard protocol classes. '''
 
-    def __new__( # noqa: PLR0913
-        clscls: type[ ProtocolClass ],
+    _dynadoc_fragments_ = (
+        'cfc produce protocol class',
+        'cfc class conceal', 'cfc class accrete', 'cfc dynadoc',
+        'cfc instance conceal', 'cfc instance protect' )
+
+    def __new__( # Typechecker stub.
+        clscls: type[ __.T ],
         name: str,
         bases: tuple[ type, ... ],
         namespace: dict[ str, __.typx.Any ], *,
-        decorators: ClassDecorators = ( ),
-        docstring: __.Absential[ __.typx.Optional[ str ] ] = __.absent,
-        mutables: __.cabc.Collection[ str ] = ( ),
-        **args: __.typx.Any
-    ) -> ProtocolClass:
-        class_ = super( ProtocolClass, clscls ).__new__(
-            clscls, name, bases, namespace, **args )
-        return _class__new__(
-            class_,
-            decorators = decorators,
-            docstring = docstring,
-            mutables = mutables )
-
-    def __init__( selfclass, *posargs: __.typx.Any, **nomargs: __.typx.Any ):
-        super( ).__init__( *posargs, **nomargs )
-        _class__init__( selfclass )
-
-    def __delattr__( selfclass, name: str ) -> None:
-        if not _class__delattr__( selfclass, name ):
-            super( ).__delattr__( name )
-
-    def __setattr__( selfclass, name: str, value: __.typx.Any ) -> None:
-        if not _class__setattr__( selfclass, name ):
-            super( ).__setattr__( name, value )
-
-ProtocolClass.__doc__ = __.generate_docstring(
-    ProtocolClass,
-    'description of class factory class',
-    'class attributes accretion' )
+        decorators: __.ClassDecorators[ __.T ] = ( ),
+        **arguments: __.typx.Unpack[ __.ccstd.ClassFactoryExtraArguments ],
+    ) -> __.T:
+        return super( ).__new__( clscls, name, bases, namespace )
 
 
+@_class_factory( )
+@__.typx.dataclass_transform( frozen_default = True, kw_only_default = True )
+class ProtocolDataclass( type( __.typx.Protocol ) ):
+    ''' Metaclass for standard protocol dataclasses. '''
+
+    _dynadoc_fragments_ = (
+        'cfc produce protocol class', 'cfc produce dataclass',
+        'cfc class conceal', 'cfc class accrete', 'cfc dynadoc',
+        'cfc instance conceal', 'cfc instance protect' )
+
+    def __new__( # Typechecker stub.
+        clscls: type[ __.T ],
+        name: str,
+        bases: tuple[ type, ... ],
+        namespace: dict[ str, __.typx.Any ], *,
+        decorators: __.ClassDecorators[ __.T ] = ( ),
+        **arguments: __.typx.Unpack[ __.ccstd.ClassFactoryExtraArguments ],
+    ) -> __.T:
+        return super( ).__new__( clscls, name, bases, namespace )
+
+
+@_class_factory( )
 @__.typx.dataclass_transform( kw_only_default = True )
-class ProtocolDataclass( ProtocolClass ):
-    ''' Accretive protocol dataclass factory. '''
-    def __new__( # noqa: PLR0913
-        clscls: type[ ProtocolDataclass ],
+class ProtocolDataclassMutable( type( __.typx.Protocol ) ):
+    ''' Metaclass for protocol dataclasses with mutable instance attributes.
+    '''
+
+    _dynadoc_fragments_ = (
+        'cfc produce protocol class', 'cfc produce dataclass',
+        'cfc class conceal', 'cfc class accrete', 'cfc dynadoc',
+        'cfc instance conceal' )
+
+    def __new__( # Typechecker stub.
+        clscls: type[ __.T ],
         name: str,
         bases: tuple[ type, ... ],
         namespace: dict[ str, __.typx.Any ], *,
-        decorators: ClassDecorators = ( ),
-        docstring: __.Absential[ __.typx.Optional[ str ] ] = __.absent,
-        mutables: __.cabc.Collection[ str ] = ( ),
-        **args: __.typx.Any
-    ) -> ProtocolDataclass:
-        decorators_ = (
-            __.dcls.dataclass( kw_only = True, slots = True ),
-            *decorators )
-        return ProtocolClass.__new__( # pyright: ignore
-            clscls, name, bases, namespace,
-            decorators = decorators_,
-            docstring = docstring,
-            mutables = mutables,
-            **args )
+        decorators: __.ClassDecorators[ __.T ] = ( ),
+        **arguments: __.typx.Unpack[ __.ccstd.ClassFactoryExtraArguments ],
+    ) -> __.T:
+        return super( ).__new__( clscls, name, bases, namespace )
 
-ProtocolDataclass.__doc__ = __.generate_docstring(
-    ProtocolDataclass,
-    'description of class factory class',
-    'class attributes accretion' )
+
+class Object(
+    metaclass = _iclasses.Class,
+    instances_assigner_core = _iclasses.assign_attribute_if_absent_mutable,
+):
+    ''' Standard base class. '''
+
+    _dynadoc_fragments_ = (
+        'class concealment', 'class protection', 'class dynadoc',
+        'class instance conceal', 'class instance accrete' )
+
+
+class ObjectMutable(
+    metaclass = _iclasses.Class,
+    instances_assigner_core = _iclasses.assign_attribute_if_absent_mutable,
+    instances_mutables = '*',
+):
+    ''' Base class with mutable instance attributes. '''
+
+    _dynadoc_fragments_ = (
+        'class concealment', 'class protection', 'class dynadoc',
+        'class instance conceal' )
+
+
+class DataclassObject(
+    metaclass = _iclasses.Dataclass,
+    instances_assigner_core = _iclasses.assign_attribute_if_absent_mutable,
+):
+    ''' Standard base dataclass. '''
+
+    _dynadoc_fragments_ = (
+        'dataclass',
+        'class concealment', 'class protection', 'class dynadoc',
+        'class instance conceal', 'class instance accrete' )
+
+
+class DataclassObjectMutable(
+    metaclass = _iclasses.DataclassMutable,
+    instances_assigner_core = _iclasses.assign_attribute_if_absent_mutable,
+):
+    ''' Base dataclass with mutable instance attributes. '''
+
+    _dynadoc_fragments_ = (
+        'dataclass',
+        'class concealment', 'class protection', 'class dynadoc',
+        'class instance conceal' )
+
+
+class Protocol(
+    __.typx.Protocol,
+    metaclass = _iclasses.ProtocolClass,
+    instances_assigner_core = _iclasses.assign_attribute_if_absent_mutable,
+):
+    ''' Standard base protocol class. '''
+
+    _dynadoc_fragments_ = (
+        'protocol class',
+        'class concealment', 'class protection', 'class dynadoc',
+        'class instance conceal', 'class instance accrete' )
+
+
+class ProtocolMutable(
+    __.typx.Protocol,
+    metaclass = _iclasses.ProtocolClass,
+    instances_assigner_core = _iclasses.assign_attribute_if_absent_mutable,
+    instances_mutables = '*',
+):
+    ''' Base protocol class with mutable instance attributes. '''
+
+    _dynadoc_fragments_ = (
+        'protocol class',
+        'class concealment', 'class protection', 'class dynadoc',
+        'class instance conceal' )
+
+
+class DataclassProtocol(
+    __.typx.Protocol,
+    metaclass = _iclasses.ProtocolDataclass,
+    instances_assigner_core = _iclasses.assign_attribute_if_absent_mutable,
+):
+    ''' Standard base protocol dataclass. '''
+
+    _dynadoc_fragments_ = (
+        'dataclass', 'protocol class',
+        'class concealment', 'class protection', 'class dynadoc',
+        'class instance conceal', 'class instance accrete' )
+
+
+class DataclassProtocolMutable(
+    __.typx.Protocol,
+    metaclass = _iclasses.ProtocolDataclassMutable,
+    instances_assigner_core = _iclasses.assign_attribute_if_absent_mutable,
+):
+    ''' Base protocol dataclass with mutable instance attributes. '''
+
+    _dynadoc_fragments_ = (
+        'dataclass', 'protocol class',
+        'class concealment', 'class protection', 'class dynadoc',
+        'class instance conceal' )
+
+
+@__.typx.overload
+def dataclass_with_standard_behaviors( # pragma: no cover
+    cls: type[ __.U ], /, *,
+    decorators: __.ClassDecorators[ __.U ] = ( ),
+    mutables: __.BehaviorExclusionVerifiersOmni = mutables_default,
+    visibles: __.BehaviorExclusionVerifiersOmni = visibles_default,
+) -> type[ __.U ]: ...
+
+
+@__.typx.overload
+def dataclass_with_standard_behaviors( # pragma: no cover
+    cls: __.AbsentSingleton = __.absent, /, *,
+    decorators: __.ClassDecorators[ __.U ] = ( ),
+    mutables: __.BehaviorExclusionVerifiersOmni = mutables_default,
+    visibles: __.BehaviorExclusionVerifiersOmni = visibles_default,
+) -> __.ClassDecoratorFactory[ __.U ]: ...
 
 
 @__.typx.dataclass_transform( frozen_default = True, kw_only_default = True )
-class CompleteProtocolDataclass( ProtocolClass ):
-    ''' Accretive protocol dataclass factory.
-
-        Dataclasses from this factory produce immutable instances. '''
-    def __new__( # noqa: PLR0913
-        clscls: type[ CompleteProtocolDataclass ],
-        name: str,
-        bases: tuple[ type, ... ],
-        namespace: dict[ str, __.typx.Any ], *,
-        decorators: ClassDecorators = ( ),
-        docstring: __.Absential[ __.typx.Optional[ str ] ] = __.absent,
-        mutables: __.cabc.Collection[ str ] = ( ),
-        **args: __.typx.Any
-    ) -> CompleteProtocolDataclass:
-        decorators_ = (
-            __.dcls.dataclass( frozen = True, kw_only = True, slots = True ),
-            *decorators )
-        return ProtocolClass.__new__( # pyright: ignore
-            clscls, name, bases, namespace,
-            decorators = decorators_,
-            docstring = docstring,
-            mutables = mutables,
-            **args )
-
-CompleteProtocolDataclass.__doc__ = __.generate_docstring(
-    CompleteProtocolDataclass,
-    'description of class factory class',
-    'class attributes accretion' )
+def dataclass_with_standard_behaviors(
+    cls: __.Absential[ type[ __.U ] ] = __.absent, /, *,
+    decorators: __.ClassDecorators[ __.U ] = ( ),
+    mutables: __.BehaviorExclusionVerifiersOmni = mutables_default,
+    visibles: __.BehaviorExclusionVerifiersOmni = visibles_default,
+) -> type[ __.U ] | __.ClassDecoratorFactory[ __.U ]:
+    ''' Decorates dataclass to enforce standard behaviors on instances. '''
+    decorate = __.funct.partial(
+        __.ccstd.dataclass_with_standard_behaviors,
+        attributes_namer = __.calculate_attrname,
+        error_class_provider = _iclasses.provide_error_class,
+        assigner_core = _iclasses.assign_attribute_if_absent_mutable,
+        decorators = decorators,
+        mutables = mutables, visibles = visibles )
+    if not __.is_absent( cls ): return decorate( )( cls )
+    return decorate( )  # No class to decorate; keyword arguments only.
 
 
-def _accumulate_mutables(
-    class_: type, mutables: __.cabc.Collection[ str ]
-) -> frozenset[ str ]:
-    return frozenset( mutables ).union( *(
-        frozenset( base.__dict__.get( '_class_mutables_', ( ) ) )
-        for base in class_.__mro__ ) )
-
-def _class__new__(
-    original: type,
-    decorators: ClassDecorators = ( ),
-    docstring: __.Absential[ __.typx.Optional[ str ] ] = __.absent,
-    mutables: __.cabc.Collection[ str ] = ( ),
-) -> type:
-    # Some decorators create new classes, which invokes this method again.
-    # Short-circuit to prevent recursive decoration and other tangles.
-    class_decorators_ = original.__dict__.get( '_class_decorators_', [ ] )
-    if class_decorators_: return original
-    if not __.is_absent( docstring ): original.__doc__ = docstring
-    original._class_mutables_ = _accumulate_mutables( original, mutables )
-    original._class_decorators_ = class_decorators_
-    reproduction = original
-    for decorator in decorators:
-        class_decorators_.append( decorator )
-        reproduction = decorator( original )
-        if original is not reproduction:
-            __.repair_class_reproduction( original, reproduction )
-        original = reproduction
-    class_decorators_.clear( )  # Flag '__init__' to enable accretion
-    return reproduction
+@__.typx.overload
+def with_standard_behaviors( # pragma: no cover
+    cls: type[ __.U ], /, *,
+    decorators: __.ClassDecorators[ __.U ] = ( ),
+    mutables: __.BehaviorExclusionVerifiersOmni = mutables_default,
+    visibles: __.BehaviorExclusionVerifiersOmni = visibles_default,
+) -> type[ __.U ]: ...
 
 
-def _class__init__( class_: type ) -> None:
-    # Some metaclasses add class attributes in '__init__' method.
-    # So, we wait until last possible moment to set immutability.
-    # Consult class attributes dictionary to ignore immutable base classes.
-    cdict = class_.__dict__
-    if cdict.get( '_class_decorators_' ): return
-    del class_._class_decorators_
-    if ( class_behaviors := cdict.get( '_class_behaviors_' ) ):
-        class_behaviors.add( _behavior )
-    else: class_._class_behaviors_ = { _behavior }
+@__.typx.overload
+def with_standard_behaviors( # pragma: no cover
+    cls: __.AbsentSingleton = __.absent, /, *,
+    decorators: __.ClassDecorators[ __.U ] = ( ),
+    mutables: __.BehaviorExclusionVerifiersOmni = mutables_default,
+    visibles: __.BehaviorExclusionVerifiersOmni = visibles_default,
+) -> __.ClassDecoratorFactory[ __.U ]: ...
 
 
-def _class__delattr__( class_: type, name: str ) -> bool:
-    # Consult class attributes dictionary to ignore accretive base classes.
-    cdict = class_.__dict__
-    if name in cdict.get( '_class_mutables_', ( ) ): return False
-    if _behavior not in cdict.get( '_class_behaviors_', ( ) ): return False
-    from .exceptions import AttributeImmutabilityError
-    raise AttributeImmutabilityError( name )
-
-
-def _class__setattr__( class_: type, name: str ) -> bool:
-    # Consult class attributes dictionary to ignore accretive base classes.
-    cdict = class_.__dict__
-    if name in cdict.get( '_class_mutables_', ( ) ): return False
-    if _behavior not in cdict.get( '_class_behaviors_', ( ) ): return False
-    if hasattr( class_, name ):
-        from .exceptions import AttributeImmutabilityError
-        raise AttributeImmutabilityError( name )
-    return False  # Allow setting new attributes.
+def with_standard_behaviors(
+    cls: __.Absential[ type[ __.U ] ] = __.absent, /, *,
+    decorators: __.ClassDecorators[ __.U ] = ( ),
+    mutables: __.BehaviorExclusionVerifiersOmni = mutables_default,
+    visibles: __.BehaviorExclusionVerifiersOmni = visibles_default,
+) -> type[ __.U ] | __.ClassDecoratorFactory[ __.U ]:
+    ''' Decorates class to enforce standard behaviors on instances. '''
+    decorate = __.funct.partial(
+        __.ccstd.with_standard_behaviors,
+        attributes_namer = __.calculate_attrname,
+        error_class_provider = _iclasses.provide_error_class,
+        assigner_core = _iclasses.assign_attribute_if_absent_mutable,
+        decorators = decorators,
+        mutables = mutables, visibles = visibles )
+    if not __.is_absent( cls ): return decorate( )( cls )
+    return decorate( )  # No class to decorate; keyword arguments only.

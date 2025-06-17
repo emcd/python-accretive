@@ -71,10 +71,10 @@ def test_101_accretion( module_qname, class_name ):
     Object = getattr( module, class_name )
     obj = Object( )
     obj.attr = 42
-    with pytest.raises( exceptions.AttributeImmutabilityError ):
+    with pytest.raises( exceptions.AttributeImmutability ):
         obj.attr = -1
     assert 42 == obj.attr
-    with pytest.raises( exceptions.AttributeImmutabilityError ):
+    with pytest.raises( exceptions.AttributeImmutability ):
         del obj.attr
     assert 42 == obj.attr
 
@@ -88,7 +88,7 @@ def test_102_string_representation( module_qname, class_name ):
     module = cache_import_module( module_qname )
     factory = getattr( module, class_name )
     obj = factory( )
-    assert base.calculate_fqname( obj ) in repr( obj )
+    assert base.ccutils.qualify_class_name( type( obj ) ) in repr( obj )
     obj.a = 1
     obj.b = 2
     assert 'a = 1, b = 2' in repr( obj )
@@ -129,27 +129,3 @@ def test_900_docstring_sanity( module_qname, class_name ):
     assert hasattr( Object, '__doc__' )
     assert isinstance( Object.__doc__, str )
     assert Object.__doc__
-
-
-@pytest.mark.parametrize(
-    'module_qname, class_name',
-    product( THESE_MODULE_QNAMES, THESE_CLASSES_NAMES )
-)
-def test_901_docstring_describes_namespace( module_qname, class_name ):
-    ''' Class docstring describes namespace. '''
-    module = cache_import_module( module_qname )
-    Object = getattr( module, class_name )
-    fragment = base.generate_docstring( 'description of namespace' )
-    assert fragment in Object.__doc__
-
-
-@pytest.mark.parametrize(
-    'module_qname, class_name',
-    product( THESE_MODULE_QNAMES, THESE_CLASSES_NAMES )
-)
-def test_902_docstring_mentions_accretion( module_qname, class_name ):
-    ''' Class docstring mentions accretion. '''
-    module = cache_import_module( module_qname )
-    Object = getattr( module, class_name )
-    fragment = base.generate_docstring( 'instance attributes accretion' )
-    assert fragment in Object.__doc__

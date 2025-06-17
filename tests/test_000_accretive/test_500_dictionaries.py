@@ -123,7 +123,7 @@ def test_102_instantiation( module_qname, class_name ):
     assert isinstance( dct, factory )
     value = [ ] if class_name in PRODUCER_NAMES else 42
     dct[ 'a' ] = value
-    with pytest.raises( exceptions.EntryValidityError ):
+    with pytest.raises( exceptions.EntryInvalidity ):
         dct[ 'b' ] = 'invalid value'
 
 
@@ -138,14 +138,14 @@ def test_200_dictionary_entry_accretion( module_qname, class_name ):
     factory = getattr( module, class_name )
     simple_posargs, simple_nomargs = select_simple_arguments( class_name )
     dct = factory( *simple_posargs, **simple_nomargs )
-    with pytest.raises( exceptions.EntryImmutabilityError ):
+    with pytest.raises( exceptions.EntryImmutability ):
         del dct[ 'foo' ]
-    with pytest.raises( exceptions.EntryImmutabilityError ):
+    with pytest.raises( exceptions.EntryImmutability ):
         dct[ 'foo' ] = 666
     dct[ 'baz' ] = 43
-    with pytest.raises( exceptions.EntryImmutabilityError ):
+    with pytest.raises( exceptions.EntryImmutability ):
         del dct[ 'baz' ]
-    with pytest.raises( exceptions.EntryImmutabilityError ):
+    with pytest.raises( exceptions.EntryImmutability ):
         dct[ 'baz' ] = 42
 
 
@@ -228,7 +228,7 @@ def test_160_or_combines_dictionaries( module_qname, class_name ):
     if class_name in PRODUCER_VALIDATOR_NAMES:
         d7[ 'a' ] = [ 2 ]
     else: d7[ 'a' ] = 2
-    with pytest.raises( exceptions.EntryImmutabilityError ):
+    with pytest.raises( exceptions.EntryImmutability ):
         _ = d1 | d7
 
 
@@ -346,9 +346,9 @@ def test_180_operations_preserve_accretion( module_qname, class_name ):
     else:
         d1[ 'a' ] = 1
         d2[ 'a' ] = 2
-    with pytest.raises( exceptions.EntryImmutabilityError ): d1 | d2
+    with pytest.raises( exceptions.EntryImmutability ): d1 | d2
     d4 = d1 & { 'a' }
-    with pytest.raises( exceptions.EntryImmutabilityError ):
+    with pytest.raises( exceptions.EntryImmutability ):
         if class_name in PRODUCER_VALIDATOR_NAMES:
             d4[ 'a' ] = [ 3 ]
         else: d4[ 'a' ] = 3
@@ -368,17 +368,17 @@ def test_201_producer_dictionary_entry_accretion( module_qname, class_name ):
     if class_name not in VALIDATOR_NAMES:
         dct[ 'baz' ] = 43
     else: dct[ 'baz' ] = [ 43 ]
-    with pytest.raises( exceptions.EntryImmutabilityError ):
+    with pytest.raises( exceptions.EntryImmutability ):
         del dct[ 'baz' ]
-    with pytest.raises( exceptions.EntryImmutabilityError ):
+    with pytest.raises( exceptions.EntryImmutability ):
         if class_name not in VALIDATOR_NAMES:
             dct[ 'baz' ] = 42
         else: dct[ 'baz' ] = [ 43 ]
     dct[ 'abc' ].append( 12 )
     assert 12 == dct[ 'abc' ][ 0 ]
-    with pytest.raises( exceptions.EntryImmutabilityError ):
+    with pytest.raises( exceptions.EntryImmutability ):
         del dct[ 'abc' ]
-    with pytest.raises( exceptions.EntryImmutabilityError ):
+    with pytest.raises( exceptions.EntryImmutability ):
         if class_name not in VALIDATOR_NAMES:
             dct[ 'abc' ] = 666
         else: dct[ 'abc' ] = [ 666 ]
@@ -397,9 +397,9 @@ def test_202_validator_dictionary_entry_accretion( module_qname, class_name ):
     dct = factory( *posargs, **nomargs )
     value = [ ] if class_name in PRODUCER_NAMES else 42
     dct[ 'foo' ] = value
-    with pytest.raises( exceptions.EntryValidityError ):
+    with pytest.raises( exceptions.EntryInvalidity ):
         dct[ 'bar' ] = 'invalid value'
-    with pytest.raises( exceptions.EntryImmutabilityError ):
+    with pytest.raises( exceptions.EntryImmutability ):
         dct[ 'foo' ] = value
     if class_name in PRODUCER_NAMES:
         lst = dct[ 'baz' ]
@@ -419,7 +419,7 @@ def test_205_producer_validator_invalid_production( module_qname, class_name ):
     factory = getattr( module, class_name )
     # Producer that returns invalid values (not a list)
     dct = factory( lambda: 42, lambda k, v: isinstance( v, list ) )
-    with pytest.raises( exceptions.EntryValidityError ):
+    with pytest.raises( exceptions.EntryInvalidity ):
         _ = dct[ 'foo' ]  # Production should fail validation
 
 
@@ -436,16 +436,16 @@ def test_210_dictionary_entry_accretion_via_update( module_qname, class_name ):
     dct = factory( *posargs, **nomargs )
     simple_posargs, simple_nomargs = select_simple_arguments( class_name )
     dct.update( *simple_posargs, **simple_nomargs )
-    with pytest.raises( exceptions.EntryImmutabilityError ):
+    with pytest.raises( exceptions.EntryImmutability ):
         del dct[ 'foo' ]
-    with pytest.raises( exceptions.EntryImmutabilityError ):
+    with pytest.raises( exceptions.EntryImmutability ):
         if class_name not in PRODUCER_VALIDATOR_NAMES: dct[ 'foo' ] = 666
         else: dct[ 'foo' ] = [ 666 ]
     if class_name not in PRODUCER_VALIDATOR_NAMES: dct[ 'baz' ] = 43
     else: dct[ 'baz' ] = [ 43 ]
-    with pytest.raises( exceptions.EntryImmutabilityError ):
+    with pytest.raises( exceptions.EntryImmutability ):
         del dct[ 'baz' ]
-    with pytest.raises( exceptions.EntryImmutabilityError ):
+    with pytest.raises( exceptions.EntryImmutability ):
         if class_name not in PRODUCER_VALIDATOR_NAMES: dct[ 'baz' ] = 42
         else: dct[ 'baz' ] = [ 42 ]
 
@@ -465,9 +465,9 @@ def test_211_validator_dictionary_entry_accretion_via_update(
     dct = factory( *posargs, **nomargs )
     value = [ ] if class_name in PRODUCER_NAMES else 42
     dct.update( foo = value )
-    with pytest.raises( exceptions.EntryValidityError ):
+    with pytest.raises( exceptions.EntryInvalidity ):
         dct.update( bar = 'invalid value' )
-    with pytest.raises( exceptions.EntryImmutabilityError ):
+    with pytest.raises( exceptions.EntryImmutability ):
         dct[ 'foo' ] = value
 
 
@@ -478,7 +478,7 @@ def test_211_validator_dictionary_entry_accretion_via_update(
 def test_212_update_with_existing_key_raises_immutability_error(
     module_qname, class_name
 ):
-    ''' Update raises EntryImmutabilityError for existing keys. '''
+    ''' Update raises EntryImmutability for existing keys. '''
     module = cache_import_module( module_qname )
     exceptions = cache_import_module( f"{PACKAGE_NAME}.exceptions" )
     factory = getattr( module, class_name )
@@ -492,11 +492,11 @@ def test_212_update_with_existing_key_raises_immutability_error(
         dictionary[ 'existing_key' ] = 42
         new_value = 999
         new_key_value = 100
-    with pytest.raises( exceptions.EntryImmutabilityError ):
+    with pytest.raises( exceptions.EntryImmutability ):
         dictionary.update( [ ( 'existing_key', new_value ) ] )
-    with pytest.raises( exceptions.EntryImmutabilityError ):
+    with pytest.raises( exceptions.EntryImmutability ):
         dictionary.update( existing_key = new_value )
-    with pytest.raises( exceptions.EntryImmutabilityError ):
+    with pytest.raises( exceptions.EntryImmutability ):
         dictionary.update(
             [ ( 'new_key', new_key_value ), ( 'existing_key', new_value ) ] )
     assert dictionary[ 'existing_key' ] == (
@@ -652,7 +652,7 @@ def test_230_string_representation( module_qname, class_name ):
     cdct = dict( dct )
     assert str( cdct ) == str( dct )
     assert str( cdct ) in repr( dct )
-    assert base.calculate_fqname( dct ) in repr( dct )
+    assert base.ccutils.qualify_class_name( type( dct ) ) in repr( dct )
 
 
 @pytest.mark.parametrize(
@@ -707,7 +707,7 @@ def test_250_with_data( module_qname, class_name ):
     if class_name in PRODUCER_NAMES:
         assert isinstance( d2[ 'x' ], list )
     if class_name in VALIDATOR_NAMES:
-        with pytest.raises( exceptions.EntryValidityError ):
+        with pytest.raises( exceptions.EntryInvalidity ):
             d2[ 'y' ] = 'invalid'
 
 

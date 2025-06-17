@@ -15,7 +15,9 @@ license = 'Apache-2.0'
 readme = { 'file' = 'README.rst', 'content-type' = 'text/x-rst' }
 requires-python = '>= 3.10'
 dependencies = [
-  'absence',
+  'absence~=1.1',
+  'classcore~=1.5',
+  'dynadoc~=1.2',
   'typing-extensions',
   # --- BEGIN: Injected by Copier ---
   # --- END: Injected by Copier ---
@@ -54,6 +56,7 @@ year-of-origin = 2024
 gha-runners = [
   '/home/runner/work/python-accretive/python-accretive/',
   '/Users/runner/work/python-accretive/python-accretive/',
+  'C:\a\python-accretive\python-accretive\',
   'D:\a\python-accretive\python-accretive\',
 ]
 [tool.coverage.run]
@@ -95,9 +98,7 @@ description = ''' Development environment. '''
 dependencies = [
   'Jinja2',
   'coverage[toml]',
-  'emcd-projects',
   'furo',
-  'icecream',
   'packaging',
   'pre-commit',
   'pyright',
@@ -120,27 +121,31 @@ PYTHONUNBUFFERED = 'TRUE' # TODO: Only for coverage/pytest.
 # --- END: Injected by Copier ---
 [tool.hatch.envs.develop.scripts]
 docsgen = [
-  '''sphinx-build -E -b doctest -d .auxiliary/caches/sphinx \
-     documentation .auxiliary/artifacts/sphinx-doctest''',
-  '''sphinx-build -E -b linkcheck -d .auxiliary/caches/sphinx \
-     documentation .auxiliary/artifacts/sphinx-linkcheck''',
-  '''sphinx-build -a -d .auxiliary/caches/sphinx \
-     documentation .auxiliary/artifacts/sphinx-html''',
+  """sphinx-build -E -b linkcheck -d .auxiliary/caches/sphinx \
+     documentation .auxiliary/artifacts/sphinx-linkcheck""",
+  """sphinx-build -a -d .auxiliary/caches/sphinx \
+     documentation .auxiliary/artifacts/sphinx-html""",
 ]
 linters = [
-  '''ruff check --quiet sources documentation tests''',
+  """ruff check --quiet sources documentation tests""",
   # --- BEGIN: Injected by Copier ---
   # --- END: Injected by Copier ---
-  '''pyright sources''',
+  """pyright sources""",
 ]
 packagers = [
-  '''hatch build''',
+  """hatch build""",
   # --- BEGIN: Injected by Copier ---
   # --- END: Injected by Copier ---
 ]
-testers = [
+testers-no-reports = [
   'coverage erase',
   'coverage run',
+  """coverage run -m sphinx.cmd.build \
+     -E -b doctest -d .auxiliary/caches/sphinx \
+     documentation .auxiliary/artifacts/sphinx-doctest""",
+]
+testers = [
+  'testers-no-reports',
   'coverage combine',
   'coverage report --skip-covered',
   'coverage html',
@@ -179,7 +184,7 @@ strict = false
 
 # https://microsoft.github.io/pyright/#/configuration
 [tool.pyright]
-ignore = [ 'tests' ] # Stronger hint for language server.
+ignore = [ 'documentation', 'tests' ] # Stronger hint for language server.
 include = [ 'sources' ]
 reportConstantRedefinition = true
 reportInvalidTypeVarUse = true

@@ -77,7 +77,7 @@ Existing entries cannot be altered.
     >>> readers[ 'xml' ] = toml_reader
     Traceback (most recent call last):
     ...
-    accretive.exceptions.EntryImmutabilityError: Cannot alter or remove existing entry for 'xml'.
+    accretive.exceptions.EntryImmutability: Could not alter or remove existing entry for 'xml'.
 
 Or removed.
 
@@ -86,7 +86,7 @@ Or removed.
     >>> del readers[ 'xml' ]
     Traceback (most recent call last):
     ...
-    accretive.exceptions.EntryImmutabilityError: Cannot alter or remove existing entry for 'xml'.
+    accretive.exceptions.EntryImmutability: Could not alter or remove existing entry for 'xml'.
 
 (Seems like XML is here to stay.)
 
@@ -213,7 +213,7 @@ When operands have overlapping keys, an error is raised:
     >>> formats | conflicting
     Traceback (most recent call last):
     ...
-    accretive.exceptions.EntryImmutabilityError: Cannot alter or remove existing entry for 'json'.
+    accretive.exceptions.EntryImmutability: Could not alter or remove existing entry for 'json'.
 
 Intersections
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -362,7 +362,7 @@ Invalid entries are rejected.
     >>> numbers[ 'e' ] = 2.718
     Traceback (most recent call last):
     ...
-    accretive.exceptions.EntryValidityError: Cannot add invalid entry with key, 'e', and value, 2.718, to dictionary.
+    accretive.exceptions.EntryInvalidity: Could not add invalid entry with key, 'e', and value, 2.718, to dictionary.
 
 This includes attempts to add invalid entries via update.
 
@@ -371,7 +371,7 @@ This includes attempts to add invalid entries via update.
     >>> numbers.update( phi = 1.618 )
     Traceback (most recent call last):
     ...
-    accretive.exceptions.EntryValidityError: Cannot add invalid entry with key, 'phi', and value, 1.618, to dictionary.
+    accretive.exceptions.EntryInvalidity: Could not add invalid entry with key, 'phi', and value, 1.618, to dictionary.
 
 Producer-Validator Dictionary
 -------------------------------------------------------------------------------
@@ -414,11 +414,11 @@ Invalid entries are rejected, whether assigned directly or via update.
     >>> registries[ 'modules' ] = { }  # Not a list
     Traceback (most recent call last):
     ...
-    accretive.exceptions.EntryValidityError: Cannot add invalid entry with key, 'modules', and value, {}, to dictionary.
+    accretive.exceptions.EntryInvalidity: Could not add invalid entry with key, 'modules', and value, {}, to dictionary.
     >>> registries.update( callbacks = set( ) )  # Not a list
     Traceback (most recent call last):
     ...
-    accretive.exceptions.EntryValidityError: Cannot add invalid entry with key, 'callbacks', and value, set(), to dictionary.
+    accretive.exceptions.EntryInvalidity: Could not add invalid entry with key, 'callbacks', and value, set(), to dictionary.
 
 If the producer returns an invalid value, the entry is rejected.
 
@@ -431,4 +431,4 @@ If the producer returns an invalid value, the entry is rejected.
     >>> bad_registries[ 'anything' ]  # Production fails validation
     Traceback (most recent call last):
     ...
-    accretive.exceptions.EntryValidityError: Cannot add invalid entry with key, 'anything', and value, {}, to dictionary.
+    accretive.exceptions.EntryInvalidity: Could not add invalid entry with key, 'anything', and value, {}, to dictionary.

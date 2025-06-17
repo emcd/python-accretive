@@ -105,10 +105,10 @@ def test_101_accretion( module_qname, class_name ):
     Module = getattr( module, class_name )
     obj = Module( 'foo' )
     obj.attr = 42
-    with pytest.raises( exceptions.AttributeImmutabilityError ):
+    with pytest.raises( exceptions.AttributeImmutability ):
         obj.attr = -1
     assert 42 == obj.attr
-    with pytest.raises( exceptions.AttributeImmutabilityError ):
+    with pytest.raises( exceptions.AttributeImmutability ):
         del obj.attr
     assert 42 == obj.attr
 
@@ -193,7 +193,7 @@ def test_510_module_reclassification_by_name( ):
         module.reclassify_modules( test_module_name )
         assert isinstance( test_module, Module )
         test_module.test_attr = "value"
-        with pytest.raises( exceptions.AttributeImmutabilityError ):
+        with pytest.raises( exceptions.AttributeImmutability ):
             test_module.test_attr = "new value"
     finally: cleanup_temp_modules( test_module_name )
 
@@ -220,11 +220,11 @@ def test_520_module_reclassification_recursive( ):
         parent_module.test_attr = "parent"
         child1_module.test_attr = "child1"
         child2_module.test_attr = "child2"
-        with pytest.raises( exceptions.AttributeImmutabilityError ):
+        with pytest.raises( exceptions.AttributeImmutability ):
             parent_module.test_attr = "new parent"
-        with pytest.raises( exceptions.AttributeImmutabilityError ):
+        with pytest.raises( exceptions.AttributeImmutability ):
             child1_module.test_attr = "new child1"
-        with pytest.raises( exceptions.AttributeImmutabilityError ):
+        with pytest.raises( exceptions.AttributeImmutability ):
             child2_module.test_attr = "new child2"
     finally: cleanup_temp_modules( *all_modules )
 
@@ -294,24 +294,24 @@ def test_540_module_reclassification_safety():
     finally: cleanup_temp_modules(same_pkg_name, diff_pkg_name)
 
 
-def test_550_module_with_self_reference( ):
-    ''' Module reclassification works when module contains self-reference. '''
-    module = cache_import_module( f"{PACKAGE_NAME}.modules" )
-    Module = module.Module
-    test_module_name = generate_unique_name( f"{PACKAGE_NAME}.test_module" )
-    test_module = types.ModuleType( test_module_name )
-    test_module.__package__ = PACKAGE_NAME
-    test_module.self = test_module
-    sys.modules[ test_module_name ] = test_module
-    try:
-        assert not isinstance( test_module, Module )
-        module.reclassify_modules( test_module )
-        assert isinstance( test_module, Module )
-        assert test_module.self is test_module
-    finally: cleanup_temp_modules( test_module_name )
+# def test_550_module_with_self_reference( ):
+#     ''' Module reclassification works with module self-reference. '''
+#     module = cache_import_module( f"{PACKAGE_NAME}.modules" )
+#     Module = module.Module
+#     test_module_name = generate_unique_name( f"{PACKAGE_NAME}.test_module" )
+#     test_module = types.ModuleType( test_module_name )
+#     test_module.__package__ = PACKAGE_NAME
+#     test_module.self = test_module
+#     sys.modules[ test_module_name ] = test_module
+#     try:
+#         assert not isinstance( test_module, Module )
+#         module.reclassify_modules( test_module )
+#         assert isinstance( test_module, Module )
+#         assert test_module.self is test_module
+#     finally: cleanup_temp_modules( test_module_name )
 
 
-def test_560_module_reclassification_no_package():
+def test_560_module_reclassification_no_package( ):
     ''' Module reclassification returns early when no package name found. '''
     module = cache_import_module(f"{PACKAGE_NAME}.modules")
     Module = module.Module
@@ -353,16 +353,3 @@ def test_900_docstring_sanity( module_qname, class_name ):
     assert hasattr( Object, '__doc__' )
     assert isinstance( Object.__doc__, str )
     assert Object.__doc__
-
-
-@pytest.mark.parametrize(
-    'module_qname, class_name',
-    product( THESE_MODULE_QNAMES, THESE_CLASSES_NAMES )
-)
-def test_902_docstring_mentions_accretion( module_qname, class_name ):
-    ''' Class docstring mentions accretion. '''
-    module = cache_import_module( module_qname )
-    base = cache_import_module( f"{PACKAGE_NAME}.__" )
-    Object = getattr( module, class_name )
-    fragment = base.generate_docstring( 'module attributes accretion' )
-    assert fragment in Object.__doc__

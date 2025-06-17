@@ -1,5 +1,5 @@
 # Changes here will be overwritten by Copier
-_commit: v1.16
+_commit: v1.22
 _src_path: gh:emcd/python-project-common
 author_email: emcd@users.noreply.github.com
 author_name: Eric McDonald
@@ -12,10 +12,8 @@ enable_publication: true
 enable_rust_extension: false
 gh_owner: emcd
 include_data_resources: false
-inject_docstring_utils: true
 inject_exceptions: true
 inject_foundations: true
-inject_immutables: true
 package_name: accretive
 project_name: python-accretive
 pypy_versions:

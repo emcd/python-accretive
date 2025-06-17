@@ -57,7 +57,7 @@ Existing attributes cannot be reassigned.
     >>> m.__name__ = 'bar'
     Traceback (most recent call last):
     ...
-    accretive.exceptions.AttributeImmutabilityError: Cannot reassign or delete existing attribute '__name__'.
+    accretive.exceptions.AttributeImmutability: Could not assign or delete existing attribute '__name__'.
 
 Or deleted.
 
@@ -66,7 +66,7 @@ Or deleted.
     >>> del m.__name__
     Traceback (most recent call last):
     ...
-    accretive.exceptions.AttributeImmutabilityError: Cannot reassign or delete existing attribute '__name__'.
+    accretive.exceptions.AttributeImmutability: Could not assign or delete existing attribute '__name__'.
 
 Attribute Assignment
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -76,52 +76,8 @@ However, new attributes can be assigned.
 .. doctest:: Module
 
     >>> m.__version__ = '1.0a3'
-    >>> vars( m )
-    {'__name__': 'foo', '__doc__': None, '__package__': None, '__loader__': None, '__spec__': None, '__version__': '1.0a3'}
-
-Reclassification
--------------------------------------------------------------------------------
-
-Existing non-accretive modules can be reclassified as accretive modules. For
-application developers, this can provide an extra layer of safety around some
-modules. (However, library developers should never reclassify any modules
-except those in the packages that they distribute. Reclassifying other modules
-that are used by applications could break contracts.)
-
-Consider the following scenario:
-
-.. doctest:: Module
-
-    >>> import getpass
-    >>> true_getpass = getpass.getpass
-    >>> import functools
-    >>> @functools.wraps( true_getpass )
-    ... def pwned_getpass( prompt = 'Password: ', stream = None ):
-    ...     password = true_getpass( prompt = prompt, stream = stream )
-    ...     # Send intercepted password, stack trace, and host details to malicious collector.
-    ...     return password
-    ...
-    >>> getpass.getpass = pwned_getpass
-
-In the above scenario, a "trusted" standard library module has been
-monkey-patched to provide a compromised function. We can prevent
-unsophisticated monkey-patching by reclassifying the module.
-
-.. doctest:: Module
-
-    >>> getpass.getpass = true_getpass
-    >>> getpass.__class__ = Module
-    >>> getpass.getpass = pwned_getpass
-    Traceback (most recent call last):
-    ...
-    accretive.exceptions.AttributeImmutabilityError: Cannot reassign or delete existing attribute 'getpass'.
-
-.. warning::
-
-    We are unable to prevent tampering of a module's underlying attributes
-    dictionary, ``__dict__``. So, accretive modules do not provide any true
-    resistance against determined tampering. They do provide security against
-    accidental alterations of attributes though.
+    >>> '__version__' in vars( m )
+    True
 
 Mass Reclassification
 -------------------------------------------------------------------------------

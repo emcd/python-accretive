@@ -28,12 +28,13 @@ Internal Development Interface
 Package ``accretive.__``
 ===============================================================================
 
+.. automodule:: accretive.__
+
 
 Module ``accretive.__.imports``
 -------------------------------------------------------------------------------
 
 .. automodule:: accretive.__.imports
-   :no-index:
 
 
 Module ``accretive.__.exceptions``
@@ -42,19 +43,13 @@ Module ``accretive.__.exceptions``
 .. automodule:: accretive.__.exceptions
 
 
-Module ``accretive.__.immutables``
--------------------------------------------------------------------------------
-
-.. automodule:: accretive.__.immutables
-
-
 Module ``accretive.__.dictionaries``
 -------------------------------------------------------------------------------
 
 .. automodule:: accretive.__.dictionaries
 
 
-Module ``accretive.__.docstrings``
+Module ``accretive.__.nomina``
 -------------------------------------------------------------------------------
 
-.. automodule:: accretive.__.docstrings
+.. automodule:: accretive.__.nomina

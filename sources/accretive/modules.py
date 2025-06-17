@@ -37,63 +37,48 @@
 
 
 from . import __
+from . import iclasses as _iclasses
 
 
-class Module( __.types.ModuleType ):
-    ''' Accretive modules. '''
+ModuleNamespaceDictionary: __.typx.TypeAlias = (
+    __.cabc.Mapping[ str, __.typx.Any ] )
 
-    def __delattr__( self, name: str ) -> None:
-        from .exceptions import AttributeImmutabilityError
-        raise AttributeImmutabilityError( name )
+ReclassifyModulesModuleArgument: __.typx.TypeAlias = __.typx.Annotated[
+    str | __.types.ModuleType | ModuleNamespaceDictionary,
+    __.ddoc.Doc( ''' Module, module name, or module namespace. ''' ),
+]
+ReclassifyModulesRecursiveArgument: __.typx.TypeAlias = __.typx.Annotated[
+    bool, __.ddoc.Doc( ''' Recursively reclassify package modules? ''' )
+]
 
-    def __setattr__( self, name: str, value: __.typx.Any ) -> None:
-        if hasattr( self, name ):
-            from .exceptions import AttributeImmutabilityError
-            raise AttributeImmutabilityError( name )
-        super( ).__setattr__( name, value )
 
-Module.__doc__ = __.generate_docstring(
-    Module, 'description of module', 'module attributes accretion' )
+class Module(
+    __.types.ModuleType,
+    metaclass = _iclasses.Class,
+    instances_assigner_core = _iclasses.assign_attribute_if_absent_mutable,
+):
+    ''' Accretive module. '''
+
+    _dynadoc_fragments_ = ( 'module', 'module conceal', 'module accrete' )
 
 
 def reclassify_modules(
-    attributes: __.typx.Annotated[
-        __.cabc.Mapping[ str, __.typx.Any ] | __.types.ModuleType | str,
-        __.typx.Doc(
-            'Module, module name, or dictionary of object attributes.' ),
-    ],
-    recursive: __.typx.Annotated[
-        bool, __.typx.Doc( 'Recursively reclassify package modules?' ),
-    ] = False,
+    module: ReclassifyModulesModuleArgument, /, *,
+    recursive: ReclassifyModulesRecursiveArgument = False,
 ) -> None:
     ''' Reclassifies modules to be accretive.
 
         Can operate on individual modules or entire package hierarchies.
 
-        Notes
-        -----
-        * Only converts modules within the same package to prevent unintended
-          modifications to external modules.
-        * When used with a dictionary, converts any module objects found as
-          values if they belong to the same package.
-        * Has no effect on already-accretive modules.
+        Only converts modules within the same package to prevent unintended
+        modifications to external modules.
+
+        When used with a dictionary, converts any module objects found as
+        values if they belong to the same package.
+
+        Has no effect on already-accretive modules.
     '''
-    from inspect import ismodule
-    from sys import modules
-    if isinstance( attributes, str ):
-        attributes = modules[ attributes ]
-    if isinstance( attributes, __.types.ModuleType ):
-        module = attributes
-        attributes = attributes.__dict__
-    else: module = None
-    package_name = (
-        attributes.get( '__package__' ) or attributes.get( '__name__' ) )
-    if not package_name: return
-    for value in attributes.values( ):
-        if not ismodule( value ): continue
-        if not value.__name__.startswith( f"{package_name}." ): continue
-        if recursive: reclassify_modules( value, recursive = True )
-        if isinstance( value, Module ): continue
-        value.__class__ = Module
-    if module and not isinstance( module, Module ):
-        module.__class__ = Module
+    __.ccstd.reclassify_modules(
+        module,
+        attributes_namer = __.calculate_attrname,
+        replacement_class = Module )
