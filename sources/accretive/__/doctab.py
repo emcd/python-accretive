@@ -20,15 +20,87 @@
 
 ''' Docstrings table for reuse across entities. '''
 
-# ruff: noqa: F403,F405
+
+from . import imports as __
 
 
-from __future__ import annotations
+fragments: __.cabc.Mapping[ str, str ] = __.types.MappingProxyType( {
 
-from .imports import *
+    'cfc class accrete':
+    ''' By default, accretes class attributes. ''',
 
+    'cfc class conceal':
+    ''' By default, conceals non-public class attributes. ''',
 
-TABLE: types.MappingProxyType[ str, str ] = types.MappingProxyType( {
+    'cfc class protect':
+    ''' By default, protects class attributes. ''',
+
+    'cfc dynadoc': ''' Applies Dynadoc decoration to classes. ''',
+
+    'cfc instance accrete':
+    ''' Produces classes which can accrete instance attributes. ''',
+
+    'cfc instance conceal':
+    ''' Produces classes which can conceal instance attributes. ''',
+
+    'cfc instance protect':
+    ''' Produces classes which can protect instance attributes. ''',
+
+    'cfc produce abstract base class':
+    ''' Produces abstract base classes compatible with :py:class:`abc.ABCMeta`.
+    ''',
+
+    'cfc produce dataclass':
+    ''' Produces inheritable dataclasses with keyword-only instantiation. ''',
+
+    'cfc produce protocol class':
+    ''' Produces :pep:`544` protocol classes. ''',
+
+    'class accretion':
+    ''' By default, class attributes are accretive. ''',
+
+    'class concealment':
+    ''' By default, non-public class attributes are invisible. ''',
+
+    'class protection':
+    ''' By default, class attributes are immutable. ''',
+
+    'class instance accrete':
+    ''' By default, accretes instance attributes. ''',
+
+    'class instance conceal':
+    ''' By default, conceals non-public instance attributes. ''',
+
+    'class instance protect':
+    ''' By default, protects instance attributes. ''',
+
+    'dataclass':
+    ''' Inheritable dataclass with keyword-only instantiation. ''',
+
+    'protocol class':
+    ''' Protocol class (:pep:`544`). Nominal and structural subtyping. ''',
+
+    'class dynadoc': ''' Is decorated by Dynadoc. ''',
+
+    'dictionary entries accrete': ''' Accretes dictionary entries. ''',
+
+    'dictionary entries produce':
+    ''' Produces default entries on attempt to access absent ones. ''',
+
+    'dictionary entries validate':
+    ''' Validates dictionary entries on initialization. ''',
+
+    'module':
+    ''' Python module class, derived from :py:class:`types.ModuleType`. ''',
+
+    'module conceal':
+    ''' By default, conceals non-public module attributes. ''',
+
+    'module protect':
+    ''' By default, protects module attributes. ''',
+
+    'namespace':
+    ''' Namespace object, modeled after :py:class:`types.SimpleNamespace. ''',
 
     'class attributes accretion': '''
 Prevents reassignment or deletion of class attributes after they have been
@@ -51,21 +123,6 @@ A namespace is an object, whose attributes can be determined from iterables and
 keyword arguments, at initialization time. The string representation of the
 namespace object reflects its current instance attributes. Modeled after
 :py:class:`types.SimpleNamespace`.
-''',
-
-    'dictionary entries accretion': '''
-Prevents alteration or removal of dictionary entries after they have been
-added. Only addition of new dictionary entries is permitted.
-''',
-
-    'dictionary entries production': '''
-When an attempt to access a missing entry is made, then the entry is added with
-a default value. Modeled after :py:class:`collections.defaultdict`.
-''',
-
-    'dictionary entries validation': '''
-When an attempt to add a new entry is made, then the entry is validated against
-supplied criteria. If validation fails, then the entry is rejected.
 ''',
 
     'instance attributes accretion': '''

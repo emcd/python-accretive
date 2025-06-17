@@ -29,25 +29,26 @@
 from . import __
 
 
-class Omniexception( __.ImmutableObject, BaseException ):
-    ''' Base for all exceptions raised by package API. '''
-
-    _attribute_visibility_includes_: __.cabc.Collection[ str ] = (
-        frozenset( ( '__cause__', '__context__', ) ) )
+class Omniexception(
+    __.frigid.Object, BaseException,
+    instances_visibles = (
+        '__cause__', '__context__', __.is_public_identifier ),
+):
+    ''' Base exceptions for package. '''
 
 
 class Omnierror( Omniexception, Exception ):
     ''' Base for error exceptions raised by package API. '''
 
 
-class AttributeImmutabilityError( Omnierror, AttributeError, TypeError ):
+class AttributeImmutability( Omnierror, AttributeError, TypeError ):
     ''' Attempt to reassign or delete immutable attribute. '''
 
     def __init__( self, name: str ) -> None:
         super( ).__init__( f"Cannot reassign or delete attribute {name!r}." )
 
 
-class DecoratorCompatibilityError( Omnierror, TypeError ):
+class DecoratorIncompatibility( Omnierror, TypeError ):
     ''' Attempt to apply decorator to incompatible class. '''
 
     def __init__( self, class_name: str, method_name: str ) -> None:
@@ -56,7 +57,7 @@ class DecoratorCompatibilityError( Omnierror, TypeError ):
             f"because it defines {method_name!r}.")
 
 
-class EntryImmutabilityError( Omnierror, TypeError ):
+class EntryImmutability( Omnierror, TypeError ):
     ''' Attempt to update or remove immutable dictionary entry. '''
 
     def __init__( self, indicator: __.cabc.Hashable ) -> None:
@@ -64,7 +65,7 @@ class EntryImmutabilityError( Omnierror, TypeError ):
             f"Cannot alter or remove existing entry for {indicator!r}." )
 
 
-class EntryValidityError( Omnierror, ValueError ):
+class EntryInvalidity( Omnierror, ValueError ):
     ''' Attempt to add invalid entry to dictionary. '''
 
     def __init__(
@@ -73,3 +74,10 @@ class EntryValidityError( Omnierror, ValueError ):
         super( ).__init__(
             f"Cannot add invalid entry with key, {indicator!r}, "
             f"and value, {value!r}, to dictionary." )
+
+
+class ErrorProvideFailure( Omnierror, RuntimeError ):
+
+    def __init__( self, name: str, reason: str ):
+        super( ).__init__(
+            f"Could not provide error class {name!r}. Reason: {reason}" )

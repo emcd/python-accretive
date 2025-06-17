@@ -21,29 +21,42 @@
 ''' Family of exceptions for package internals. '''
 
 
-from __future__ import annotations
-
 from . import imports as __
-from . import immutables as _immutables
+from . import nomina as _nomina
 
 
-class Omniexception( _immutables.ImmutableObject, BaseException ):
+class Omniexception(
+    __.frigid.Object, BaseException,
+    instances_visibles = (
+        '__cause__', '__context__', _nomina.is_public_identifier ),
+):
     ''' Base for all exceptions raised internally. '''
-
-    _attribute_visibility_includes_: __.cabc.Collection[ str ] = (
-        frozenset( ( '__cause__', '__context__', ) ) )
 
 
 class Omnierror( Omniexception, Exception ):
     ''' Base for error exceptions raised internally. '''
 
 
-class EntryImmutabilityError( Omnierror, TypeError ):
+class AttributeImmutability( Omnierror, AttributeError, TypeError ):
+    ''' Attempt to reassign or delete immutable attribute. '''
+
+    def __init__( self, name: str ) -> None:
+        super( ).__init__( f"Cannot reassign or delete attribute {name!r}." )
+
+
+class EntryImmutability( Omnierror, TypeError ):
     ''' Attempt to update or remove immutable dictionary entry. '''
 
     def __init__( self, indicator: __.cabc.Hashable ) -> None:
         super( ).__init__(
             f"Cannot alter or remove existing entry for {indicator!r}." )
+
+
+class ErrorProvideFailure( Omnierror, RuntimeError ):
+
+    def __init__( self, name: str, reason: str ):
+        super( ).__init__(
+            f"Could not provide error class {name!r}. Reason: {reason}" )
 
 
 class OperationInvalidity( Omnierror, RuntimeError, TypeError ):

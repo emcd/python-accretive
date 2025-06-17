@@ -43,10 +43,11 @@
 
 
 from . import __
-from . import objects as _objects
+from . import classes as _classes
 
 
-class Namespace( _objects.Object ):
+class Namespace( metaclass = _classes.Class ):
+    # TODO: Dynadoc fragments.
     ''' Accretive namespaces. '''
 
     def __init__(
@@ -61,22 +62,17 @@ class Namespace( _objects.Object ):
     def __repr__( self ) -> str:
         attributes = ', '.join( tuple(
             f"{key} = {value!r}" for key, value
-            in super( ).__getattribute__( '__dict__' ).items( ) ) )
-        fqname = __.calculate_fqname( self )
+            in getattr( self, '__dict__', { } ).items( ) ) )
+        fqname = __.ccutils.qualify_class_name( type( self ) )
         if not attributes: return f"{fqname}( )"
         return f"{fqname}( {attributes} )"
 
     def __eq__( self, other: __.typx.Any ) -> __.ComparisonResult:
-        mydict = super( ).__getattribute__( '__dict__' )
         if isinstance( other, ( Namespace, __.types.SimpleNamespace ) ):
-            return mydict == other.__dict__
+            return self.__dict__ == other.__dict__
         return NotImplemented
 
     def __ne__( self, other: __.typx.Any ) -> __.ComparisonResult:
-        mydict = super( ).__getattribute__( '__dict__' )
         if isinstance( other, ( Namespace, __.types.SimpleNamespace ) ):
-            return mydict != other.__dict__
+            return self.__dict__ != other.__dict__
         return NotImplemented
-
-Namespace.__doc__ = __.generate_docstring(
-    Namespace, 'description of namespace', 'instance attributes accretion' )
