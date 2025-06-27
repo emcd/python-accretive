@@ -16,207 +16,472 @@
    |                                                                          |
    +--------------------------------------------------------------------------+
 
+
+*******************************************************************************
 Classes
+*******************************************************************************
+
+
+Introduction
 ===============================================================================
 
-Standard Classes
+The package provides base classes, decorators, and class factory classes
+(metaclasses) to imbue classes, and the instances which they produce, with
+attributes concealment and accretion. Base classes, decorators, and class
+factories each provide different sets of behaviors.
+
+.. doctest:: Classes
+
+    >>> import accretive
+
+Class Factory Classes
+===============================================================================
+
+Class factory classes produce classes which accrete attributes. Instances of
+the produced classes have immutable attributes. Both the classes and their
+instances conceal attributes.
+
+.. doctest:: Classes
+
+    >>> class Point2d( metaclass = accretive.Class ):
+    ...     def __init__( self, x: float, y: float ) -> None:
+    ...         self.x = x
+    ...         self.y = y
+    ...
+    >>> point = Point2d( 5, 12 )
+
+Class Attributes Accretion
 -------------------------------------------------------------------------------
 
-Accretive classes are similar to standard Python classes, but with the added
-property that once an attribute is set, it cannot be altered or removed. This
-makes them useful for defining constants or configurations that should remain
-immutable once defined.
+We can assign new attributes on such classes:
 
 .. doctest:: Classes
 
-    >>> from accretive import Class
+    >>> Point2d.foo = 42
 
-Initialization
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Accretive classes can be defined using the `Class` metaclass. Attributes can be
-added during class definition.
+However, we cannot reassign or delete attributes on them:
 
 .. doctest:: Classes
 
-    >>> class Config( metaclass = Class ):
-    ...     host = 'localhost'
-    ...     port = 8080
-    >>> Config.host
-    'localhost'
-
-Immutability
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Existing attributes cannot be reassigned.
-
-.. doctest:: Classes
-
-    >>> Config.host = '127.0.0.1'
+    >>> Point2d.foo = 216
     Traceback (most recent call last):
     ...
-    accretive.exceptions.AttributeImmutability: Could not assign or delete existing attribute 'host'.
-
-Or deleted.
-
-.. doctest:: Classes
-
-    >>> del Config.port
+    accretive.exceptions.AttributeImmutability: Could not assign or delete attribute 'foo' on class ...
+    >>> del Point2d.foo
     Traceback (most recent call last):
     ...
-    accretive.exceptions.AttributeImmutability: Could not assign or delete existing attribute 'port'.
-
-Attribute Assignment
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-However, new attributes can be assigned.
-
-.. doctest:: Classes
-
-    >>> Config.new_feature = 'enabled'
-    >>> Config.new_feature
-    'enabled'
-
-Decorator Usage
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Accretive classes can also use decorators to modify class behavior. Decorators
-can add new attributes, but cannot modify existing ones.
-
-.. doctest:: Classes
-
-    >>> def add_version( cls ):
-    ...     cls.version = '1.0'
-    ...     return cls
-    >>> class AppConfig( metaclass = Class, decorators = ( add_version, ) ):
-    ...     name = 'MyApp'
-    >>> AppConfig.version
-    '1.0'
-    >>> AppConfig.name
-    'MyApp'
-    >>> AppConfig.name = 'NewApp'
+    accretive.exceptions.AttributeImmutability: Could not assign or delete attribute 'foo' on class ...
+    >>> del Point2d.__init__
     Traceback (most recent call last):
     ...
-    accretive.exceptions.AttributeImmutability: Could not assign or delete existing attribute 'name'.
+    accretive.exceptions.AttributeImmutability: Could not assign or delete attribute '__init__' on class ...
 
-Mutable Attributes
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Instance Attributes Immutability
+-------------------------------------------------------------------------------
 
-While accretive classes make attributes immutable by default after assignment,
-you can designate specific attributes as mutable using the ``mutables``
-parameter. This is useful for attributes that need to be updated or removed
-throughout the class lifecycle.
+We cannot assign or delete attributes on instances of these classes.
 
 .. doctest:: Classes
 
-    >>> class Configuration( metaclass = Class, class_mutables = ( 'version', ) ):
-    ...     name = 'MyApp'
-    ...     version = '1.0.0'
-    ...     release_date = '2025-01-01'
-
-    >>> # Standard immutable attributes behave as expected
-    >>> Configuration.name = 'NewApp'
+    >>> point.x = 42
     Traceback (most recent call last):
     ...
-    accretive.exceptions.AttributeImmutability: Could not assign or delete attribute 'name'.
+    accretive.exceptions.AttributeImmutability: Could not assign or delete attribute 'x' on instance of class ...
+    >>> del point.x
+    Traceback (most recent call last):
+    ...
+    accretive.exceptions.AttributeImmutability: Could not assign or delete attribute 'x' on instance of class ...
 
-    >>> # Mutable attributes can be modified
-    >>> Configuration.version = '1.0.1'
-    >>> Configuration.version
-    '1.0.1'
+Attributes Concealment
+-------------------------------------------------------------------------------
 
-    >>> # Mutable attributes can also be deleted
-    >>> del Configuration.version
-    >>> hasattr( Configuration, 'version' )
+Non-public attributes are concealed on both the classes and their instances.
+
+.. doctest:: Classes
+
+    >>> dir( Point2d )
+    ['foo']
+    >>> dir( point )
+    ['foo', 'x', 'y']
+
+
+Base Classes
+===============================================================================
+
+Base classes and their descendants have immutable attributes. Instances of
+these classes accrete attributes.
+
+.. doctest:: Classes
+
+    >>> class Point2d( accretive.Object ):
+    ...     def __init__( self, x: float, y: float ) -> None:
+    ...         self.x = x
+    ...         self.y = y
+    ...
+    >>> point = Point2d( 3, 4 )
+
+Class Attributes Immutability
+-------------------------------------------------------------------------------
+
+We cannot assign or delete attributes on these classes:
+
+.. doctest:: Classes
+
+    >>> Point2d.foo = 42
+    Traceback (most recent call last):
+    ...
+    accretive.exceptions.AttributeImmutability: Could not assign or delete attribute 'foo' on class ...
+    >>> del Point2d.foo
+    Traceback (most recent call last):
+    ...
+    accretive.exceptions.AttributeImmutability: Could not assign or delete attribute 'foo' on class ...
+    >>> del Point2d.__init__
+    Traceback (most recent call last):
+    ...
+    accretive.exceptions.AttributeImmutability: Could not assign or delete attribute '__init__' on class ...
+
+Instance Attributes Accretion
+-------------------------------------------------------------------------------
+
+We can assign new attributes on their instances:
+
+.. doctest:: Classes
+
+    >>> point.foo = 42
+
+However, we cannot reassign or delete attributes on them:
+
+.. doctest:: Classes
+
+    >>> point.foo = 216
+    Traceback (most recent call last):
+    ...
+    accretive.exceptions.AttributeImmutability: Could not assign or delete attribute 'foo' on instance of class ...
+    >>> point.x = 3
+    Traceback (most recent call last):
+    ...
+    accretive.exceptions.AttributeImmutability: Could not assign or delete attribute 'x' on instance of class ...
+    >>> del point.x
+    Traceback (most recent call last):
+    ...
+    accretive.exceptions.AttributeImmutability: Could not assign or delete attribute 'x' on instance of class ...
+
+Attributes Concealment
+-------------------------------------------------------------------------------
+
+Non-public attributes are concealed on both the classes and their instances.
+
+.. doctest:: Classes
+
+    >>> dir( Point2d )
+    []
+    >>> dir( point )
+    ['foo', 'x', 'y']
+
+
+Decorators
+===============================================================================
+
+Decorators cause classes to produce instances which accrete attributes.
+However, the classes, themselves, retain default Python behaviors (full
+mutability and visibility) with respect to their own attributes.
+
+.. doctest:: Classes
+
+    >>> @accretive.with_standard_behaviors
+    ... class Point2d:
+    ...     def __init__( self, x: float, y: float ) -> None:
+    ...         self.x = x
+    ...         self.y = y
+    ...
+    >>> point = Point2d( 8, 15 )
+    >>> type( Point2d )
+    <class 'type'>
+
+Class Attributes Mutability
+-------------------------------------------------------------------------------
+
+Per Python default behavior, class attributes are mutable:
+
+.. doctest:: Classes
+
+    >>> del Point2d.__init__
+
+Instance Attributes Accretion
+-------------------------------------------------------------------------------
+
+We can assign new attributes on instances:
+
+.. doctest:: Classes
+
+    >>> point.foo = 42
+
+However, we cannot reassign or delete attributes on them:
+
+.. doctest:: Classes
+
+    >>> point.foo = 216
+    Traceback (most recent call last):
+    ...
+    accretive.exceptions.AttributeImmutability: Could not assign or delete attribute 'foo' on instance of class ...
+    >>> point.x = 5
+    Traceback (most recent call last):
+    ...
+    accretive.exceptions.AttributeImmutability: Could not assign or delete attribute 'x' on instance of class ...
+    >>> del point.x
+    Traceback (most recent call last):
+    ...
+    accretive.exceptions.AttributeImmutability: Could not assign or delete attribute 'x' on instance of class ...
+
+Class Attributes Publicity
+-------------------------------------------------------------------------------
+
+Per Python default behavior, all class attributes are visible:
+
+.. doctest:: Classes
+
+    >>> '__init__' in dir( Point2d )
+    True
+
+Instance Attributes Concealment
+-------------------------------------------------------------------------------
+
+Non-public instance attributes are concealed:
+
+.. doctest:: Classes
+
+    >>> dir( point )
+    ['foo', 'x', 'y']
+
+
+Dataclasses
+===============================================================================
+
+The package also provides base classes, decorators, and class factories
+(metaclasses) to imbue :py:mod:`dataclasses`, and the instances which they
+produce, with attributes concealment and immutability.
+
+.. doctest:: Classes
+
+    >>> import accretive
+    >>> import dataclasses
+
+Inheriting from a standard base:
+
+.. doctest:: Classes
+
+    >>> class Point2d( accretive.DataclassObject ):
+    ...     x: float
+    ...     y: float
+    ...
+    >>> point = Point2d( x = 3, y = 4 )
+    >>> dataclasses.is_dataclass( Point2d )
+    True
+
+is essentially equivalent to producing a new class with a standard metaclass:
+
+.. doctest:: Classes
+
+    >>> class Point2d( metaclass = accretive.Dataclass ):
+    ...     x: float
+    ...     y: float
+    ...
+    >>> point = Point2d( x = 5, y = 12 )
+    >>> dataclasses.is_dataclass( Point2d )
+    True
+
+As can be seen above, dataclasses are produced without the need to explicitly
+decorate with the :py:func:`dataclasses.dataclass` decorator. And, speaking of
+decorators, one is provided which transforms a class into a dataclass with the
+standard behaviors (attributes concealment and immutability) of the package:
+
+.. doctest:: Classes
+
+    >>> @accretive.dataclass_with_standard_behaviors
+    ... class Point2d:
+    ...     x: float
+    ...     y: float
+    ...
+    >>> point = Point2d( x = 8, y = 15 )
+    >>> dataclasses.is_dataclass( Point2d )
+    True
+    >>> type( Point2d )
+    <class 'type'>
+
+
+Mutable Instances
+===============================================================================
+
+To produce classes with immutable attributes but instances with mutable
+attributes, there is a convenience class, ``ObjectMutable``.
+
+.. doctest:: Classes
+
+    >>> class Point2d( accretive.ObjectMutable ):
+    ...     def __init__( self, x: float, y: float ) -> None:
+    ...         self.x = x
+    ...         self.y = y
+    ...
+    >>> point = Point2d( 7, 24 )
+    >>> point.x, point.y = 20, 21
+    >>> point.x, point.y
+    (20, 21)
+
+Similarly, there is a convenience dataclass, ``DataclassObjectMutable``.
+
+.. doctest:: Classes
+
+    >>> class Point2d( accretive.DataclassObjectMutable ):
+    ...     x: float
+    ...     y: float
+    ...
+    >>> dataclasses.is_dataclass( Point2d )
+    True
+    >>> point = Point2d( x = 7, y = 24 )
+    >>> point.x, point.y = 20, 21
+    >>> point.x, point.y
+    (20, 21)
+
+The ``with_standard_behaviors`` decorator can also provide mutability by
+supplying the ``mutables`` argument as a wildcard:
+
+.. doctest:: Classes
+
+    >>> @accretive.with_standard_behaviors( mutables = '*' )
+    ... class Point2d:
+    ...     def __init__( self, x: float, y: float ) -> None:
+    ...         self.x = x
+    ...         self.y = y
+    ...
+    >>> point = Point2d( 7, 24 )
+    >>> point.x, point.y = 20, 21
+    >>> point.x, point.y
+    (20, 21)
+
+Likewise for the ``dataclass_with_standard_behaviors`` decorator:
+
+.. doctest:: Classes
+
+    >>> @accretive.dataclass_with_standard_behaviors( mutables = '*' )
+    ... class Point2d:
+    ...     x: float
+    ...     y: float
+    ...
+    >>> point = Point2d( x = 7, y = 24 )
+    >>> point.x, point.y = 20, 21
+    >>> point.x, point.y
+    (20, 21)
+
+
+Attribute Preallocations
+===============================================================================
+
+You can preallocate attributes using the standard Python ``__slots__``
+mechanism. In addition to potential performance gains for attribute lookups,
+this can be useful if you are making a namespace class and want to keep the
+namespace dictionary free of record-keeping attributes. You cannot inherit a
+standard base class, such as ``Object``, for this purpose, as it is
+``__dict__``-based. However, you can create the namespace class via metaclass.
+
+.. doctest:: Classes
+
+    >>> class Namespace( metaclass = accretive.Class ):
+    ...     __slots__ = ( '__dict__', )
+    ...     def __init__( self, **arguments: float ) -> None:
+    ...         self.__dict__.update( arguments )
+    ...
+    >>> ns = Namespace( x = 20, y = 21 )
+    >>> ns.__slots__
+    ('__dict__', '_accretive_instance_behaviors_')
+    >>> 'x' in ns.__dict__
+    True
+    >>> '_accretive_instance_behaviors_' in ns.__dict__
     False
+    >>> ns.x, ns.y
+    (20, 21)
 
-    >>> # New mutable attributes can be added later
-    >>> Configuration.version = '1.1.0'
-    >>> Configuration.version
-    '1.1.0'
-
-Abstract Base Classes
--------------------------------------------------------------------------------
-
-The ``AbstractBaseClass`` metaclass creates accretive abstract base classes.
-This is particularly useful for defining interfaces that can be extended but
-not modified after definition. All of the behaviors mentioned for standard
-classes also apply to these.
+The mapping form of ``__slots__`` is also supported.
 
 .. doctest:: Classes
 
-    >>> from accretive import AbstractBaseClass
-    >>> from abc import abstractmethod
-
-    >>> class DataStore( metaclass = AbstractBaseClass ):
-    ...     @abstractmethod
-    ...     def get( self, key ): pass
+    >>> class Namespace( metaclass = accretive.Class ):
+    ...     __slots__ = { '__dict__': 'Namespace attributes.' }
+    ...     def __init__( self, **arguments: float ):
+    ...         self.__dict__.update( arguments )
     ...
-    ...     @abstractmethod
-    ...     def put( self, key, value ): pass
-    ...
-    ...     ENCODING = 'utf-8'
+    >>> ns = Namespace( x = 20, y = 21 )
+    >>> ns.__slots__[ '__dict__' ]
+    'Namespace attributes.'
 
-The abstract methods and class attributes are protected from modification:
+
+Integrations with Custom Behaviors
+===============================================================================
+
+You can define dunder methods, like ``__delattr__``, ``__setattr__``, and
+``__dir__``, and they will be automatically wrapped by the decorators which
+setup attributes concealment and immutability enforcement on classes.
 
 .. doctest:: Classes
 
-    >>> def new_method( self ): pass
-    >>> DataStore.list_keys = new_method  # Attempt to replace
-    >>> # Cannot modify class attributes
-    >>> DataStore.ENCODING = 'ascii'  # Attempt to modify
-    Traceback (most recent call last):
+    >>> class Point2d( accretive.ObjectMutable ):
+    ...     def __init__( self, x: float, y: float ) -> None:
+    ...         super( ).__init__( )
+    ...         self.x = x
+    ...         self.y = y
+    ...     def __delattr__( self, name: str ) -> None:
+    ...         if not name.startswith( '_' ): print( name )
+    ...         super( ).__delattr__( name )
+    ...     def __setattr__( self, name: str, value ) -> None:
+    ...         if not name.startswith( '_' ): print( f"{name} = {value!r}" )
+    ...         super( ).__setattr__( name, value )
+    ...     def __dir__( self ):
+    ...         print( 'called dir' )
+    ...         return super( ).__dir__( )
     ...
-    accretive.exceptions.AttributeImmutability: Could not assign or delete existing attribute 'ENCODING'.
+    >>> point = Point2d( 3, 4 )
+    x = 3
+    y = 4
+    >>> point.x, point.y = 5, 12
+    x = 5
+    y = 12
+    >>> del point.y
+    y
+    >>> 'x' in dir( point )
+    called dir
+    True
 
-However, new abstract methods and class attributes can be added:
+The integration points work correctly with inheritance. Furthermore, the
+standard behaviors (concealment and immutability) are idempotent, which
+improves their performance in class hierarchies.
 
 .. doctest:: Classes
 
-    >>> # Adding a new abstract method is permitted
-    >>> @abstractmethod
-    ... def delete( self, key ): pass
-    >>> DataStore.delete = delete
-    >>> # Adding a new class attribute is permitted
-    >>> DataStore.TIMEOUT = 30
-
-Protocol Classes
--------------------------------------------------------------------------------
-
-The ``ProtocolClass`` metaclass creates accretive protocol classes, which is
-useful for defining type interfaces that can be extended but not modified. All
-of the behaviors mentioned for standard classes also apply to these.
-
-.. doctest:: Classes
-
-    >>> from accretive import ProtocolClass
-    >>> from typing import Protocol
-
-    >>> class Comparable( Protocol, metaclass = ProtocolClass ):
-    ...     def __lt__( self, other ) -> bool: ...
-    ...     def __gt__( self, other ) -> bool: ...
+    >>> class Point3d( Point2d ):
+    ...     def __init__( self, x: float, y: float, z: float ) -> None:
+    ...         super( ).__init__( x, y )
+    ...         self.z = z
+    ...     def __delattr__( self, name: str ) -> None:
+    ...         if name == 'z': print( 'Z!' )
+    ...         super( ).__delattr__( name )
+    ...     def __setattr__( self, name: str, value ) -> None:
+    ...         if name == 'z': print( 'Z!' )
+    ...         super( ).__setattr__( name, value )
+    ...     def __dir__( self ):
+    ...         print( 'called dir in 3D' )
+    ...         return super( ).__dir__( )
     ...
-    ...     ORDERING = 'natural'
-
-The existing protocol interface is protected from modification:
-
-.. doctest:: Classes
-
-    >>> # Cannot modify existing protocol method
-    >>> def lt( self, other ) -> bool: ...
-    >>> Comparable.__lt__ = lt  # Attempt to replace
-    Traceback (most recent call last):
-    ...
-    accretive.exceptions.AttributeImmutability: Could not assign or delete existing attribute '__lt__'.
-    >>> # Cannot modify existing class attributes
-    >>> Comparable.ORDERING = 'reverse'  # Attempt to modify
-    Traceback (most recent call last):
-    ...
-    accretive.exceptions.AttributeImmutability: Could not assign or delete existing attribute 'ORDERING'.
-
-However, new protocol methods and class attributes can be added:
-
-.. doctest:: Classes
-
-    >>> # Adding new class attributes is permitted
-    >>> Comparable.COMPARISON_MODE = 'strict'
+    >>> point3 = Point3d( 5, 12, 17 )
+    x = 5
+    y = 12
+    Z!
+    z = 17
+    >>> point3.z = 60
+    Z!
+    z = 60
+    >>> del point3.z
+    Z!
+    z
+    >>> 'z' not in dir( point3 )
+    called dir in 3D
+    called dir
+    True
