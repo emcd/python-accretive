@@ -258,27 +258,15 @@ Dataclasses
 ===============================================================================
 
 The package also provides base classes, decorators, and class factories
-(metaclasses) to imbue :py:mod:`dataclasses`, and the instances which they
-produce, with attributes concealment and immutability.
+(metaclasses) to imbue :py:mod:`dataclasses` with the same standard behaviors
+as seen above.
 
 .. doctest:: Classes
 
     >>> import accretive
     >>> import dataclasses
 
-Inheriting from a standard base:
-
-.. doctest:: Classes
-
-    >>> class Point2d( accretive.DataclassObject ):
-    ...     x: float
-    ...     y: float
-    ...
-    >>> point = Point2d( x = 3, y = 4 )
-    >>> dataclasses.is_dataclass( Point2d )
-    True
-
-is essentially equivalent to producing a new class with a standard metaclass:
+New dataclasses with accretive class attributes can be produced via metaclass.
 
 .. doctest:: Classes
 
@@ -290,10 +278,23 @@ is essentially equivalent to producing a new class with a standard metaclass:
     >>> dataclasses.is_dataclass( Point2d )
     True
 
+New dataclasses with accretive instance attributes can inherit from a base.
+
+.. doctest:: Classes
+
+    >>> class Point2d( accretive.DataclassObject ):
+    ...     x: float
+    ...     y: float
+    ...
+    >>> point = Point2d( x = 3, y = 4 )
+    >>> dataclasses.is_dataclass( Point2d )
+    True
+
 As can be seen above, dataclasses are produced without the need to explicitly
 decorate with the :py:func:`dataclasses.dataclass` decorator. And, speaking of
 decorators, one is provided which transforms a class into a dataclass with the
-standard behaviors (attributes concealment and immutability) of the package:
+standard behaviors (instance attributes concealment and accretion) of the
+package:
 
 .. doctest:: Classes
 
@@ -419,7 +420,7 @@ Integrations with Custom Behaviors
 
 You can define dunder methods, like ``__delattr__``, ``__setattr__``, and
 ``__dir__``, and they will be automatically wrapped by the decorators which
-setup attributes concealment and immutability enforcement on classes.
+setup attributes concealment and accretion enforcement on classes.
 
 .. doctest:: Classes
 
@@ -451,7 +452,7 @@ setup attributes concealment and immutability enforcement on classes.
     True
 
 The integration points work correctly with inheritance. Furthermore, the
-standard behaviors (concealment and immutability) are idempotent, which
+standard behaviors (concealment and accretion) are idempotent, which
 improves their performance in class hierarchies.
 
 .. doctest:: Classes
