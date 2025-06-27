@@ -46,7 +46,7 @@ from . import __
 from . import iclasses as _iclasses
 
 
-class Namespace(
+class Namespace( # noqa: PLW1641
     metaclass = _iclasses.Class,
     instances_assigner_core = _iclasses.assign_attribute_if_absent_mutable,
 ):
