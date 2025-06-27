@@ -90,4 +90,4 @@ accretive modules.
 .. code-block:: python
 
     from accretive import reclassify_modules
-    reclassify_modules( globals( ) )
+    reclassify_modules( __name__ )
