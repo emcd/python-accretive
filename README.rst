@@ -108,11 +108,11 @@ forms of initialization.)
 >>> ns.apples = 14    # ❌ Attempted reassignment raises error.
 Traceback (most recent call last):
 ...
-accretive.exceptions.AttributeImmutability: Could not reassign or delete existing attribute 'apples'.
+accretive.exceptions.AttributeImmutability: Could not assign or delete existing attribute 'apples'.
 >>> del ns.apples     # ❌ Attempted deletion raises error.
 Traceback (most recent call last):
 ...
-accretive.exceptions.AttributeImmutability: Could not reassign or delete existing attribute 'apples'.
+accretive.exceptions.AttributeImmutability: Could not assign or delete existing attribute 'apples'.
 >>> ns
 accretive.namespaces.Namespace( apples = 12, bananas = 6, cherries = 42 )
 
@@ -158,7 +158,7 @@ The ``accretive`` decorator can be applied to any class to make its instances en
 >>> config.debug = False   # ❌ Attempted reassignment raises error
 Traceback (most recent call last):
 ...
-accretive.exceptions.AttributeImmutability: Could not reassign or delete existing attribute 'debug'.
+accretive.exceptions.AttributeImmutability: Could not assign or delete existing attribute 'debug'.
 
 
 Use Cases 🎯
