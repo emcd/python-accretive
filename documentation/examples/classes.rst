@@ -32,6 +32,7 @@ factories each provide different sets of behaviors.
 
 .. doctest:: Classes
 
+    >>> import typing
     >>> import accretive
 
 Class Factory Classes
@@ -328,6 +329,15 @@ attributes, there is a convenience class, ``ObjectMutable``.
     >>> point.x, point.y
     (20, 21)
 
+with a protocol variant:
+
+.. doctest:: Classes
+
+    >>> class Point2d( accretive.ProtocolMutable, typing.Protocol ):
+    ...     def __init__( self, x: float, y: float ) -> None:
+    ...         self.x = x
+    ...         self.y = y
+
 Similarly, there is a convenience dataclass, ``DataclassObjectMutable``.
 
 .. doctest:: Classes
@@ -342,6 +352,17 @@ Similarly, there is a convenience dataclass, ``DataclassObjectMutable``.
     >>> point.x, point.y = 20, 21
     >>> point.x, point.y
     (20, 21)
+
+with a protocol variant:
+
+.. doctest:: Classes
+
+    >>> class Point2d( accretive.DataclassProtocolMutable, typing.Protocol ):
+    ...     x: float
+    ...     y: float
+    ...
+    >>> dataclasses.is_dataclass( Point2d )
+    True
 
 The ``with_standard_behaviors`` decorator can also provide mutability by
 supplying the ``mutables`` argument as a wildcard:
@@ -372,6 +393,87 @@ Likewise for the ``dataclass_with_standard_behaviors`` decorator:
     >>> point.x, point.y = 20, 21
     >>> point.x, point.y
     (20, 21)
+
+
+Selective Mutability
+===============================================================================
+
+Explicit attribute names for selective mutability:
+
+.. doctest:: Classes
+
+    >>> @accretive.dataclass_with_standard_behaviors( mutables = ( 'x', 'y' ) )
+    ... class Point2d:
+    ...     x: float
+    ...     y: float
+    ...
+    >>> point = Point2d( x = 8, y = 15 )
+    >>> point.x, point.y = 7, 24
+    >>> point.x, point.y
+    (7, 24)
+    >>> del point.x
+    >>> point.__slots__ = ( )
+    Traceback (most recent call last):
+    ...
+    accretive.exceptions.AttributeImmutability: Could not assign or delete attribute '__slots__' on instance of class ...
+
+With a regular expression in the mix:
+
+.. doctest:: Classes
+
+    >>> import re
+    >>> regex = re.compile( r'''cache_.*''' )
+    >>> @accretive.dataclass_with_standard_behaviors( mutables = ( 'x', 'y', regex ) )
+    ... class Point2d:
+    ...     x: float
+    ...     y: float
+    ...     cache_area: float = dataclasses.field( init = False )
+    ...     cache_hypotenuse: float = dataclasses.field( init = False )
+    ...
+    >>> point = Point2d( x = 7, y = 24 )
+    >>> point.x, point.y = 20, 21
+    >>> point.x, point.y
+    (20, 21)
+    >>> point.cache_hypotenuse = 28 # initial accretion
+    >>> point.cache_hypotenuse = 29 # correction on mutable
+    >>> del point.cache_hypotenuse
+    >>> point.__slots__ = ( )
+    Traceback (most recent call last):
+    ...
+    accretive.exceptions.AttributeImmutability: Could not assign or delete attribute '__slots__' on instance of class ...
+    >>> del point.__annotations__
+    Traceback (most recent call last):
+    ...
+    accretive.exceptions.AttributeImmutability: Could not assign or delete attribute '__annotations__' on instance of class ...
+
+Or with a predicate:
+
+.. doctest:: Classes
+
+    >>> def predicate( name: str ) -> bool:
+    ...     return not name.startswith( '_' ) or name.startswith( 'cache_' )
+    ...
+    >>> @accretive.dataclass_with_standard_behaviors( mutables = ( predicate, ) )
+    ... class Point2d:
+    ...     x: float
+    ...     y: float
+    ...     cache_area: float = dataclasses.field( init = False )
+    ...     cache_hypotenuse: float = dataclasses.field( init = False )
+    ...
+    >>> point = Point2d( x = 20, y = 21 )
+    >>> point.x, point.y = 12, 35
+    >>> point.x, point.y
+    (12, 35)
+    >>> point.cache_hypotenuse = 37
+    >>> del point.cache_hypotenuse
+    >>> point.__slots__ = ( )
+    Traceback (most recent call last):
+    ...
+    accretive.exceptions.AttributeImmutability: Could not assign or delete attribute '__slots__' on instance of class ...
+    >>> del point.__annotations__
+    Traceback (most recent call last):
+    ...
+    accretive.exceptions.AttributeImmutability: Could not assign or delete attribute '__annotations__' on instance of class ...
 
 
 Attribute Preallocations

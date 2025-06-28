@@ -35,7 +35,10 @@ from . import (
 
 THESE_MODULE_QNAMES = tuple(
     name for name in MODULES_QNAMES if name.endswith( '.classes' ) )
-THESE_CLASSES_NAMES = ( 'Class', 'AbstractBaseClass', 'ProtocolClass' )
+THESE_CLASSES_NAMES = (
+    'Class', 'AbstractBaseClass', 'ProtocolClass', )
+    # 'Class', 'Dataclass', 'AbstractBaseClass',
+    # 'ProtocolClass', 'ProtocolDataclass' )
 
 
 pypy_skip_mark = pytest.mark.skipif(
@@ -44,10 +47,8 @@ pypy_skip_mark = pytest.mark.skipif(
 )
 
 
-@pytest.mark.parametrize(
-    'module_qname, class_name',
-    product( THESE_MODULE_QNAMES, THESE_CLASSES_NAMES )
-)
+@pytest.mark.parametrize( 'module_qname', THESE_MODULE_QNAMES )
+@pytest.mark.parametrize( 'class_name', THESE_CLASSES_NAMES )
 def test_100_instantiation( module_qname, class_name ):
     ''' Class instantiates. '''
     module = cache_import_module( module_qname )
@@ -55,38 +56,39 @@ def test_100_instantiation( module_qname, class_name ):
 
     class Object( metaclass = class_factory_class ):
         ''' test '''
+        x: int
 
     assert isinstance( Object, class_factory_class )
 
 
-# @pytest.mark.parametrize(
-#     'module_qname, class_name',
-#     product( THESE_MODULE_QNAMES, THESE_CLASSES_NAMES )
-# )
-# def test_101_accretion( module_qname, class_name ):
-#     ''' Class accretes attributes. '''
-#     module = cache_import_module( module_qname )
-#     exceptions = cache_import_module( f"{PACKAGE_NAME}.exceptions" )
-#     class_factory_class = getattr( module, class_name )
-#
-#     class Object( metaclass = class_factory_class ):
-#         ''' test '''
-#         attr = 42
-#
-#     with pytest.raises( exceptions.AttributeImmutability ):
-#         Object.attr = -1
-#     assert 42 == Object.attr
-#     with pytest.raises( exceptions.AttributeImmutability ):
-#         del Object.attr
-#     assert 42 == Object.attr
-#     Object.accreted_attr = 'foo'
-#     assert 'foo' == Object.accreted_attr
-#     with pytest.raises( exceptions.AttributeImmutability ):
-#         Object.accreted_attr = 'bar'
-#     assert 'foo' == Object.accreted_attr
-#     with pytest.raises( exceptions.AttributeImmutability ):
-#         del Object.accreted_attr
-#     assert 'foo' == Object.accreted_attr
+@pytest.mark.parametrize(
+    'module_qname, class_name',
+    product( THESE_MODULE_QNAMES, THESE_CLASSES_NAMES )
+)
+def test_101_accretion( module_qname, class_name ):
+    ''' Class accretes attributes. '''
+    module = cache_import_module( module_qname )
+    exceptions = cache_import_module( f"{PACKAGE_NAME}.exceptions" )
+    class_factory_class = getattr( module, class_name )
+
+    class Object( metaclass = class_factory_class ):
+        ''' test '''
+        attr = 42
+
+    with pytest.raises( exceptions.AttributeImmutability ):
+        Object.attr = -1
+    assert 42 == Object.attr
+    with pytest.raises( exceptions.AttributeImmutability ):
+        del Object.attr
+    assert 42 == Object.attr
+    Object.accreted_attr = 'foo'
+    assert 'foo' == Object.accreted_attr
+    with pytest.raises( exceptions.AttributeImmutability ):
+        Object.accreted_attr = 'bar'
+    assert 'foo' == Object.accreted_attr
+    with pytest.raises( exceptions.AttributeImmutability ):
+        del Object.accreted_attr
+    assert 'foo' == Object.accreted_attr
 
 
 # @pytest.mark.parametrize(
@@ -180,6 +182,113 @@ def test_115_mutable_attributes( module_qname, class_name ):
 
 @pytest.mark.parametrize(
     'module_qname, class_name',
+    product(
+        ( qname for qname in MODULES_QNAMES if qname.endswith( '.classes' ) ),
+        ( 'Object', 'ObjectMutable',
+          'DataclassObject', 'DataclassObjectMutable',
+          'Protocol', 'ProtocolMutable',
+          'DataclassProtocol', 'DataclassProtocolMutable' )
+    )
+)
+def test_130_object_instantiation( module_qname, class_name ):
+    ''' Object class instantiates. '''
+    module = cache_import_module( module_qname )
+    object_class = getattr( module, class_name )
+    assert isinstance( object_class, type )
+
+
+@pytest.mark.parametrize(
+    'module_qname, decorator_name',
+    product(
+        ( qname for qname in MODULES_QNAMES if qname.endswith( '.classes' ) ),
+        ( 'dataclass_with_standard_behaviors', 'with_standard_behaviors' )
+    )
+)
+def test_140_decorator_instantiation( module_qname, decorator_name ):
+    ''' Decorator class instantiates. '''
+    module = cache_import_module( module_qname )
+    decorator_class = getattr( module, decorator_name )
+    assert callable( decorator_class )
+
+
+@pytest.mark.parametrize(
+    'module_qname, decorator_name',
+    product(
+        ( qname for qname in MODULES_QNAMES if qname.endswith( '.classes' ) ),
+        ( 'dataclass_with_standard_behaviors', ) # 'with_standard_behaviors' )
+    )
+)
+def test_141_decorator_application( module_qname, decorator_name ):
+    ''' Decorator class applies to class. '''
+    module = cache_import_module( module_qname )
+    decorator = getattr( module, decorator_name )
+    @decorator
+    class Foo:
+        ''' Test. '''
+        a: int = 1
+        b: int
+    foo = Foo( b = 2 )
+    assert 1 == foo.a
+    assert 2 == foo.b
+    exceptions = cache_import_module( f"{PACKAGE_NAME}.exceptions" )
+    with pytest.raises( exceptions.AttributeImmutability ):
+        foo.a = 3
+
+
+@pytest.mark.parametrize(
+    'module_qname, decorator_name',
+    product(
+        ( qname for qname in MODULES_QNAMES if qname.endswith( '.classes' ) ),
+        ( 'dataclass_with_standard_behaviors', ) # 'with_standard_behaviors' )
+    )
+)
+def test_142_decorator_application_with_args( module_qname, decorator_name ):
+    ''' Decorator class applies to class with arguments. '''
+    module = cache_import_module( module_qname )
+    decorator = getattr( module, decorator_name )
+    @decorator( mutables = ( 'a', ) )
+    class Foo:
+        ''' Test. '''
+        a: int = 1
+        b: int
+    foo = Foo( b = 2 )
+    assert 1 == foo.a
+    assert 2 == foo.b
+    foo.a = 3
+    assert 3 == foo.a
+    exceptions = cache_import_module( f"{PACKAGE_NAME}.exceptions" )
+    with pytest.raises( exceptions.AttributeImmutability ):
+        foo.b = 4
+
+
+@pytest.mark.parametrize(
+    'module_qname, decorator_name',
+    product(
+        ( qname for qname in MODULES_QNAMES if qname.endswith( '.classes' ) ),
+        ( 'dataclass_with_standard_behaviors', ) # 'with_standard_behaviors' )
+    )
+)
+def test_143_decorator_application_with_no_args(
+    module_qname, decorator_name
+):
+    ''' Decorator class applies to class with no arguments. '''
+    module = cache_import_module( module_qname )
+    decorator = getattr( module, decorator_name )
+    @decorator( )
+    class Foo:
+        ''' Test. '''
+        a: int = 1
+        b: int
+    foo = Foo( b = 2 )
+    assert 1 == foo.a
+    assert 2 == foo.b
+    exceptions = cache_import_module( f"{PACKAGE_NAME}.exceptions" )
+    with pytest.raises( exceptions.AttributeImmutability ):
+        foo.a = 3
+
+
+@pytest.mark.parametrize(
+    'module_qname, class_name',
     product( THESE_MODULE_QNAMES, THESE_CLASSES_NAMES )
 )
 def test_900_docstring_sanity( module_qname, class_name ):
@@ -189,3 +298,31 @@ def test_900_docstring_sanity( module_qname, class_name ):
     assert hasattr( class_factory_class, '__doc__' )
     assert isinstance( class_factory_class.__doc__, str )
     assert class_factory_class.__doc__
+
+
+@pytest.mark.parametrize(
+    'module_qname, class_name',
+    product( THESE_MODULE_QNAMES, THESE_CLASSES_NAMES )
+)
+def test_910_dynadoc_sanity( module_qname, class_name ):
+    ''' Class has valid dynamic documentation attributes. '''
+    module = cache_import_module( module_qname )
+    class_factory_class = getattr( module, class_name )
+    assert hasattr( class_factory_class, '_dynadoc_fragments_' )
+    assert isinstance( class_factory_class._dynadoc_fragments_, tuple )
+    assert class_factory_class._dynadoc_fragments_
+    assert hasattr( class_factory_class, '__doc__' )
+    assert isinstance( class_factory_class.__doc__, str )
+    assert class_factory_class.__doc__
+
+
+@pytest.mark.parametrize(
+    'module_qname, class_name',
+    product( THESE_MODULE_QNAMES, THESE_CLASSES_NAMES )
+)
+def test_920_new_sanity( module_qname, class_name ):
+    ''' Class has valid __new__ method. '''
+    module = cache_import_module( module_qname )
+    class_factory_class = getattr( module, class_name )
+    assert hasattr( class_factory_class, '__new__' )
+    assert callable( class_factory_class.__new__ )

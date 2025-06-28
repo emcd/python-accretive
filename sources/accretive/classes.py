@@ -96,7 +96,7 @@ class DataclassMutable( type ):
         namespace: dict[ str, __.typx.Any ], *,
         decorators: __.ClassDecorators[ __.T ] = ( ),
         **arguments: __.typx.Unpack[ __.ccstd.ClassFactoryExtraArguments ],
-    ) -> __.T:
+    ) -> __.T: # pragma: no cover
         return super( ).__new__( clscls, name, bases, namespace )
 
 
@@ -157,7 +157,7 @@ class ProtocolDataclass( type( __.typx.Protocol ) ):
         namespace: dict[ str, __.typx.Any ], *,
         decorators: __.ClassDecorators[ __.T ] = ( ),
         **arguments: __.typx.Unpack[ __.ccstd.ClassFactoryExtraArguments ],
-    ) -> __.T:
+    ) -> __.T: # pragma: no cover
         return super( ).__new__( clscls, name, bases, namespace )
 
 
@@ -179,7 +179,7 @@ class ProtocolDataclassMutable( type( __.typx.Protocol ) ):
         namespace: dict[ str, __.typx.Any ], *,
         decorators: __.ClassDecorators[ __.T ] = ( ),
         **arguments: __.typx.Unpack[ __.ccstd.ClassFactoryExtraArguments ],
-    ) -> __.T:
+    ) -> __.T: # pragma: no cover
         return super( ).__new__( clscls, name, bases, namespace )
 
 
