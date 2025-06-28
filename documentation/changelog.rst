@@ -21,8 +21,33 @@
 Release Notes
 *******************************************************************************
 
-
 .. towncrier release notes start
+
+Accretive 4.0 (2025-06-28)
+==========================
+
+Enhancements
+------------
+
+- Add comprehensive examples for classes and update all examples for the new
+  architecture.
+- Add concealment of non-public attributes to standard behaviors of classes and
+  objects.
+
+
+Removals
+--------
+
+- * Merge ``objects`` module into ``classes`` module.
+  * Remove ``qaliases`` module.
+- * Replace ``@immutable`` decorator with ``@with_standard_behaviors``.
+  * Replace ``@immutable_dataclass`` decorator with
+    ``@dataclass_with_standard_behaviors``.
+- Rename exception classes for better consistency.
+
+  * ``AttributeImmutabilityError`` is now ``AttributeImmutability``
+  * ``EntryImmutabilityError`` is now ``EntryImmutability``
+  * ``EntryValidityError`` is now ``EntryInvalidity``
 
 
 Accretive 3.0.1 (2025-03-04)
