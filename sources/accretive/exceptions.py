@@ -49,14 +49,6 @@ class AttributeImmutability( Omnierror, AttributeError, TypeError ):
             f"Could not assign or delete attribute {name!r} on {target}." )
 
 
-class DecoratorIncompatibility( Omnierror, TypeError ):
-
-    def __init__( self, class_name: str, method_name: str ) -> None:
-        super( ).__init__(
-            f"Could not apply accretion decorator to {class_name!r} "
-            f"because it defines {method_name!r}.")
-
-
 class EntryImmutability( Omnierror, TypeError ):
 
     def __init__( self, indicator: __.cabc.Hashable ) -> None:
