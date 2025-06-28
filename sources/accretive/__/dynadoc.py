@@ -18,23 +18,20 @@
 #============================================================================#
 
 
-''' Common imports used throughout the package. '''
-
-# ruff: noqa: F401
+''' Common Dynadoc configuration. '''
 
 
-import                          abc
-import collections.abc as       cabc
-import dataclasses as           dcls
-import functools as             funct
-import                          types
-
-import classcore.standard as    ccstd
-import classcore.utilities as   ccutils
-import dynadoc as               ddoc
-import typing_extensions as     typx
-# --- BEGIN: Injected by Copier ---
-# --- END: Injected by Copier ---
+from . import imports as __
+from . import nomina as _nomina
 
 
-from absence import AbsentSingleton, Absential, absent, is_absent
+dynadoc_introspection_limiter = (
+    __.ccstd.dynadoc.produce_dynadoc_introspection_limiter(
+        attributes_namer = _nomina.calculate_attrname ) )
+dynadoc_introspection_control_on_class = (
+    __.ccstd.dynadoc.produce_dynadoc_introspection_control(
+        limiters = ( dynadoc_introspection_limiter, ) ) )
+dynadoc_introspection_control_on_package = (
+    __.ccstd.dynadoc.produce_dynadoc_introspection_control(
+        limiters = ( dynadoc_introspection_limiter, ),
+        targets = __.ddoc.IntrospectionTargetsOmni ) )

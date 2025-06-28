@@ -1,0 +1,27 @@
+{
+  "mcpServers": {
+    "pyright": {
+      "command": "mcp-language-server",
+      "args": [
+        "--lsp",
+        "pyright-langserver",
+        "--workspace",
+        ".",
+        "--",
+        "--stdio"
+      ]
+    },
+    "ruff": {
+       "command": "mcp-language-server",
+       "args": [
+         "--lsp",
+         "ruff",
+         "--workspace",
+         ".",
+         "--",
+         "server",
+         "--preview"
+      ]
+    }
+  }
+}

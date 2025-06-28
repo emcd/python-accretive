@@ -26,50 +26,48 @@
 '''
 
 
-from . import __ # pylint: disable=cyclic-import
+from . import __
+from . import classes as _classes
 
 
-class Omniexception( __.ImmutableObject, BaseException ):
-    ''' Base for all exceptions raised by package API. '''
-
-    _attribute_visibility_includes_: __.cabc.Collection[ str ] = (
-        frozenset( ( '__cause__', '__context__', ) ) )
+class Omniexception(
+    _classes.Object, BaseException,
+    instances_visibles = (
+        '__cause__', '__context__', __.is_public_identifier ),
+):
+    ''' Base exceptions for package. '''
 
 
 class Omnierror( Omniexception, Exception ):
     ''' Base for error exceptions raised by package API. '''
 
 
-class AttributeImmutabilityError( Omnierror, AttributeError, TypeError ):
-    ''' Attempt to reassign or delete immutable attribute. '''
+class AttributeImmutability( Omnierror, AttributeError, TypeError ):
 
-    def __init__( self, name: str ) -> None:
-        super( ).__init__( f"Cannot reassign or delete attribute {name!r}." )
-
-
-class DecoratorCompatibilityError( Omnierror, TypeError ):
-    ''' Attempt to apply decorator to incompatible class. '''
-
-    def __init__( self, class_name: str, method_name: str ) -> None:
+    def __init__( self, name: str, target: str ):
         super( ).__init__(
-            f"Cannot apply accretion decorator to {class_name!r} "
-            f"because it defines {method_name!r}.")
+            f"Could not assign or delete attribute {name!r} on {target}." )
 
 
-class EntryImmutabilityError( Omnierror, TypeError ):
-    ''' Attempt to update or remove immutable dictionary entry. '''
+class EntryImmutability( Omnierror, TypeError ):
 
     def __init__( self, indicator: __.cabc.Hashable ) -> None:
         super( ).__init__(
-            f"Cannot alter or remove existing entry for {indicator!r}." )
+            f"Could not alter or remove existing entry for {indicator!r}." )
 
 
-class EntryValidityError( Omnierror, ValueError ):
-    ''' Attempt to add invalid entry to dictionary. '''
+class EntryInvalidity( Omnierror, ValueError ):
 
     def __init__(
         self, indicator: __.cabc.Hashable, value: __.typx.Any
     ) -> None:
         super( ).__init__(
-            f"Cannot add invalid entry with key, {indicator!r}, "
+            f"Could not add invalid entry with key, {indicator!r}, "
             f"and value, {value!r}, to dictionary." )
+
+
+class ErrorProvideFailure( Omnierror, RuntimeError ):
+
+    def __init__( self, name: str, reason: str ):
+        super( ).__init__(
+            f"Could not provide error class {name!r}. Reason: {reason}" )

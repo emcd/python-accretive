@@ -18,11 +18,16 @@
 #============================================================================#
 
 
-''' Accretive data structures. '''
+''' Accretive data structures.
+
+    Data structures which can grow but never shrink - once values are set, they
+    become immutable. This behavior is useful for configuration registries,
+    plugin systems, and other scenarios requiring grow-only collections with
+    immutability guarantees.
+'''
 
 
 from . import __
-from . import qaliases
 # --- BEGIN: Injected by Copier ---
 from . import exceptions
 # --- END: Injected by Copier ---
@@ -31,11 +36,14 @@ from .classes import *
 from .dictionaries import *
 from .modules import *
 from .namespaces import *
-from .objects import *
 
 
-__version__ = '3.0.1'
+__version__: __.typx.Annotated[ str, __.ddoc.Visibilities.Reveal ]
+__version__ = '4.0rc0'
 
 
-_attribute_visibility_includes_ = frozenset( ( '__version__', ) )
-__.reclassify_modules( __name__, recursive = True )
+__.ccstd.dynadoc.assign_module_docstring(
+    __name__,
+    introspection = __.dynadoc_introspection_control_on_package,
+    table = __.fragments )
+reclassify_modules( __name__, recursive = True )

@@ -21,8 +21,6 @@
 ''' Assert correct function of internal dictionary types. '''
 
 
-from platform import python_implementation
-
 import pytest
 
 from . import PACKAGE_NAME, cache_import_module
@@ -31,11 +29,6 @@ from . import PACKAGE_NAME, cache_import_module
 MODULE_QNAME = f"{PACKAGE_NAME}.__.dictionaries"
 EXCEPTIONS_QNAME = f"{PACKAGE_NAME}.__.exceptions"
 THESE_CLASSES_NAMES = ( 'AccretiveDictionary', )
-
-pypy_skip_mark = pytest.mark.skipif(
-    'PyPy' == python_implementation( ),
-    reason = "PyPy handles class cell updates differently"
-)
 
 
 def test_100_instantiation( ):
@@ -68,12 +61,12 @@ def test_101_accretion( ):
     assert dictionary[ 'new_key' ] == 3
 
     # Attempt to modify existing entry
-    with pytest.raises( exceptions.EntryImmutabilityError ):
+    with pytest.raises( exceptions.EntryImmutability ):
         dictionary[ 'key1' ] = 999
     assert dictionary[ 'key1' ] == 1
 
     # Attempt to delete existing entry
-    with pytest.raises( exceptions.EntryImmutabilityError ):
+    with pytest.raises( exceptions.EntryImmutability ):
         del dictionary[ 'key1' ]
     assert dictionary[ 'key1' ] == 1
 
@@ -81,7 +74,7 @@ def test_101_accretion( ):
 def test_102_update_behavior( ):
     ''' Validates update behavior of AccretiveDictionary.
 
-        Ensures update adds new entries but raises EntryImmutabilityError for
+        Ensures update adds new entries but raises EntryImmutability for
         existing entries.
     '''
     module = cache_import_module( MODULE_QNAME )
@@ -95,12 +88,12 @@ def test_102_update_behavior( ):
     assert dictionary[ 'new_key2' ] == 5
 
     # Update with existing entry (positional)
-    with pytest.raises( exceptions.EntryImmutabilityError ):
+    with pytest.raises( exceptions.EntryImmutability ):
         dictionary.update( [ ( 'key1', 999 ) ] )
     assert dictionary[ 'key1' ] == 1
 
     # Update with existing entry (keyword)
-    with pytest.raises( exceptions.EntryImmutabilityError ):
+    with pytest.raises( exceptions.EntryImmutability ):
         dictionary.update( key1 = 999 )
     assert dictionary[ 'key1' ] == 1
 
@@ -152,7 +145,7 @@ def test_104_copy_behavior( ):
     assert 'new_key2' not in dictionary
 
     # Ensure original remains immutable for existing entries
-    with pytest.raises( exceptions.EntryImmutabilityError ):
+    with pytest.raises( exceptions.EntryImmutability ):
         dictionary[ 'key1' ] = 999
     assert dictionary[ 'key1' ] == 1
 

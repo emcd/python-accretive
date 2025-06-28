@@ -20,18 +20,13 @@
 
 ''' Internal dictionary. '''
 
-# pylint: disable=unused-import
-# ruff: noqa: F401
-
 
 # TODO: Consider a dictionary factory to allow 'mutables' closure
 #       to be referenced in the '__setitem__' and '__delitem__' methods.
 
 
-from __future__ import annotations
-
 from . import imports as __
-from . import immutables as _immutables
+from . import nomina as _nomina
 
 
 _H = __.typx.TypeVar( '_H' )
@@ -39,8 +34,8 @@ _V = __.typx.TypeVar( '_V' )
 
 
 class AccretiveDictionary(
-    _immutables.ConcealerExtension,
     dict[ _H, _V ],
+    __.ccstd.Object,
     __.typx.Generic[ _H, _V ],
 ):
     ''' Accretive subclass of :py:class:`dict`.
@@ -52,19 +47,19 @@ class AccretiveDictionary(
 
     def __init__(
         self,
-        *iterables: __.DictionaryPositionalArgument[ _H, _V ],
-        **entries: __.DictionaryNominativeArgument[ _V ],
+        *iterables: _nomina.DictionaryPositionalArgument[ _H, _V ],
+        **entries: _nomina.DictionaryNominativeArgument[ _V ],
     ):
         super( ).__init__( )
         self.update( *iterables, **entries )
 
     def __delitem__( self, key: _H ) -> None:
-        from .exceptions import EntryImmutabilityError
-        raise EntryImmutabilityError( key )
+        from .exceptions import EntryImmutability
+        raise EntryImmutability( key )
 
     def __setitem__( self, key: _H, value: _V ) -> None:
-        from .exceptions import EntryImmutabilityError
-        if key in self: raise EntryImmutabilityError( key )
+        from .exceptions import EntryImmutability
+        if key in self: raise EntryImmutability( key )
         super( ).__setitem__( key, value )
 
     def clear( self ) -> __.typx.Never:
@@ -76,7 +71,7 @@ class AccretiveDictionary(
         ''' Provides fresh copy of dictionary. '''
         return type( self )( self )
 
-    def pop( # pylint: disable=unused-argument
+    def pop( # pyright: ignore
         self, key: _H, default: __.Absential[ _V ] = __.absent
     ) -> __.typx.Never:
         ''' Raises exception. Cannot pop immutable entry. '''
@@ -88,19 +83,19 @@ class AccretiveDictionary(
         from .exceptions import OperationInvalidity
         raise OperationInvalidity( 'popitem' )
 
-    def update( # type: ignore
+    def update( # pyright: ignore
         self,
-        *iterables: __.DictionaryPositionalArgument[ _H, _V ],
-        **entries: __.DictionaryNominativeArgument[ _V ],
+        *iterables: _nomina.DictionaryPositionalArgument[ _H, _V ],
+        **entries: _nomina.DictionaryNominativeArgument[ _V ],
     ) -> None:
         ''' Adds new entries as a batch. '''
         from itertools import chain
         # Add values in order received, enforcing no alteration.
-        for indicator, value in chain.from_iterable( map( # type: ignore
+        for indicator, value in chain.from_iterable( map( # pyright: ignore
             lambda element: ( # pyright: ignore
                 element.items( )
                 if isinstance( element, __.cabc.Mapping )
                 else element
             ),
             ( *iterables, entries )
-        ) ): self[ indicator ] = value # type: ignore
+        ) ): self[ indicator ] = value # pyright: ignore
