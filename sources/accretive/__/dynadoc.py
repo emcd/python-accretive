@@ -31,7 +31,3 @@ dynadoc_introspection_limiter = (
 dynadoc_introspection_control_on_class = (
     __.ccstd.dynadoc.produce_dynadoc_introspection_control(
         limiters = ( dynadoc_introspection_limiter, ) ) )
-dynadoc_introspection_control_on_package = (
-    __.ccstd.dynadoc.produce_dynadoc_introspection_control(
-        limiters = ( dynadoc_introspection_limiter, ),
-        targets = __.ddoc.IntrospectionTargetsOmni ) )

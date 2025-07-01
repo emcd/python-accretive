@@ -113,6 +113,9 @@ def test_101_accretion( module_qname, class_name ):
     assert 42 == obj.attr
 
 
+@pytest.mark.filterwarnings(
+    "ignore:Use 'finalize_module' function instead.:DeprecationWarning"
+)
 def test_500_module_reclassification( ):
     ''' Modules are correctly reclassified when passed directly. '''
     module = cache_import_module( f"{PACKAGE_NAME}.modules" )
@@ -129,6 +132,9 @@ def test_500_module_reclassification( ):
     finally: cleanup_temp_modules( module_name )
 
 
+@pytest.mark.filterwarnings(
+    "ignore:Use 'finalize_module' function instead.:DeprecationWarning"
+)
 def test_501_module_reclassification_dictionary( ):
     ''' Modules are correctly reclassified from dictionary. '''
     module = cache_import_module( f"{PACKAGE_NAME}.modules" )
@@ -150,6 +156,9 @@ def test_501_module_reclassification_dictionary( ):
     finally: cleanup_temp_modules( module_name )
 
 
+@pytest.mark.filterwarnings(
+    "ignore:Use 'finalize_module' function instead.:DeprecationWarning"
+)
 def test_502_module_reclassification_package_dict( ):
     ''' Modules correctly reclassified from dictionary with package info. '''
     module = cache_import_module( f"{PACKAGE_NAME}.modules" )
@@ -179,6 +188,9 @@ def test_502_module_reclassification_package_dict( ):
     finally: cleanup_temp_modules( module_name, other_name )
 
 
+@pytest.mark.filterwarnings(
+    "ignore:Use 'finalize_module' function instead.:DeprecationWarning"
+)
 def test_510_module_reclassification_by_name( ):
     ''' Modules are correctly reclassified when passed by name. '''
     module = cache_import_module( f"{PACKAGE_NAME}.modules" )
@@ -198,6 +210,9 @@ def test_510_module_reclassification_by_name( ):
     finally: cleanup_temp_modules( test_module_name )
 
 
+@pytest.mark.filterwarnings(
+    "ignore:Use 'finalize_module' function instead.:DeprecationWarning"
+)
 def test_520_module_reclassification_recursive( ):
     ''' Module reclassification correctly operates recursively. '''
     module = cache_import_module( f"{PACKAGE_NAME}.modules" )
@@ -229,6 +244,9 @@ def test_520_module_reclassification_recursive( ):
     finally: cleanup_temp_modules( *all_modules )
 
 
+@pytest.mark.filterwarnings(
+    "ignore:Use 'finalize_module' function instead.:DeprecationWarning"
+)
 def test_530_module_reclassification_non_recursive( ):
     ''' Module reclassification respects non-recursive mode. '''
     module = cache_import_module(f"{PACKAGE_NAME}.modules")
@@ -265,6 +283,9 @@ def test_530_module_reclassification_non_recursive( ):
     finally: cleanup_temp_modules(*all_modules)
 
 
+@pytest.mark.filterwarnings(
+    "ignore:Use 'finalize_module' function instead.:DeprecationWarning"
+)
 def test_540_module_reclassification_safety():
     ''' Module reclassification only affects modules in the same package. '''
     module = cache_import_module(f"{PACKAGE_NAME}.modules")
@@ -311,6 +332,9 @@ def test_540_module_reclassification_safety():
 #     finally: cleanup_temp_modules( test_module_name )
 
 
+@pytest.mark.filterwarnings(
+    "ignore:Use 'finalize_module' function instead.:DeprecationWarning"
+)
 def test_560_module_reclassification_no_package( ):
     ''' Module reclassification returns early when no package name found. '''
     module = cache_import_module(f"{PACKAGE_NAME}.modules")
@@ -340,6 +364,199 @@ def test_560_module_reclassification_no_package( ):
         module.reclassify_modules(dict_with_empty_package)
         assert not isinstance(test_module2, Module)
     finally: cleanup_temp_modules(test_module_name, test_module2_name)
+
+
+@pytest.mark.parametrize(
+    'module_qname, class_name',
+    product( THESE_MODULE_QNAMES, THESE_CLASSES_NAMES )
+)
+@pytest.mark.filterwarnings(
+    "ignore:Use 'finalize_module' instead.:DeprecationWarning"
+)
+def test_600_finalize_module_with_defaults( module_qname, class_name ):
+    ''' finalize_module works with default absent values. '''
+    module = cache_import_module( module_qname )
+    Module = getattr( module, class_name )
+    test_module_name = generate_unique_name( f"{PACKAGE_NAME}.test_finalize" )
+    test_module = types.ModuleType( test_module_name )
+    test_module.__package__ = PACKAGE_NAME
+    sys.modules[ test_module_name ] = test_module
+    try:
+        assert not isinstance( test_module, Module )
+        # This should use absent defaults for both dynadoc parameters
+        module.finalize_module( test_module )
+        assert isinstance( test_module, Module )
+        exceptions = cache_import_module( f"{PACKAGE_NAME}.exceptions" )
+        test_module.new_attr = 42
+        with pytest.raises( exceptions.AttributeImmutability ):
+            test_module.new_attr = 43
+    finally: cleanup_temp_modules( test_module_name )
+
+
+@pytest.mark.parametrize(
+    'module_qname, class_name',
+    product( THESE_MODULE_QNAMES, THESE_CLASSES_NAMES )
+)
+@pytest.mark.filterwarnings(
+    "ignore:Use 'finalize_module' instead.:DeprecationWarning"
+)
+def test_601_finalize_module_with_dynadoc_table( module_qname, class_name ):
+    ''' finalize_module works with explicit dynadoc_table. '''
+    module = cache_import_module( module_qname )
+    Module = getattr( module, class_name )
+    test_module_name = generate_unique_name(
+        f"{PACKAGE_NAME}.test_finalize_table" )
+    test_module = types.ModuleType( test_module_name )
+    test_module.__package__ = PACKAGE_NAME
+    sys.modules[ test_module_name ] = test_module
+    try:
+        assert not isinstance( test_module, Module )
+        # This should exercise the dynadoc_table conditional branch
+        fragments_table = { 'version': '1.0.0', 'description': 'Test module' }
+        module.finalize_module( test_module, dynadoc_table = fragments_table )
+        assert isinstance( test_module, Module )
+        exceptions = cache_import_module( f"{PACKAGE_NAME}.exceptions" )
+        test_module.new_attr = 42
+        with pytest.raises( exceptions.AttributeImmutability ):
+            test_module.new_attr = 43
+    finally: cleanup_temp_modules( test_module_name )
+
+
+@pytest.mark.parametrize(
+    'module_qname, class_name',
+    product( THESE_MODULE_QNAMES, THESE_CLASSES_NAMES )
+)
+@pytest.mark.filterwarnings(
+    "ignore:Use 'finalize_module' instead.:DeprecationWarning"
+)
+def test_602_finalize_module_with_dynadoc_introspection(
+    module_qname, class_name
+):
+    ''' finalize_module works with explicit dynadoc_introspection. '''
+    module = cache_import_module( module_qname )
+    base = cache_import_module( f"{PACKAGE_NAME}.__" )
+    Module = getattr( module, class_name )
+    test_module_name = generate_unique_name(
+        f"{PACKAGE_NAME}.test_finalize_introspection" )
+    test_module = types.ModuleType( test_module_name )
+    test_module.__package__ = PACKAGE_NAME
+    sys.modules[ test_module_name ] = test_module
+    try:
+        assert not isinstance( test_module, Module )
+        # This should exercise the dynadoc_introspection conditional branch
+        introspection_control = base.dynadoc_introspection_control_on_class
+        module.finalize_module( 
+            test_module, 
+            dynadoc_introspection = introspection_control 
+        )
+        assert isinstance( test_module, Module )
+        exceptions = cache_import_module( f"{PACKAGE_NAME}.exceptions" )
+        test_module.new_attr = 42
+        with pytest.raises( exceptions.AttributeImmutability ):
+            test_module.new_attr = 43
+    finally: cleanup_temp_modules( test_module_name )
+
+
+@pytest.mark.parametrize(
+    'module_qname, class_name',
+    product( THESE_MODULE_QNAMES, THESE_CLASSES_NAMES )
+)
+@pytest.mark.filterwarnings(
+    "ignore:Use 'finalize_module' instead.:DeprecationWarning"
+)
+def test_603_finalize_module_with_both_dynadoc_params(
+    module_qname, class_name
+):
+    ''' finalize_module works with both dynadoc parameters provided. '''
+    module = cache_import_module( module_qname )
+    base = cache_import_module( f"{PACKAGE_NAME}.__" )
+    Module = getattr( module, class_name )
+    test_module_name = generate_unique_name(
+        f"{PACKAGE_NAME}.test_finalize_both" )
+    test_module = types.ModuleType( test_module_name )
+    test_module.__package__ = PACKAGE_NAME
+    sys.modules[ test_module_name ] = test_module
+    try:
+        assert not isinstance( test_module, Module )
+        # This should exercise both conditional branches
+        introspection_control = base.dynadoc_introspection_control_on_class
+        fragments_table = { 'version': '1.0.0', 'description': 'Test module' }
+        module.finalize_module( 
+            test_module, 
+            dynadoc_introspection = introspection_control,
+            dynadoc_table = fragments_table
+        )
+        assert isinstance( test_module, Module )
+        exceptions = cache_import_module( f"{PACKAGE_NAME}.exceptions" )
+        test_module.new_attr = 42
+        with pytest.raises( exceptions.AttributeImmutability ):
+            test_module.new_attr = 43
+    finally: cleanup_temp_modules( test_module_name )
+
+
+@pytest.mark.parametrize(
+    'module_qname, class_name',
+    product( THESE_MODULE_QNAMES, THESE_CLASSES_NAMES )
+)
+@pytest.mark.filterwarnings(
+    "ignore:Use 'finalize_module' instead.:DeprecationWarning"
+)
+def test_604_finalize_module_recursive( module_qname, class_name ):
+    ''' finalize_module works with recursive=True. '''
+    module = cache_import_module( module_qname )
+    Module = getattr( module, class_name )
+    parent_name, parent_module, children = (
+        create_temp_module_hierarchy( PACKAGE_NAME ) )
+    child1_module = children[ 'child1' ]
+    child2_module = children[ 'child2' ]
+    all_modules = [ parent_name ]
+    all_modules.extend( ( f"{parent_name}.child1", f"{parent_name}.child2" ) )
+    try:
+        assert not isinstance( parent_module, Module )
+        assert not isinstance( child1_module, Module )
+        assert not isinstance( child2_module, Module )
+        module.finalize_module( parent_module, recursive=True )
+        assert isinstance( parent_module, Module )
+        assert isinstance( child1_module, Module )
+        assert isinstance( child2_module, Module )
+        exceptions = cache_import_module( f"{PACKAGE_NAME}.exceptions" )
+        parent_module.test_attr = "parent"
+        child1_module.test_attr = "child1"
+        child2_module.test_attr = "child2"
+        with pytest.raises( exceptions.AttributeImmutability ):
+            parent_module.test_attr = "new parent"
+        with pytest.raises( exceptions.AttributeImmutability ):
+            child1_module.test_attr = "new child1"
+        with pytest.raises( exceptions.AttributeImmutability ):
+            child2_module.test_attr = "new child2"
+    finally: cleanup_temp_modules( *all_modules )
+
+
+@pytest.mark.parametrize(
+    'module_qname, class_name',
+    product( THESE_MODULE_QNAMES, THESE_CLASSES_NAMES )
+)
+@pytest.mark.filterwarnings(
+    "ignore:Use 'finalize_module' instead.:DeprecationWarning"
+)
+def test_605_finalize_module_by_name( module_qname, class_name ):
+    ''' finalize_module works when passed module by name. '''
+    module = cache_import_module( module_qname )
+    Module = getattr( module, class_name )
+    test_module_name = generate_unique_name(
+        f"{PACKAGE_NAME}.test_finalize_name" )
+    test_module = types.ModuleType( test_module_name )
+    test_module.__package__ = PACKAGE_NAME
+    sys.modules[ test_module_name ] = test_module
+    try:
+        assert not isinstance( test_module, Module )
+        module.finalize_module( test_module_name )
+        assert isinstance( test_module, Module )
+        exceptions = cache_import_module( f"{PACKAGE_NAME}.exceptions" )
+        test_module.new_attr = 42
+        with pytest.raises( exceptions.AttributeImmutability ):
+            test_module.new_attr = 43
+    finally: cleanup_temp_modules( test_module_name )
 
 
 @pytest.mark.parametrize(

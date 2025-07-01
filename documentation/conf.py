@@ -100,6 +100,7 @@ nitpick_ignore = [
     ( 'py:class', "builtins.NotImplementedType" ),
     ( 'py:class', "collections.abc.Annotated" ),
     ( 'py:class', "classcore.standard.classes.Object" ),
+    ( 'py:class', "dynadoc.context.IntrospectionControl" ),
     ( 'py:class', "types.Annotated" ),
     ( 'py:class', "types.NoneType" ),
     ( 'py:class', "typing_extensions._ProtocolMeta" ),
