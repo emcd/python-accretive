@@ -21,13 +21,5 @@
 ''' Common Dynadoc configuration. '''
 
 
-from . import imports as __
-from . import nomina as _nomina
-
-
-dynadoc_introspection_limiter = (
-    __.ccstd.dynadoc.produce_dynadoc_introspection_limiter(
-        attributes_namer = _nomina.calculate_attrname ) )
-dynadoc_introspection_control_on_class = (
-    __.ccstd.dynadoc.produce_dynadoc_introspection_control(
-        limiters = ( dynadoc_introspection_limiter, ) ) )
+# Dynadoc introspection is handled by classcore entities and
+# dynadoc's built-in visitee tracking. No custom controls needed.

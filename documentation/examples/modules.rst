@@ -49,7 +49,7 @@ might use it in a hypothetical package:
 .. code-block:: python
 
     # mypackage/__init__.py
-    import accretive
+    import accretive as _accretive
     
     # Import your submodules
     from . import core
@@ -57,7 +57,7 @@ might use it in a hypothetical package:
     from . import exceptions
     
     # Apply module reclassification
-    accretive.reclassify_modules( __name__, recursive = True )
+    _accretive.reclassify_modules( __name__, recursive = True )
 
 After reclassification, the modules become accretive:
 
@@ -86,14 +86,14 @@ package hierarchy:
 .. code-block:: python
 
     # mypackage/core.py
-    import accretive
+    import accretive as _accretive
     
     def important_function():
         ''' This function should not be accidentally modified. '''
         return "Important result"
     
     # Reclassify only this module
-    accretive.reclassify_modules( __name__ )
+    _accretive.reclassify_modules( __name__ )
 
 This approach is useful when you want fine-grained control over which modules
 in your package receive the enhanced behaviors.
@@ -112,14 +112,14 @@ Basic Usage
 .. code-block:: python
 
     # mypackage/__init__.py
-    import accretive
+    import accretive as _accretive
     
     from . import core
     from . import utils
     from . import exceptions
     
     # Finalize the module with documentation and reclassification
-    accretive.finalize_module( __name__, recursive = True )
+    _accretive.finalize_module( __name__, recursive = True )
 
 The ``finalize_module`` function will:
 
@@ -136,21 +136,21 @@ For complex packages, you might want to configure different parts differently:
 .. code-block:: python
 
     # mypackage/__init__.py
-    import accretive
+    import accretive as _accretive
     
     # Configure main package with full documentation
-    accretive.finalize_module(
+    _accretive.finalize_module(
         __name__,
         recursive = False  # Handle submodules individually
     )
     
     # Configure submodules with different settings
-    accretive.finalize_module(
+    _accretive.finalize_module(
         f"{__name__}.core",
         recursive = True
     )
     
-    accretive.finalize_module(
+    _accretive.finalize_module(
         f"{__name__}.utils",
         recursive = True
     )
@@ -171,7 +171,7 @@ For most packages, apply ``finalize_module`` at the package level in your
 .. code-block:: python
 
     # mypackage/__init__.py
-    import accretive
+    import accretive as _accretive
     
     # Package metadata
     __version__ = '1.0.0'
@@ -181,7 +181,7 @@ For most packages, apply ``finalize_module`` at the package level in your
     from .utils import helper_function
     
     # Finalize the entire package
-    accretive.finalize_module( __name__, recursive = True )
+    _accretive.finalize_module( __name__, recursive = True )
 
 This pattern ensures that:
 
@@ -227,7 +227,7 @@ all dynamic setup is complete:
 .. code-block:: python
 
     # mypackage/__init__.py
-    import accretive
+    import accretive as _accretive
     
     # Dynamic setup (plugin registration, etc.)
     _setup_plugins()
@@ -237,7 +237,7 @@ all dynamic setup is complete:
     from .api import *
     
     # Lock down the package
-    accretive.finalize_module( __name__, recursive = True )
+    _accretive.finalize_module( __name__, recursive = True )
 
 This ensures that your package initialization is complete before the
 accretive protections are applied.
