@@ -224,7 +224,6 @@ python_functions = [ 'test_[0-9][0-9][0-9]_*' ]
 cache_dir = '.auxiliary/caches/pytest'
 filterwarnings = [
     # Suppress deprecation warnings from external dependencies during transition
-    "ignore:Use 'finalize_module' instead.:DeprecationWarning:classcore.standard.modules",
     "ignore:Use 'finalize_module' instead.:DeprecationWarning:falsifier",
     "ignore:Use 'finalize_module' instead.:DeprecationWarning:absence",
     # Suppress internal warnings from our own deprecated reclassify_modules
