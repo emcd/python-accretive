@@ -113,9 +113,6 @@ def test_101_accretion( module_qname, class_name ):
     assert 42 == obj.attr
 
 
-@pytest.mark.filterwarnings(
-    "ignore:Use 'finalize_module' function instead.:DeprecationWarning"
-)
 def test_500_module_reclassification( ):
     ''' Modules are correctly reclassified when passed directly. '''
     module = cache_import_module( f"{PACKAGE_NAME}.modules" )
@@ -124,17 +121,15 @@ def test_500_module_reclassification( ):
     test_module = types.ModuleType( module_name )
     test_module.__name__ = module_name
     test_module.__package__ = PACKAGE_NAME
-    sys.modules[module_name] = test_module
+    sys.modules[ module_name ] = test_module
     try:
         assert not isinstance( test_module, Module )
-        module.reclassify_modules( test_module )
+        with pytest.warns( DeprecationWarning ):
+            module.reclassify_modules( test_module )
         assert isinstance( test_module, Module )
     finally: cleanup_temp_modules( module_name )
 
 
-@pytest.mark.filterwarnings(
-    "ignore:Use 'finalize_module' function instead.:DeprecationWarning"
-)
 def test_501_module_reclassification_dictionary( ):
     ''' Modules are correctly reclassified from dictionary. '''
     module = cache_import_module( f"{PACKAGE_NAME}.modules" )
@@ -151,14 +146,12 @@ def test_501_module_reclassification_dictionary( ):
     sys.modules[module_name] = test_module
     try:
         assert not isinstance( test_module, Module )
-        module.reclassify_modules( package_dict )
+        with pytest.warns( DeprecationWarning ):
+            module.reclassify_modules( package_dict )
         assert isinstance( test_module, Module )
     finally: cleanup_temp_modules( module_name )
 
 
-@pytest.mark.filterwarnings(
-    "ignore:Use 'finalize_module' function instead.:DeprecationWarning"
-)
 def test_502_module_reclassification_package_dict( ):
     ''' Modules correctly reclassified from dictionary with package info. '''
     module = cache_import_module( f"{PACKAGE_NAME}.modules" )
@@ -182,15 +175,13 @@ def test_502_module_reclassification_package_dict( ):
     try:
         assert not isinstance( test_module, Module )
         assert not isinstance( other_module, Module )
-        module.reclassify_modules( ns_dict )
+        with pytest.warns( DeprecationWarning ):
+            module.reclassify_modules( ns_dict )
         assert isinstance( test_module, Module )
         assert not isinstance( other_module, Module )
     finally: cleanup_temp_modules( module_name, other_name )
 
 
-@pytest.mark.filterwarnings(
-    "ignore:Use 'finalize_module' function instead.:DeprecationWarning"
-)
 def test_510_module_reclassification_by_name( ):
     ''' Modules are correctly reclassified when passed by name. '''
     module = cache_import_module( f"{PACKAGE_NAME}.modules" )
@@ -202,7 +193,8 @@ def test_510_module_reclassification_by_name( ):
     sys.modules[ test_module_name ] = test_module
     try:
         assert not isinstance( test_module, Module )
-        module.reclassify_modules( test_module_name )
+        with pytest.warns( DeprecationWarning ):
+            module.reclassify_modules( test_module_name )
         assert isinstance( test_module, Module )
         test_module.test_attr = "value"
         with pytest.raises( exceptions.AttributeImmutability ):
@@ -210,9 +202,6 @@ def test_510_module_reclassification_by_name( ):
     finally: cleanup_temp_modules( test_module_name )
 
 
-@pytest.mark.filterwarnings(
-    "ignore:Use 'finalize_module' function instead.:DeprecationWarning"
-)
 def test_520_module_reclassification_recursive( ):
     ''' Module reclassification correctly operates recursively. '''
     module = cache_import_module( f"{PACKAGE_NAME}.modules" )
@@ -228,7 +217,8 @@ def test_520_module_reclassification_recursive( ):
         assert not isinstance( parent_module, Module )
         assert not isinstance( child1_module, Module )
         assert not isinstance( child2_module, Module )
-        module.reclassify_modules( parent_module, recursive=True )
+        with pytest.warns( DeprecationWarning ):
+            module.reclassify_modules( parent_module, recursive=True )
         assert isinstance( parent_module, Module )
         assert isinstance( child1_module, Module )
         assert isinstance( child2_module, Module )
@@ -244,9 +234,6 @@ def test_520_module_reclassification_recursive( ):
     finally: cleanup_temp_modules( *all_modules )
 
 
-@pytest.mark.filterwarnings(
-    "ignore:Use 'finalize_module' function instead.:DeprecationWarning"
-)
 def test_530_module_reclassification_non_recursive( ):
     ''' Module reclassification respects non-recursive mode. '''
     module = cache_import_module(f"{PACKAGE_NAME}.modules")
@@ -276,16 +263,14 @@ def test_530_module_reclassification_non_recursive( ):
         assert not isinstance(parent_module, Module)
         assert not isinstance(child1_module, Module)
         assert not isinstance(child2_module, Module)
-        module.reclassify_modules(parent_module)
+        with pytest.warns( DeprecationWarning ):
+            module.reclassify_modules(parent_module)
         assert isinstance(parent_module, Module)
         assert not isinstance(child1_module, Module)
         assert not isinstance(child2_module, Module)
     finally: cleanup_temp_modules(*all_modules)
 
 
-@pytest.mark.filterwarnings(
-    "ignore:Use 'finalize_module' function instead.:DeprecationWarning"
-)
 def test_540_module_reclassification_safety():
     ''' Module reclassification only affects modules in the same package. '''
     module = cache_import_module(f"{PACKAGE_NAME}.modules")
@@ -309,32 +294,13 @@ def test_540_module_reclassification_safety():
     try:
         assert not isinstance(same_pkg_module, Module)
         assert not isinstance(diff_pkg_module, Module)
-        module.reclassify_modules(pkg_module)
+        with pytest.warns( DeprecationWarning ):
+            module.reclassify_modules(pkg_module)
         assert isinstance(same_pkg_module, Module)
         assert not isinstance(diff_pkg_module, Module)
     finally: cleanup_temp_modules(same_pkg_name, diff_pkg_name)
 
 
-# def test_550_module_with_self_reference( ):
-#     ''' Module reclassification works with module self-reference. '''
-#     module = cache_import_module( f"{PACKAGE_NAME}.modules" )
-#     Module = module.Module
-#     test_module_name = generate_unique_name( f"{PACKAGE_NAME}.test_module" )
-#     test_module = types.ModuleType( test_module_name )
-#     test_module.__package__ = PACKAGE_NAME
-#     test_module.self = test_module
-#     sys.modules[ test_module_name ] = test_module
-#     try:
-#         assert not isinstance( test_module, Module )
-#         module.reclassify_modules( test_module )
-#         assert isinstance( test_module, Module )
-#         assert test_module.self is test_module
-#     finally: cleanup_temp_modules( test_module_name )
-
-
-@pytest.mark.filterwarnings(
-    "ignore:Use 'finalize_module' function instead.:DeprecationWarning"
-)
 def test_560_module_reclassification_no_package( ):
     ''' Module reclassification returns early when no package name found. '''
     module = cache_import_module(f"{PACKAGE_NAME}.modules")
@@ -349,7 +315,8 @@ def test_560_module_reclassification_no_package( ):
     }
     try:
         assert not isinstance(test_module, Module)
-        module.reclassify_modules(empty_dict)
+        with pytest.warns( DeprecationWarning ):
+            module.reclassify_modules(empty_dict)
         assert not isinstance(test_module, Module)
         test_module2_name = generate_unique_name("test_module2")
         test_module2 = types.ModuleType(test_module2_name)
@@ -361,7 +328,8 @@ def test_560_module_reclassification_no_package( ):
             "test_module": test_module2
         }
         assert not isinstance(test_module2, Module)
-        module.reclassify_modules(dict_with_empty_package)
+        with pytest.warns( DeprecationWarning ):
+            module.reclassify_modules(dict_with_empty_package)
         assert not isinstance(test_module2, Module)
     finally: cleanup_temp_modules(test_module_name, test_module2_name)
 
@@ -369,9 +337,6 @@ def test_560_module_reclassification_no_package( ):
 @pytest.mark.parametrize(
     'module_qname, class_name',
     product( THESE_MODULE_QNAMES, THESE_CLASSES_NAMES )
-)
-@pytest.mark.filterwarnings(
-    "ignore:Use 'finalize_module' instead.:DeprecationWarning"
 )
 def test_600_finalize_module_with_defaults( module_qname, class_name ):
     ''' finalize_module works with default absent values. '''
@@ -396,9 +361,6 @@ def test_600_finalize_module_with_defaults( module_qname, class_name ):
 @pytest.mark.parametrize(
     'module_qname, class_name',
     product( THESE_MODULE_QNAMES, THESE_CLASSES_NAMES )
-)
-@pytest.mark.filterwarnings(
-    "ignore:Use 'finalize_module' instead.:DeprecationWarning"
 )
 def test_601_finalize_module_with_dynadoc_table( module_qname, class_name ):
     ''' finalize_module works with explicit dynadoc_table. '''
@@ -426,9 +388,6 @@ def test_601_finalize_module_with_dynadoc_table( module_qname, class_name ):
     'module_qname, class_name',
     product( THESE_MODULE_QNAMES, THESE_CLASSES_NAMES )
 )
-@pytest.mark.filterwarnings(
-    "ignore:Use 'finalize_module' instead.:DeprecationWarning"
-)
 def test_602_finalize_module_with_dynadoc_introspection(
     module_qname, class_name
 ):
@@ -447,12 +406,12 @@ def test_602_finalize_module_with_dynadoc_introspection(
         import dynadoc.context as ddoc_context
         class_control = ddoc_context.ClassIntrospectionControl(
             inheritance = True )
-        introspection_control = ddoc_context.IntrospectionControl( 
-            class_control = class_control 
+        introspection_control = ddoc_context.IntrospectionControl(
+            class_control = class_control
         )
-        module.finalize_module( 
-            test_module, 
-            dynadoc_introspection = introspection_control 
+        module.finalize_module(
+            test_module,
+            dynadoc_introspection = introspection_control
         )
         assert isinstance( test_module, Module )
         exceptions = cache_import_module( f"{PACKAGE_NAME}.exceptions" )
@@ -465,9 +424,6 @@ def test_602_finalize_module_with_dynadoc_introspection(
 @pytest.mark.parametrize(
     'module_qname, class_name',
     product( THESE_MODULE_QNAMES, THESE_CLASSES_NAMES )
-)
-@pytest.mark.filterwarnings(
-    "ignore:Use 'finalize_module' instead.:DeprecationWarning"
 )
 def test_603_finalize_module_with_both_dynadoc_params(
     module_qname, class_name
@@ -487,12 +443,12 @@ def test_603_finalize_module_with_both_dynadoc_params(
         import dynadoc.context as ddoc_context
         class_control = ddoc_context.ClassIntrospectionControl(
             inheritance = True )
-        introspection_control = ddoc_context.IntrospectionControl( 
-            class_control = class_control 
+        introspection_control = ddoc_context.IntrospectionControl(
+            class_control = class_control
         )
         fragments_table = { 'version': '1.0.0', 'description': 'Test module' }
-        module.finalize_module( 
-            test_module, 
+        module.finalize_module(
+            test_module,
             dynadoc_introspection = introspection_control,
             dynadoc_table = fragments_table
         )
@@ -507,9 +463,6 @@ def test_603_finalize_module_with_both_dynadoc_params(
 @pytest.mark.parametrize(
     'module_qname, class_name',
     product( THESE_MODULE_QNAMES, THESE_CLASSES_NAMES )
-)
-@pytest.mark.filterwarnings(
-    "ignore:Use 'finalize_module' instead.:DeprecationWarning"
 )
 def test_604_finalize_module_recursive( module_qname, class_name ):
     ''' finalize_module works with recursive=True. '''
@@ -545,9 +498,6 @@ def test_604_finalize_module_recursive( module_qname, class_name ):
 @pytest.mark.parametrize(
     'module_qname, class_name',
     product( THESE_MODULE_QNAMES, THESE_CLASSES_NAMES )
-)
-@pytest.mark.filterwarnings(
-    "ignore:Use 'finalize_module' instead.:DeprecationWarning"
 )
 def test_605_finalize_module_by_name( module_qname, class_name ):
     ''' finalize_module works when passed module by name. '''
