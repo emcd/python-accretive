@@ -1,1 +1,0 @@
-Add ``finalize_module`` function that combines Dynadoc docstring assignment and module reclassification.
