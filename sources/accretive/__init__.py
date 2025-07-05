@@ -39,7 +39,7 @@ from .namespaces import *
 
 
 __version__: __.typx.Annotated[ str, __.ddoc.Visibilities.Reveal ]
-__version__ = '4.1a0'
+__version__ = '4.2a0'
 
 
 finalize_module( __name__, dynadoc_table = __.fragments, recursive = True )
