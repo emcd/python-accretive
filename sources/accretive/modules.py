@@ -43,12 +43,34 @@ from . import iclasses as _iclasses
 ModuleNamespaceDictionary: __.typx.TypeAlias = (
     __.cabc.Mapping[ str, __.typx.Any ] )
 
-ReclassifyModulesModuleArgument: __.typx.TypeAlias = __.typx.Annotated[
+DynadocIntrospectionArgument: __.typx.TypeAlias = __.typx.Annotated[
+    __.Absential[ __.ddoc.IntrospectionControl ],
+    __.ddoc.Doc(
+        ''' Dynadoc introspection control.
+
+            Which kinds of object to recursively introspect?
+            Scan unnannotated attributes?
+            Consider base classes?
+            Etc...
+        ''' ),
+]
+FinalizeModuleDynadocTableArgument: __.typx.TypeAlias = __.typx.Annotated[
+    __.Absential[ __.cabc.Mapping[ str, str ] ],
+    __.ddoc.Doc( ''' Table of documentation fragments. ''' ),
+]
+ModuleArgument: __.typx.TypeAlias = __.typx.Annotated[
+    str | __.types.ModuleType, __.ddoc.Doc( ''' Module or module name. ''' ),
+]
+ModuleNamespaceArgument: __.typx.TypeAlias = __.typx.Annotated[
     str | __.types.ModuleType | ModuleNamespaceDictionary,
     __.ddoc.Doc( ''' Module, module name, or module namespace. ''' ),
 ]
-ReclassifyModulesRecursiveArgument: __.typx.TypeAlias = __.typx.Annotated[
+RecursiveArgument: __.typx.TypeAlias = __.typx.Annotated[
     bool, __.ddoc.Doc( ''' Recursively reclassify package modules? ''' )
+]
+ReplacementClassArgument: __.typx.TypeAlias = __.typx.Annotated[
+    type[ __.types.ModuleType ],
+    __.ddoc.Doc( ''' New class for module. ''' ),
 ]
 
 
@@ -62,9 +84,40 @@ class Module(
     _dynadoc_fragments_ = ( 'module', 'module conceal', 'module accrete' )
 
 
+def finalize_module( # noqa: PLR0913
+    module: ModuleArgument, /,
+    *fragments: __.ddoc.interfaces.Fragment,
+    attributes_namer: __.AttributesNamer = __.calculate_attrname,
+    dynadoc_introspection: DynadocIntrospectionArgument = __.absent,
+    dynadoc_table: FinalizeModuleDynadocTableArgument = __.absent,
+    recursive: RecursiveArgument = False,
+    replacement_class: ReplacementClassArgument = Module,
+) -> None:
+    ''' Combines Dynadoc docstring assignment and module reclassification.
+
+        Applies module docstring generation via Dynadoc introspection,
+        then reclassifies modules for accretion and concealment.
+
+        When recursive is False, automatically excludes module targets from
+        dynadoc introspection to document only the provided module. When
+        recursive is True, automatically includes module targets so Dynadoc
+        can recursively document all modules.
+    '''
+    nomargs: dict[ str, __.typx.Any ] = dict(
+        attributes_namer = attributes_namer,
+        recursive = recursive,
+        replacement_class = replacement_class )
+    if not __.is_absent( dynadoc_introspection ):
+        nomargs[ 'dynadoc_introspection' ] = dynadoc_introspection
+    if not __.is_absent( dynadoc_table ):
+        nomargs[ 'dynadoc_table' ] = dynadoc_table
+    __.ccstd.finalize_module( module, *fragments, **nomargs )
+
+
+@__.typx.deprecated( "Use 'finalize_module' function instead." )
 def reclassify_modules(
-    module: ReclassifyModulesModuleArgument, /, *,
-    recursive: ReclassifyModulesRecursiveArgument = False,
+    module: ModuleNamespaceArgument, /, *,
+    recursive: RecursiveArgument = False,
 ) -> None:
     ''' Reclassifies modules to be accretive.
 

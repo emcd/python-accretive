@@ -121,10 +121,11 @@ def test_500_module_reclassification( ):
     test_module = types.ModuleType( module_name )
     test_module.__name__ = module_name
     test_module.__package__ = PACKAGE_NAME
-    sys.modules[module_name] = test_module
+    sys.modules[ module_name ] = test_module
     try:
         assert not isinstance( test_module, Module )
-        module.reclassify_modules( test_module )
+        with pytest.warns( DeprecationWarning ):
+            module.reclassify_modules( test_module )
         assert isinstance( test_module, Module )
     finally: cleanup_temp_modules( module_name )
 
@@ -145,7 +146,8 @@ def test_501_module_reclassification_dictionary( ):
     sys.modules[module_name] = test_module
     try:
         assert not isinstance( test_module, Module )
-        module.reclassify_modules( package_dict )
+        with pytest.warns( DeprecationWarning ):
+            module.reclassify_modules( package_dict )
         assert isinstance( test_module, Module )
     finally: cleanup_temp_modules( module_name )
 
@@ -173,7 +175,8 @@ def test_502_module_reclassification_package_dict( ):
     try:
         assert not isinstance( test_module, Module )
         assert not isinstance( other_module, Module )
-        module.reclassify_modules( ns_dict )
+        with pytest.warns( DeprecationWarning ):
+            module.reclassify_modules( ns_dict )
         assert isinstance( test_module, Module )
         assert not isinstance( other_module, Module )
     finally: cleanup_temp_modules( module_name, other_name )
@@ -190,7 +193,8 @@ def test_510_module_reclassification_by_name( ):
     sys.modules[ test_module_name ] = test_module
     try:
         assert not isinstance( test_module, Module )
-        module.reclassify_modules( test_module_name )
+        with pytest.warns( DeprecationWarning ):
+            module.reclassify_modules( test_module_name )
         assert isinstance( test_module, Module )
         test_module.test_attr = "value"
         with pytest.raises( exceptions.AttributeImmutability ):
@@ -213,7 +217,8 @@ def test_520_module_reclassification_recursive( ):
         assert not isinstance( parent_module, Module )
         assert not isinstance( child1_module, Module )
         assert not isinstance( child2_module, Module )
-        module.reclassify_modules( parent_module, recursive=True )
+        with pytest.warns( DeprecationWarning ):
+            module.reclassify_modules( parent_module, recursive=True )
         assert isinstance( parent_module, Module )
         assert isinstance( child1_module, Module )
         assert isinstance( child2_module, Module )
@@ -258,7 +263,8 @@ def test_530_module_reclassification_non_recursive( ):
         assert not isinstance(parent_module, Module)
         assert not isinstance(child1_module, Module)
         assert not isinstance(child2_module, Module)
-        module.reclassify_modules(parent_module)
+        with pytest.warns( DeprecationWarning ):
+            module.reclassify_modules(parent_module)
         assert isinstance(parent_module, Module)
         assert not isinstance(child1_module, Module)
         assert not isinstance(child2_module, Module)
@@ -288,27 +294,11 @@ def test_540_module_reclassification_safety():
     try:
         assert not isinstance(same_pkg_module, Module)
         assert not isinstance(diff_pkg_module, Module)
-        module.reclassify_modules(pkg_module)
+        with pytest.warns( DeprecationWarning ):
+            module.reclassify_modules(pkg_module)
         assert isinstance(same_pkg_module, Module)
         assert not isinstance(diff_pkg_module, Module)
     finally: cleanup_temp_modules(same_pkg_name, diff_pkg_name)
-
-
-# def test_550_module_with_self_reference( ):
-#     ''' Module reclassification works with module self-reference. '''
-#     module = cache_import_module( f"{PACKAGE_NAME}.modules" )
-#     Module = module.Module
-#     test_module_name = generate_unique_name( f"{PACKAGE_NAME}.test_module" )
-#     test_module = types.ModuleType( test_module_name )
-#     test_module.__package__ = PACKAGE_NAME
-#     test_module.self = test_module
-#     sys.modules[ test_module_name ] = test_module
-#     try:
-#         assert not isinstance( test_module, Module )
-#         module.reclassify_modules( test_module )
-#         assert isinstance( test_module, Module )
-#         assert test_module.self is test_module
-#     finally: cleanup_temp_modules( test_module_name )
 
 
 def test_560_module_reclassification_no_package( ):
@@ -325,7 +315,8 @@ def test_560_module_reclassification_no_package( ):
     }
     try:
         assert not isinstance(test_module, Module)
-        module.reclassify_modules(empty_dict)
+        with pytest.warns( DeprecationWarning ):
+            module.reclassify_modules(empty_dict)
         assert not isinstance(test_module, Module)
         test_module2_name = generate_unique_name("test_module2")
         test_module2 = types.ModuleType(test_module2_name)
@@ -337,9 +328,195 @@ def test_560_module_reclassification_no_package( ):
             "test_module": test_module2
         }
         assert not isinstance(test_module2, Module)
-        module.reclassify_modules(dict_with_empty_package)
+        with pytest.warns( DeprecationWarning ):
+            module.reclassify_modules(dict_with_empty_package)
         assert not isinstance(test_module2, Module)
     finally: cleanup_temp_modules(test_module_name, test_module2_name)
+
+
+@pytest.mark.parametrize(
+    'module_qname, class_name',
+    product( THESE_MODULE_QNAMES, THESE_CLASSES_NAMES )
+)
+def test_600_finalize_module_with_defaults( module_qname, class_name ):
+    ''' finalize_module works with default absent values. '''
+    module = cache_import_module( module_qname )
+    Module = getattr( module, class_name )
+    test_module_name = generate_unique_name( f"{PACKAGE_NAME}.test_finalize" )
+    test_module = types.ModuleType( test_module_name )
+    test_module.__package__ = PACKAGE_NAME
+    sys.modules[ test_module_name ] = test_module
+    try:
+        assert not isinstance( test_module, Module )
+        # This should use absent defaults for both dynadoc parameters
+        module.finalize_module( test_module )
+        assert isinstance( test_module, Module )
+        exceptions = cache_import_module( f"{PACKAGE_NAME}.exceptions" )
+        test_module.new_attr = 42
+        with pytest.raises( exceptions.AttributeImmutability ):
+            test_module.new_attr = 43
+    finally: cleanup_temp_modules( test_module_name )
+
+
+@pytest.mark.parametrize(
+    'module_qname, class_name',
+    product( THESE_MODULE_QNAMES, THESE_CLASSES_NAMES )
+)
+def test_601_finalize_module_with_dynadoc_table( module_qname, class_name ):
+    ''' finalize_module works with explicit dynadoc_table. '''
+    module = cache_import_module( module_qname )
+    Module = getattr( module, class_name )
+    test_module_name = generate_unique_name(
+        f"{PACKAGE_NAME}.test_finalize_table" )
+    test_module = types.ModuleType( test_module_name )
+    test_module.__package__ = PACKAGE_NAME
+    sys.modules[ test_module_name ] = test_module
+    try:
+        assert not isinstance( test_module, Module )
+        # This should exercise the dynadoc_table conditional branch
+        fragments_table = { 'version': '1.0.0', 'description': 'Test module' }
+        module.finalize_module( test_module, dynadoc_table = fragments_table )
+        assert isinstance( test_module, Module )
+        exceptions = cache_import_module( f"{PACKAGE_NAME}.exceptions" )
+        test_module.new_attr = 42
+        with pytest.raises( exceptions.AttributeImmutability ):
+            test_module.new_attr = 43
+    finally: cleanup_temp_modules( test_module_name )
+
+
+@pytest.mark.parametrize(
+    'module_qname, class_name',
+    product( THESE_MODULE_QNAMES, THESE_CLASSES_NAMES )
+)
+def test_602_finalize_module_with_dynadoc_introspection(
+    module_qname, class_name
+):
+    ''' finalize_module works with explicit dynadoc_introspection. '''
+    module = cache_import_module( module_qname )
+    Module = getattr( module, class_name )
+    test_module_name = generate_unique_name(
+        f"{PACKAGE_NAME}.test_finalize_introspection" )
+    test_module = types.ModuleType( test_module_name )
+    test_module.__package__ = PACKAGE_NAME
+    sys.modules[ test_module_name ] = test_module
+    try:
+        assert not isinstance( test_module, Module )
+        # This should exercise the dynadoc_introspection conditional branch
+        # Create a simple introspection control for testing
+        import dynadoc.context as ddoc_context
+        class_control = ddoc_context.ClassIntrospectionControl(
+            inheritance = True )
+        introspection_control = ddoc_context.IntrospectionControl(
+            class_control = class_control
+        )
+        module.finalize_module(
+            test_module,
+            dynadoc_introspection = introspection_control
+        )
+        assert isinstance( test_module, Module )
+        exceptions = cache_import_module( f"{PACKAGE_NAME}.exceptions" )
+        test_module.new_attr = 42
+        with pytest.raises( exceptions.AttributeImmutability ):
+            test_module.new_attr = 43
+    finally: cleanup_temp_modules( test_module_name )
+
+
+@pytest.mark.parametrize(
+    'module_qname, class_name',
+    product( THESE_MODULE_QNAMES, THESE_CLASSES_NAMES )
+)
+def test_603_finalize_module_with_both_dynadoc_params(
+    module_qname, class_name
+):
+    ''' finalize_module works with both dynadoc parameters provided. '''
+    module = cache_import_module( module_qname )
+    Module = getattr( module, class_name )
+    test_module_name = generate_unique_name(
+        f"{PACKAGE_NAME}.test_finalize_both" )
+    test_module = types.ModuleType( test_module_name )
+    test_module.__package__ = PACKAGE_NAME
+    sys.modules[ test_module_name ] = test_module
+    try:
+        assert not isinstance( test_module, Module )
+        # This should exercise both conditional branches
+        # Create a simple introspection control for testing
+        import dynadoc.context as ddoc_context
+        class_control = ddoc_context.ClassIntrospectionControl(
+            inheritance = True )
+        introspection_control = ddoc_context.IntrospectionControl(
+            class_control = class_control
+        )
+        fragments_table = { 'version': '1.0.0', 'description': 'Test module' }
+        module.finalize_module(
+            test_module,
+            dynadoc_introspection = introspection_control,
+            dynadoc_table = fragments_table
+        )
+        assert isinstance( test_module, Module )
+        exceptions = cache_import_module( f"{PACKAGE_NAME}.exceptions" )
+        test_module.new_attr = 42
+        with pytest.raises( exceptions.AttributeImmutability ):
+            test_module.new_attr = 43
+    finally: cleanup_temp_modules( test_module_name )
+
+
+@pytest.mark.parametrize(
+    'module_qname, class_name',
+    product( THESE_MODULE_QNAMES, THESE_CLASSES_NAMES )
+)
+def test_604_finalize_module_recursive( module_qname, class_name ):
+    ''' finalize_module works with recursive=True. '''
+    module = cache_import_module( module_qname )
+    Module = getattr( module, class_name )
+    parent_name, parent_module, children = (
+        create_temp_module_hierarchy( PACKAGE_NAME ) )
+    child1_module = children[ 'child1' ]
+    child2_module = children[ 'child2' ]
+    all_modules = [ parent_name ]
+    all_modules.extend( ( f"{parent_name}.child1", f"{parent_name}.child2" ) )
+    try:
+        assert not isinstance( parent_module, Module )
+        assert not isinstance( child1_module, Module )
+        assert not isinstance( child2_module, Module )
+        module.finalize_module( parent_module, recursive=True )
+        assert isinstance( parent_module, Module )
+        assert isinstance( child1_module, Module )
+        assert isinstance( child2_module, Module )
+        exceptions = cache_import_module( f"{PACKAGE_NAME}.exceptions" )
+        parent_module.test_attr = "parent"
+        child1_module.test_attr = "child1"
+        child2_module.test_attr = "child2"
+        with pytest.raises( exceptions.AttributeImmutability ):
+            parent_module.test_attr = "new parent"
+        with pytest.raises( exceptions.AttributeImmutability ):
+            child1_module.test_attr = "new child1"
+        with pytest.raises( exceptions.AttributeImmutability ):
+            child2_module.test_attr = "new child2"
+    finally: cleanup_temp_modules( *all_modules )
+
+
+@pytest.mark.parametrize(
+    'module_qname, class_name',
+    product( THESE_MODULE_QNAMES, THESE_CLASSES_NAMES )
+)
+def test_605_finalize_module_by_name( module_qname, class_name ):
+    ''' finalize_module works when passed module by name. '''
+    module = cache_import_module( module_qname )
+    Module = getattr( module, class_name )
+    test_module_name = generate_unique_name(
+        f"{PACKAGE_NAME}.test_finalize_name" )
+    test_module = types.ModuleType( test_module_name )
+    test_module.__package__ = PACKAGE_NAME
+    sys.modules[ test_module_name ] = test_module
+    try:
+        assert not isinstance( test_module, Module )
+        module.finalize_module( test_module_name )
+        assert isinstance( test_module, Module )
+        exceptions = cache_import_module( f"{PACKAGE_NAME}.exceptions" )
+        test_module.new_attr = 42
+        with pytest.raises( exceptions.AttributeImmutability ):
+            test_module.new_attr = 43
+    finally: cleanup_temp_modules( test_module_name )
 
 
 @pytest.mark.parametrize(

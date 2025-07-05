@@ -86,11 +86,7 @@ def provide_error_class( name: str ) -> type[ Exception ]:
 
 
 dynadoc_configuration = (
-    __.ccstd.dynadoc.produce_dynadoc_configuration(
-        introspection = __.dynadoc_introspection_control_on_class,
-        table = __.fragments ) )
-
-
+    __.ccstd.dynadoc.produce_dynadoc_configuration( table = __.fragments ) )
 _class_factory = __.funct.partial(
     __.ccstd.class_factory,
     attributes_namer = __.calculate_attrname,

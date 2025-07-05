@@ -23,6 +23,5 @@
 
 from .dictionaries import *
 from .doctab import *
-from .dynadoc import *
 from .imports import *
 from .nomina import *
