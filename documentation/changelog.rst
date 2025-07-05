@@ -23,6 +23,21 @@ Release Notes
 
 .. towncrier release notes start
 
+Accretive 4.1 (2025-07-04)
+==========================
+
+Enhancements
+------------
+
+- Add ``finalize_module`` function that combines Dynadoc docstring assignment and module reclassification.
+
+
+Notices
+-------
+
+- Deprecate ``reclassify_modules`` function. Use ``finalize_module`` instead.
+
+
 Accretive 4.0 (2025-06-28)
 ==========================
 
