@@ -21,16 +21,15 @@
 ''' Assert correct function of namespaces. '''
 
 
-import pytest
-
 from itertools import product
 
-from . import (
+import pytest
+
+from .__ import (
     MODULES_QNAMES,
     PACKAGE_NAME,
     cache_import_module,
 )
-
 
 THESE_MODULE_QNAMES = tuple(
     name for name in MODULES_QNAMES if name.endswith( '.namespaces' ) )

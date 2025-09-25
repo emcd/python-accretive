@@ -26,7 +26,7 @@
 from . import imports as __
 
 
-from classcore.standard.nomina import (
+from classcore.standard.nomina import ( # isort: skip
                             AssignerLigation,
                             AttributesNamer,
                             BehaviorExclusionNamesOmni,

@@ -29,6 +29,7 @@ import dataclasses as           dcls
 import functools as             funct
 import                          types
 
+import classcore.exceptions as  ccexc
 import classcore.standard as    ccstd
 import classcore.utilities as   ccutils
 import dynadoc as               ddoc

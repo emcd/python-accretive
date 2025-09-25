@@ -46,6 +46,29 @@ Ways to Contribute
 Development
 ===============================================================================
 
+Architecture
+-------------------------------------------------------------------------------
+
+* The :doc:`Product Requirements Document <prd>` is a good starting point to
+  understand the motivations and rationale for the project. This should be
+  reviewed and updated, as necessary, when making changes that affect product
+  functionality or user experience. See the `requirements documentation guide
+  <https://emcd.github.io/python-project-common/stable/sphinx-html/common/requirements.html>`_
+  for PRD format and best practices.
+
+* The :doc:`system architecture overview <architecture/summary>` should be
+  reviewed to understand the structure and operational patterns of the project.
+  Major changes to the architecture should be reflected in this document.
+
+* Document significant architectural decisions using Architectural Decision
+  Records (ADRs) in the ``architecture/decisions/`` directory. See the
+  `architecture documentation guide
+  <https://emcd.github.io/python-project-common/stable/sphinx-html/common/architecture.html>`_
+  for ADR format and best practices.
+
+* Document interface specifications, schemas, and algorithms in the
+  ``architecture/designs/`` directory to guide implementation efforts.
+
 Guidance and Standards
 -------------------------------------------------------------------------------
 
@@ -60,9 +83,11 @@ Guidance and Standards
   for configuration details.
 
 * Adhere to the `development practices
-  <https://emcd.github.io/python-project-common/stable/sphinx-html/common/practices.html>`_
-  and `code style
-  <https://emcd.github.io/python-project-common/stable/sphinx-html/common/style.html>`_
+  <https://emcd.github.io/python-project-common/stable/sphinx-html/common/practices.html>`_,
+  `code style
+  <https://emcd.github.io/python-project-common/stable/sphinx-html/common/style.html>`_,
+  and `testing guidelines
+  <https://emcd.github.io/python-project-common/stable/sphinx-html/common/tests.html>`_
   to improve the probability of pull request acceptance. You may wish to use an
   LLM to assist with this, if the standards seem too onerous or specific.
 
@@ -104,4 +129,6 @@ Resources
 .. toctree::
    :maxdepth: 2
 
+   prd
+   architecture/index
    devapi

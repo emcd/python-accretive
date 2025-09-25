@@ -77,48 +77,20 @@ nitpick_ignore = [
     ( 'py:class',
       "v, remove specified key and return the corresponding value." ),
     # Type annotation weirdnesses.
-    ( 'py:class', "Doc" ),
-    ( 'py:class', "NotImplementedType" ),
-    ( 'py:class', "absence.objects.AbsenceFactory" ),
-    ( 'py:class', "absence.objects.AbsentSingleton" ),
-    ( 'py:class', "accretive.__.Annotated" ),
-    ( 'py:class', "accretive.__.H" ),
-    ( 'py:class', "accretive.__.V" ),
-    ( 'py:class', "accretive.__.dictionaries.Annotated" ),
     ( 'py:class', "accretive.__.dictionaries._H" ),
     ( 'py:class', "accretive.__.dictionaries._V" ),
-    ( 'py:class', "accretive.__.imports.Annotated" ),
-    ( 'py:class', "accretive.__.imports.C" ),
-    ( 'py:class', "accretive.__.imports.H" ),
-    ( 'py:class', "accretive.__.imports.V" ),
     ( 'py:class', "accretive.__.nomina.H" ),
     ( 'py:class', "accretive.__.nomina.U" ),
     ( 'py:class', "accretive.__.nomina.V" ),
-    ( 'py:class', "accretive.__._H" ),
-    ( 'py:class', "accretive.__._V" ),
     ( 'py:class', "accretive.dictionaries._DictionaryOperations" ),
     ( 'py:class', "builtins.NotImplementedType" ),
-    ( 'py:class', "collections.abc.Annotated" ),
-    ( 'py:class', "classcore.standard.classes.Object" ),
-    ( 'py:class', "dynadoc.context.IntrospectionControl" ),
-    ( 'py:class', "types.Annotated" ),
-    ( 'py:class', "types.NoneType" ),
     ( 'py:class', "typing_extensions._ProtocolMeta" ),
-    ( 'py:class', "typing_extensions.Annotated" ),
     ( 'py:class', "typing_extensions.Any" ),
     ( 'py:class', "typing_extensions.Never" ),
-    ( 'py:class', "typing_extensions.NoDefault" ),
     ( 'py:class', "typing_extensions.Self" ),
-    ( 'py:class', "typing_extensions.TypeIs" ),
-    ( 'py:obj', "accretive.__.H" ),
-    ( 'py:obj', "accretive.__.V" ),
     ( 'py:obj', "accretive.__.dictionaries._H" ),
     ( 'py:obj', "accretive.__.dictionaries._V" ),
-    ( 'py:obj', "accretive.__.imports.H" ),
-    ( 'py:obj', "accretive.__.imports.V" ),
     ( 'py:obj', "accretive.__.nomina.H" ),
-    ( 'py:obj', "accretive.__._H" ),
-    ( 'py:obj', "accretive.__._V" ),
 ]
 
 # -- Options for linkcheck builder -------------------------------------------
@@ -135,6 +107,8 @@ linkcheck_ignore = [
     r'https://pypi.org/project/accretive/',
     # Github aggressively rate-limits access to certain blobs.
     r'https://github\.com/.*/.*/blob/.*',
+    # Avoid timeouts for slow sites.
+    r'http://www\.catb\.org/~esr/faqs/smart-questions\.html',
 ]
 
 # -- Options for HTML output -------------------------------------------------
@@ -166,6 +140,12 @@ autodoc_use_type_comments = False
 # https://www.sphinx-doc.org/en/master/usage/extensions/intersphinx.html#configuration
 
 intersphinx_mapping = {
+    'absence': (
+        'https://emcd.github.io/python-absence/stable/sphinx-html/', None),
+    'classcore': (
+        'https://emcd.github.io/python-classcore/stable/sphinx-html/', None),
+    'dynadoc': (
+        'https://emcd.github.io/python-dynadoc/stable/sphinx-html/', None),
     'python': (
         'https://docs.python.org/3', None),
     'typing-extensions': (

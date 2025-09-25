@@ -32,8 +32,8 @@ from . import classes as _classes
 
 class Omniexception(
     _classes.Object, BaseException,
-    instances_visibles = (
-        '__cause__', '__context__', __.is_public_identifier ),
+    instances_mutables = __.ccexc.exception_mutables_default,
+    instances_visibles = __.ccexc.exception_visibles_default,
 ):
     ''' Base exceptions for package. '''
 
