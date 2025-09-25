@@ -23,6 +23,15 @@ Release Notes
 
 .. towncrier release notes start
 
+accretive 4.2.1 (2025-09-25)
+============================
+
+Repairs
+-------
+
+- Fix Dictionary class to properly configure ABC machinery as mutable.
+
+
 accretive 4.2 (2025-09-25)
 ==========================
 
