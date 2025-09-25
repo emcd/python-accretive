@@ -23,6 +23,21 @@ Release Notes
 
 .. towncrier release notes start
 
+accretive 4.2 (2025-09-25)
+==========================
+
+Enhancements
+------------
+
+- Documentation: Add cross-references to absence, classcore, and dynadoc projects for improved navigation and reduced broken reference warnings.
+
+
+Repairs
+-------
+
+- Fix compatibility issues with PyPy interpreter by ensuring exception and protocol class attributes have proper mutability constraints.
+
+
 Accretive 4.1 (2025-07-04)
 ==========================
 
