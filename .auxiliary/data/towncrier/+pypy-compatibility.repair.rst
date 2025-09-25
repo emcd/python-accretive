@@ -1,0 +1,1 @@
+Fix compatibility issues with PyPy interpreter by ensuring exception and protocol class attributes have proper mutability constraints.
