@@ -29,7 +29,7 @@ from itertools import product
 
 import pytest
 
-from . import (
+from .__ import (
     MODULES_QNAMES,
     PACKAGE_NAME,
     cache_import_module,

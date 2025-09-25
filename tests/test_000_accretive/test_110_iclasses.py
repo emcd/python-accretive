@@ -25,7 +25,7 @@
 
 import pytest
 
-from . import (
+from .__ import (
     PACKAGE_NAME,
     cache_import_module,
 )

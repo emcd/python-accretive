@@ -26,7 +26,7 @@ from platform import python_implementation
 
 import pytest
 
-from . import (
+from .__ import (
     MODULES_QNAMES,
     PACKAGE_NAME,
     cache_import_module,
