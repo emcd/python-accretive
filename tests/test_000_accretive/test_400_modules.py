@@ -147,7 +147,7 @@ def test_501_module_reclassification_dictionary( ):
     try:
         assert not isinstance( test_module, Module )
         with pytest.warns( DeprecationWarning ):
-            module.reclassify_modules( package_dict )
+            module.reclassify_modules( package_dict, recursive = True )
         assert isinstance( test_module, Module )
     finally: cleanup_temp_modules( module_name )
 
@@ -176,7 +176,7 @@ def test_502_module_reclassification_package_dict( ):
         assert not isinstance( test_module, Module )
         assert not isinstance( other_module, Module )
         with pytest.warns( DeprecationWarning ):
-            module.reclassify_modules( ns_dict )
+            module.reclassify_modules( ns_dict, recursive = True )
         assert isinstance( test_module, Module )
         assert not isinstance( other_module, Module )
     finally: cleanup_temp_modules( module_name, other_name )
@@ -295,7 +295,7 @@ def test_540_module_reclassification_safety():
         assert not isinstance(same_pkg_module, Module)
         assert not isinstance(diff_pkg_module, Module)
         with pytest.warns( DeprecationWarning ):
-            module.reclassify_modules(pkg_module)
+            module.reclassify_modules(pkg_module, recursive = True)
         assert isinstance(same_pkg_module, Module)
         assert not isinstance(diff_pkg_module, Module)
     finally: cleanup_temp_modules(same_pkg_name, diff_pkg_name)

@@ -134,4 +134,5 @@ def reclassify_modules(
     __.ccstd.reclassify_modules(
         module,
         attributes_namer = __.calculate_attrname,
+        recursive = recursive,
         replacement_class = Module )
