@@ -226,6 +226,7 @@ class _DictionaryOperations( AbstractDictionary[ __.H, __.V ] ):
 class Dictionary(
     _DictionaryOperations[ __.H, __.V ],
     metaclass = _classes.AbstractBaseClass,
+    class_mutables = _classes.abc_class_mutables,
 ):
     ''' Accretive dictionary. '''
 

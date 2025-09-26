@@ -27,16 +27,16 @@ from . import __
 from . import iclasses as _iclasses
 
 
-mutables_default = _iclasses.mutables_default
-visibles_default = _iclasses.visibles_default
-
-
-_abc_class_mutables = (
+abc_class_mutables = (
     '_abc_cache',
     '_abc_negative_cache',
     '_abc_negative_cache_version',
     '_abc_registry',
 )
+mutables_default = _iclasses.mutables_default
+visibles_default = _iclasses.visibles_default
+
+
 _class_factory = __.funct.partial(
     __.ccstd.class_factory,
     assigner_core = _iclasses.assign_attribute_if_absent_mutable,
@@ -239,7 +239,7 @@ class DataclassObjectMutable(
 class Protocol(
     __.typx.Protocol,
     metaclass = _iclasses.ProtocolClass,
-    class_mutables = _abc_class_mutables,
+    class_mutables = abc_class_mutables,
     instances_assigner_core = _iclasses.assign_attribute_if_absent_mutable,
 ):
     ''' Standard base protocol class. '''
@@ -253,7 +253,7 @@ class Protocol(
 class ProtocolMutable(
     __.typx.Protocol,
     metaclass = _iclasses.ProtocolClass,
-    class_mutables = _abc_class_mutables,
+    class_mutables = abc_class_mutables,
     instances_assigner_core = _iclasses.assign_attribute_if_absent_mutable,
     instances_mutables = '*',
 ):
@@ -268,7 +268,7 @@ class ProtocolMutable(
 class DataclassProtocol(
     __.typx.Protocol,
     metaclass = _iclasses.ProtocolDataclass,
-    class_mutables = _abc_class_mutables,
+    class_mutables = abc_class_mutables,
     instances_assigner_core = _iclasses.assign_attribute_if_absent_mutable,
 ):
     ''' Standard base protocol dataclass. '''
@@ -282,7 +282,7 @@ class DataclassProtocol(
 class DataclassProtocolMutable(
     __.typx.Protocol,
     metaclass = _iclasses.ProtocolDataclassMutable,
-    class_mutables = _abc_class_mutables,
+    class_mutables = abc_class_mutables,
     instances_assigner_core = _iclasses.assign_attribute_if_absent_mutable,
 ):
     ''' Base protocol dataclass with mutable instance attributes. '''
