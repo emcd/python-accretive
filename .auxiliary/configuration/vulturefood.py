@@ -4,7 +4,6 @@ PositionalArguments     # unused variable
 package_name            # unused variable
 
 # --- BEGIN: Injected by Copier ---
-Omnierror              # unused base exception class for derivation
 # --- END: Injected by Copier ---
 
 # Vulture suppressions for legitimate API methods and exports

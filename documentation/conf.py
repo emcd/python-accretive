@@ -150,6 +150,8 @@ intersphinx_mapping = {
         'https://docs.python.org/3', None),
     'typing-extensions': (
         'https://typing-extensions.readthedocs.io/en/latest', None),
+  # --- BEGIN: Injected by Copier ---
+  # --- END: Injected by Copier ---
 }
 
 # -- Options for todo extension ----------------------------------------------

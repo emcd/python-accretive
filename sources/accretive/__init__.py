@@ -28,8 +28,8 @@
 
 
 from . import __
-# --- BEGIN: Injected by Copier ---
 from . import exceptions
+# --- BEGIN: Injected by Copier ---
 # --- END: Injected by Copier ---
 
 from .classes import *
