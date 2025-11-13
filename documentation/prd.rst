@@ -24,17 +24,17 @@ Product Requirements Document
 Executive Summary
 ===============================================================================
 
-Accretive is a Python library providing data structures that enforce a grow-only
-constraint: values can be added but never modified or removed once set. The
-library offers accretive variants of familiar Python types (dictionaries,
-namespaces, classes, modules) with consistent APIs and flexible configuration
-options for selective mutability.
+The package provides data structures that enforce a grow-only constraint: values
+can be added but never modified or removed once set. It offers accretive
+variants of familiar Python types (dictionaries, namespaces, classes, modules)
+with consistent APIs and flexible configuration options for selective
+mutability.
 
-The library addresses the need for collections that accumulate state with
+The package addresses the need for collections that accumulate state with
 immutability guarantees, particularly valuable for configuration registries,
 plugin systems, and scenarios requiring sticky state. By providing a middle
-ground between fully immutable and fully mutable collections, Accretive enables
-developers to build safer, more predictable systems.
+ground between fully immutable and fully mutable collections, the package
+enables developers to build safer, more predictable systems.
 
 Problem Statement
 ===============================================================================
@@ -352,7 +352,7 @@ Technical Constraints
 
 * **Python Immutability Limitations**: True immutability is impossible in
   Python; enforcement is best-effort and can be circumvented by determined users
-  with intermediate Python knowledge. The library encourages immutability rather
+  with intermediate Python knowledge. The package encourages immutability rather
   than guarantees it.
 
 * **Metaclass Limitations**: Classes can only have one metaclass; users cannot
@@ -392,19 +392,19 @@ The following features are explicitly excluded from the current product scope:
 
 **Deep Immutability**
 
-Accretive does not enforce immutability of nested values. If a dictionary entry
-is itself mutable (e.g., a list), that object can still be modified. Only the
-binding between key and value is immutable.
+The package does not enforce immutability of nested values. If a dictionary
+entry is itself mutable (e.g., a list), that object can still be modified. Only
+the binding between key and value is immutable.
 
 **Cryptographic Guarantees**
 
-The library does not provide cryptographic verification of immutability or
+The package does not provide cryptographic verification of immutability or
 tamper detection. Immutability enforcement is best-effort in Python's dynamic
 environment.
 
 **Multi-Process Synchronization**
 
-Accretive does not provide synchronization primitives for multi-process
+The package does not provide synchronization primitives for multi-process
 scenarios. Thread-safety within a single process is supported, but distributed
 consistency is out of scope.
 
@@ -421,4 +421,4 @@ types faster than standard types are not a goal.
 **Alternative Immutability Models**
 
 Other immutability patterns (copy-on-write, persistent data structures, etc.)
-are not provided. The library focuses exclusively on accretive semantics.
+are not provided. The package focuses exclusively on accretive semantics.
