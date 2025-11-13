@@ -141,17 +141,7 @@ Success Metrics:
 Secondary Objectives
 -------------------------------------------------------------------------------
 
-**REQ-OBJ-004 [Medium]: Performance Efficiency**
-
-Minimize performance overhead compared to standard mutable collections.
-
-Success Metrics:
-
-* Lookup operations within 10% of standard dict/object performance
-* Addition operations within 20% of standard performance
-* Memory overhead less than 15% compared to standard types
-
-**REQ-OBJ-005 [Medium]: Comprehensive Type Coverage**
+**REQ-OBJ-004 [Medium]: Comprehensive Type Coverage**
 
 Provide accretive variants for common Python types beyond basic collections.
 
@@ -162,63 +152,6 @@ Success Metrics:
 * Class metaclasses supporting dataclasses and standard classes
 * Module reclassification utilities
 
-Target Users
-===============================================================================
-
-User Personas
--------------------------------------------------------------------------------
-
-**Persona 1: Library Author**
-
-* Building reusable libraries with plugin architectures
-* Needs guaranteed availability of registered extensions
-* Values correctness and predictability over flexibility
-* Intermediate to advanced Python knowledge
-* Uses type hints and modern Python features
-
-**Persona 2: Application Developer**
-
-* Building configuration systems for production applications
-* Needs to prevent accidental configuration overwrites
-* Values safety and clear error messages
-* Intermediate Python knowledge
-* May work in teams with varying skill levels
-
-**Persona 3: System Architect**
-
-* Designing concurrent or distributed systems
-* Needs to minimize shared mutable state
-* Values architectural patterns and best practices
-* Advanced Python knowledge
-* Concerned with maintainability and long-term evolution
-
-User Needs and Motivations
--------------------------------------------------------------------------------
-
-* **Safety**: Prevent accidental state mutation that leads to bugs
-* **Predictability**: Guarantee that once-set values remain constant
-* **Simplicity**: Minimal API surface and familiar patterns
-* **Flexibility**: Support legitimate use cases requiring selective mutability
-* **Performance**: Acceptable overhead for the safety guarantees provided
-* **Debuggability**: Clear error messages identifying violation sources
-
-Technical Proficiency Levels
--------------------------------------------------------------------------------
-
-* **Minimum**: Intermediate Python (understands classes, decorators, type hints)
-* **Typical**: Advanced Python (understands metaclasses, descriptors, protocols)
-* **Documentation**: Should serve both proficiency levels with clear examples
-
-Usage Contexts
--------------------------------------------------------------------------------
-
-* Plugin registration systems
-* Configuration management
-* Event handler registries
-* Cache implementations
-* State management in web frameworks
-* Concurrent programming with shared state
-
 Functional Requirements
 ===============================================================================
 
@@ -227,10 +160,8 @@ Accretive Dictionary Types
 
 **REQ-DICT-001 [Critical]: Basic Dictionary**
 
-Provide a standard accretive dictionary implementation.
-
-As a library author, I want a dictionary that allows adding new entries but
-prevents modifying existing ones, so that plugin registrations remain stable.
+Standard accretive dictionary implementation that allows adding new entries but
+prevents modifying or removing existing ones.
 
 Acceptance Criteria:
 
@@ -243,11 +174,8 @@ Acceptance Criteria:
 
 **REQ-DICT-002 [High]: Producer Dictionary**
 
-Provide a dictionary that auto-generates values for missing keys.
-
-As an application developer, I want a dictionary with default factories like
-defaultdict but with accretive behavior, so that I can accumulate grouped data
-safely.
+Dictionary that auto-generates values for missing keys using a factory function,
+similar to collections.defaultdict but with accretive behavior.
 
 Acceptance Criteria:
 
@@ -258,10 +186,8 @@ Acceptance Criteria:
 
 **REQ-DICT-003 [Medium]: Validator Dictionary**
 
-Provide a dictionary that validates entries before addition.
-
-As a system architect, I want to enforce type or value constraints on
-dictionary entries, so that invalid data never enters the registry.
+Dictionary that validates entries before addition using a predicate function,
+ensuring only valid data can be added.
 
 Acceptance Criteria:
 
@@ -272,7 +198,7 @@ Acceptance Criteria:
 
 **REQ-DICT-004 [Medium]: Combined Producer-Validator**
 
-Provide a dictionary combining producer and validator behaviors.
+Dictionary combining auto-generation and validation behaviors.
 
 Acceptance Criteria:
 
@@ -285,10 +211,9 @@ Accretive Namespace Types
 
 **REQ-NS-001 [Critical]: Basic Namespace**
 
-Provide an accretive namespace similar to types.SimpleNamespace.
-
-As a library author, I want an object where I can add attributes dynamically but
-prevent later modification, so that configuration objects remain consistent.
+Accretive namespace similar to types.SimpleNamespace that allows adding
+attributes dynamically but prevents modification or deletion of existing
+attributes.
 
 Acceptance Criteria:
 
@@ -304,10 +229,8 @@ Accretive Class Types
 
 **REQ-CLASS-001 [Critical]: Standard Metaclass**
 
-Provide a metaclass for creating classes with accretive instances.
-
-As an application developer, I want to create custom classes whose instances
-have accretive behavior, so that I can build domain-specific immutable types.
+Metaclass for creating classes with accretive instances where instance
+attributes become immutable after first assignment.
 
 Acceptance Criteria:
 
@@ -319,10 +242,8 @@ Acceptance Criteria:
 
 **REQ-CLASS-002 [High]: Dataclass Metaclass**
 
-Provide a metaclass for dataclasses with accretive instances.
-
-As a library author, I want to use @dataclass decorator with accretive behavior,
-so that I can leverage dataclass features with immutability guarantees.
+Metaclass for dataclasses with accretive instances, compatible with the
+@dataclass decorator.
 
 Acceptance Criteria:
 
@@ -334,7 +255,7 @@ Acceptance Criteria:
 
 **REQ-CLASS-003 [Medium]: Mutable Dataclass Metaclass**
 
-Provide a metaclass for dataclasses with selectively mutable instances.
+Metaclass for dataclasses with selectively mutable instances.
 
 Acceptance Criteria:
 
@@ -348,10 +269,8 @@ Accretive Module Types
 
 **REQ-MOD-001 [High]: Module Reclassification**
 
-Provide utilities to reclassify existing modules as accretive.
-
-As a library author, I want to make module-level constants truly constant, so
-that module state cannot be tampered with at runtime.
+Utilities to reclassify existing modules as accretive, making module-level
+attributes immutable after finalization.
 
 Acceptance Criteria:
 
@@ -366,10 +285,8 @@ Error Handling
 
 **REQ-ERR-001 [Critical]: Exception Hierarchy**
 
-Provide clear exception hierarchy for accretive violations.
-
-As an application developer, I want informative exceptions when immutability is
-violated, so that I can quickly identify and fix the source of violations.
+Clear exception hierarchy for accretive violations with informative error
+messages.
 
 Acceptance Criteria:
 
@@ -382,17 +299,6 @@ Acceptance Criteria:
 
 Non-Functional Requirements
 ===============================================================================
-
-Performance Requirements
--------------------------------------------------------------------------------
-
-**REQ-PERF-001**: Dictionary lookup operations complete within 10% of standard
-dict performance for collections up to 100,000 entries.
-
-**REQ-PERF-002**: Attribute access on accretive objects completes within 15% of
-standard object attribute access.
-
-**REQ-PERF-003**: Import time overhead less than 100ms for the entire package.
 
 Compatibility Requirements
 -------------------------------------------------------------------------------
