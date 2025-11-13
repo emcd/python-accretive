@@ -57,15 +57,22 @@ The main Python package follows the standard ``sources/`` directory pattern:
 .. code-block::
 
     sources/
-    ├── accretive/          # Main Python package
-    │   ├── __/                      # Centralized import hub
-    │   │   ├── __init__.py          # Re-exports core utilities
-    │   │   ├── imports.py           # External library imports
-    │   │   └── nomina.py            # python-accretive-specific naming constants
-    │   ├── __init__.py              # Package entry point
-    │   ├── py.typed                 # Type checking marker
-    │   ├── exceptions.py            # Package exception hierarchy
-    │   └── [modules].py             # Feature-specific modules
+    └── accretive/                   # Main Python package
+        ├── __/                      # Centralized import hub
+        │   ├── __init__.py          # Re-exports core utilities
+        │   ├── dictionaries.py      # Internal dictionary utilities and type aliases
+        │   ├── doctab.py            # Documentation fragment table
+        │   ├── exceptions.py        # Internal exception utilities
+        │   ├── imports.py           # External library imports
+        │   └── nomina.py            # Package-specific naming constants
+        ├── __init__.py              # Package entry point
+        ├── py.typed                 # Type checking marker
+        ├── classes.py               # Accretive class metaclasses and decorators
+        ├── dictionaries.py          # Accretive dictionary implementations
+        ├── exceptions.py            # Package exception hierarchy
+        ├── iclasses.py              # Internal class implementations
+        ├── modules.py               # Accretive module implementation
+        └── namespaces.py            # Accretive namespace implementation
     
 
 All package modules use the standard ``__`` import pattern as documented
