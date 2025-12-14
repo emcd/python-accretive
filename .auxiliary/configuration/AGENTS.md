@@ -1,7 +1,7 @@
 # Context
 
 - Project overview and quick start: README.rst
-- Product requirements and goals: documentation/prd.rst
+- Product requirements and goals: documentation/architecture/openspec/specs
 - System architecture and design: @documentation/architecture/
 - Development practices and style: @.auxiliary/instructions/
 - Current session notes and TODOs: @.auxiliary/notes/
