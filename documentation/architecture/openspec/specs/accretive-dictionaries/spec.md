@@ -1,7 +1,7 @@
 # Accretive Dictionaries
 
 ## Purpose
-To provide dictionary implementations that enforce grow-only semantics, where new entries can be added but existing entries cannot be modified or removed. This ensures data consistency for configuration registries, plugin systems, and other use cases requiring sticky state.
+To provide dictionary implementations that enforce grow-only semantics, where new entries can be added but existing entries cannot be modified or removed. Includes variants with auto-generation (producer) and validation behaviors.
 
 ## Requirements
 
@@ -22,7 +22,7 @@ Priority: Critical
 
 #### Scenario: Removing entries
 - **WHEN** a user attempts to delete an existing key
-- **THEN** an exception (likely `TypeError` or `EntryImmutability`) is raised
+- **THEN** an `EntryImmutability` exception is raised
 - **AND** the entry remains in the dictionary
 
 ### Requirement: Producer Dictionary

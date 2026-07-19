@@ -1,7 +1,7 @@
 # Accretive Classes
 
 ## Purpose
-To provide metaclasses that enforce accretive behavior on class instances, ensuring that instance attributes become immutable after their initial assignment. This supports creating robust objects where state accumulation is permitted but state mutation is forbidden.
+To provide metaclasses and decorators for creating user-defined accretive types. Includes metaclasses for standard classes, dataclasses, abstract base classes, and protocols — all enforcing attribute immutability after initialization.
 
 ## Requirements
 
@@ -41,3 +41,33 @@ Priority: Medium
 - **WHEN** a class is defined with specific attributes marked as mutable
 - **THEN** those attributes can be reassigned
 - **AND** other attributes remain immutable
+
+### Requirement: Abstract Base Class Metaclass
+The system SHALL provide a metaclass for abstract base classes with accretive instances, compatible with `abc.ABCMeta`.
+
+Priority: Medium
+
+#### Scenario: Defining an accretive abstract class
+- **WHEN** a class inherits from `ABC` or uses `ABCMeta` with the accretive abstract metaclass
+- **THEN** the class supports abstract methods
+- **AND** concrete instances exhibit accretive behavior
+
+### Requirement: Protocol Metaclass
+The system SHALL provide metaclasses for protocol classes with accretive behavior, compatible with `typing.Protocol`.
+
+Priority: Medium
+
+#### Scenario: Defining an accretive protocol
+- **WHEN** a class inherits from `Protocol` with an accretive protocol metaclass
+- **THEN** the class behaves as a protocol
+- **AND** instances exhibit accretive behavior
+
+### Requirement: Object Decorator
+The system SHALL provide a decorator (`with_standard_behaviors`) that adds accretive behavior to any class without requiring metaclass configuration.
+
+Priority: High
+
+#### Scenario: Decorating a class
+- **WHEN** a class is decorated with `@with_standard_behaviors`
+- **THEN** instances of that class exhibit accretive behavior
+- **AND** the class retains its original metaclass

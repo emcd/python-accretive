@@ -1,7 +1,7 @@
 # Accretive Namespaces
 
 ## Purpose
-To provide a namespace implementation similar to `types.SimpleNamespace` that allows adding attributes dynamically but prevents modification or deletion of existing attributes, suitable for configuration objects and structured data carriers.
+To provide a namespace implementation similar to `types.SimpleNamespace` that allows adding attributes dynamically but prevents modification or deletion of existing attributes. Suitable for configuration objects and structured data carriers.
 
 ## Requirements
 
@@ -22,5 +22,5 @@ Priority: Critical
 
 #### Scenario: Deleting attributes
 - **WHEN** a user attempts to delete an existing attribute
-- **THEN** an exception is raised
+- **THEN** an `AttributeImmutability` exception is raised
 - **AND** the attribute remains in the namespace
