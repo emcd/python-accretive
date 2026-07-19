@@ -254,3 +254,8 @@ standard library exceptions (`AttributeError`, `TypeError`, `ValueError`).
 This enables both specific handling (`catch AttributeImmutability`) and
 general handling (`catch Omnierror`) while remaining compatible with
 standard exception hierarchies.
+
+## Sister Projects
+
+- **[classcore](https://github.com/emcd/python-classcore)** — Foundational class factory and behavior system. Provides the metaclass machinery that accretive delegates to.
+- **[frigid](https://github.com/emcd/python-frigid)** — Fully immutable data structures. Like accretive, but values cannot be added or changed after creation.
