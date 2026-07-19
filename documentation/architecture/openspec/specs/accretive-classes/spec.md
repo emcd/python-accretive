@@ -62,8 +62,25 @@ Priority: Medium
 - **THEN** the class behaves as a protocol
 - **AND** instances exhibit accretive behavior
 
-### Requirement: Object Decorator
-The system SHALL provide a decorator (`with_standard_behaviors`) that adds accretive behavior to any class without requiring metaclass configuration.
+### Requirement: Base Classes
+The system SHALL provide ready-to-use base classes: `Object`, `ObjectMutable`, `DataclassObject`, `DataclassObjectMutable`, `Protocol`, `ProtocolMutable`, `DataclassProtocol`, and `DataclassProtocolMutable`.
+
+Priority: High
+
+#### Scenario: Using Object base class
+- **WHEN** a class inherits from `Object`
+- **THEN** instances have immutable attributes after initialization
+
+#### Scenario: Using ObjectMutable base class
+- **WHEN** a class inherits from `ObjectMutable`
+- **THEN** instance attributes are mutable
+
+#### Scenario: Using DataclassObject base class
+- **WHEN** a class inherits from `DataclassObject`
+- **THEN** the class behaves as a dataclass with immutable instances
+
+### Requirement: Class Decorator
+The system SHALL provide a `with_standard_behaviors` decorator that adds accretive behavior to any class without requiring metaclass configuration.
 
 Priority: High
 
@@ -71,3 +88,36 @@ Priority: High
 - **WHEN** a class is decorated with `@with_standard_behaviors`
 - **THEN** instances of that class exhibit accretive behavior
 - **AND** the class retains its original metaclass
+
+#### Scenario: Decorating with mutable attributes
+- **WHEN** `@with_standard_behaviors(mutables=...)` specifies mutable attributes
+- **THEN** those attributes remain mutable
+- **AND** other attributes remain immutable
+
+### Requirement: Dataclass Decorator
+The system SHALL provide a `dataclass_with_standard_behaviors` decorator that adds accretive behavior to dataclasses.
+
+Priority: High
+
+#### Scenario: Decorating a dataclass
+- **WHEN** a dataclass is decorated with `@dataclass_with_standard_behaviors`
+- **THEN** instances have immutable fields after initialization
+
+### Requirement: ABC Internals Exemption
+The system SHALL exempt abstract base class internals (`_abc_cache`, `_abc_negative_cache`, `_abc_negative_cache_version`, `_abc_registry`) from immutability enforcement on protocol classes.
+
+Priority: Medium
+
+#### Scenario: ABC cache mutation
+- **WHEN** Python's ABC machinery modifies `_abc_cache` on a protocol class
+- **THEN** the modification succeeds without raising `AttributeImmutability`
+
+### Requirement: Attribute Concealment
+The system SHALL delegate attribute concealment (filtering from `dir()`) to classcore's class factory system.
+
+Priority: Low
+
+#### Scenario: Concealed attributes
+- **WHEN** a class uses an accretive metaclass with concealment configured
+- **THEN** concealed attributes are not visible in `dir()` output
+- **AND** concealment is managed by classcore's behavior system
