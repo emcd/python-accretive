@@ -13,6 +13,9 @@ pop                     # dictionary method in API
 popitem                 # dictionary method in API
 setdefault              # dictionary method in API
 ClassDecorationPreparers # import for API
+ClassDecorator          # import for API
+ClassDecoratorFactory   # import for API
+ClassDecorators         # import for API
 concealment_label       # import for API
 DynadocConfiguration    # import for API
 ModuleReclassifier      # variable for API

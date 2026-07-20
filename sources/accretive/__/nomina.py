@@ -33,9 +33,13 @@ from classcore.standard.nomina import ( # isort: skip
                             BehaviorExclusionRegexes,
                             BehaviorExclusionPredicates,
                             BehaviorExclusionVerifiersOmni,
+                            ClassDecorator,
+                            ClassDecorators,
+                            ClassDecoratorFactory,
     DecorationPreparers as  ClassDecorationPreparers,
                             DynadocConfiguration,
                             ErrorClassProvider,
+                            ModuleReclassifier,
                             concealment_label,
                             immutability_label,
                             is_public_identifier,
@@ -51,17 +55,6 @@ V = __.typx.TypeVar( 'V' ) # Value
 ComparisonResult: __.typx.TypeAlias = bool | __.types.NotImplementedType
 NominativeArguments: __.typx.TypeAlias = __.cabc.Mapping[ str, __.typx.Any ]
 PositionalArguments: __.typx.TypeAlias = __.cabc.Sequence[ __.typx.Any ]
-
-# TODO: Import ClassDecorator aliases from 'classcore' once available.
-ClassDecorator: __.typx.TypeAlias = (
-    __.cabc.Callable[ [ type[ U ] ], type[ U ] ] )
-ClassDecorators: __.typx.TypeAlias = (
-    __.cabc.Sequence[ ClassDecorator[ U ] ] )
-ClassDecoratorFactory: __.typx.TypeAlias = (
-    __.cabc.Callable[ ..., ClassDecorator[ U ] ] )
-# TODO: Import ModuleReclassifier from 'classcore' once available.
-ModuleReclassifier: __.typx.TypeAlias = __.cabc.Callable[
-    [ __.cabc.Mapping[ str, __.typx.Any ] ], None ]
 
 DictionaryNominativeArgument: __.typx.TypeAlias = __.typx.Annotated[
     V,
