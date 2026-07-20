@@ -184,7 +184,13 @@ class _DictionaryOperations( AbstractDictionary[ __.H, __.V ] ):
 
     def __ror__( self, other: __.cabc.Mapping[ __.H, __.V ] ) -> __.typx.Self:
         if not isinstance( other, __.cabc.Mapping ): return NotImplemented
-        return self | other
+        conflicts = set( other.keys( ) ) & set( self.keys( ) )
+        if conflicts:
+            from .exceptions import EntryImmutability
+            raise EntryImmutability( next( iter( conflicts ) ) )
+        data = dict( other )
+        data.update( self )
+        return self.with_data( data )
 
     def __and__(
         self,

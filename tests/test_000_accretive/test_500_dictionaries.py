@@ -223,6 +223,7 @@ def test_160_or_combines_dictionaries( module_qname, class_name ):
     if class_name in PRODUCER_VALIDATOR_NAMES:
         assert d6 == { 'a': [ 1 ], 'd': [ 5 ], 'e': [ 6 ] }
     else: assert d6 == { 'a': 1, 'd': 5, 'e': 6 }
+    assert list( d6.keys( ) ) == [ 'd', 'e', 'a' ]
     d7 = factory( *posargs, **nomargs )
     if class_name in PRODUCER_VALIDATOR_NAMES:
         d7[ 'a' ] = [ 2 ]
