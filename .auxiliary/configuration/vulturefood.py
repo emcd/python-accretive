@@ -30,3 +30,4 @@ ProducerDictionary      # exported class
 ValidatorDictionary     # exported class
 ProducerValidatorDictionary # exported class
 dataclass_core          # import for API
+is_internal_name        # detector for classcore seam
