@@ -21,8 +21,6 @@
 ''' Assert correct function of namespaces. '''
 
 
-from itertools import product
-
 import pytest
 
 from .__ import (
@@ -39,10 +37,8 @@ base = cache_import_module( f"{PACKAGE_NAME}.__" )
 exceptions = cache_import_module( f"{PACKAGE_NAME}.exceptions" )
 
 
-@pytest.mark.parametrize(
-    'module_qname, class_name',
-    product( THESE_MODULE_QNAMES, THESE_CLASSES_NAMES )
-)
+@pytest.mark.parametrize( 'module_qname', THESE_MODULE_QNAMES )
+@pytest.mark.parametrize( 'class_name', THESE_CLASSES_NAMES )
 def test_100_instantiation( module_qname, class_name ):
     ''' Class instantiates. '''
     module = cache_import_module( module_qname )
@@ -60,10 +56,8 @@ def test_100_instantiation( module_qname, class_name ):
     assert ( 1, 2, True, False ) == tuple( ns2.__dict__.values( ) )
 
 
-@pytest.mark.parametrize(
-    'module_qname, class_name',
-    product( THESE_MODULE_QNAMES, THESE_CLASSES_NAMES )
-)
+@pytest.mark.parametrize( 'module_qname', THESE_MODULE_QNAMES )
+@pytest.mark.parametrize( 'class_name', THESE_CLASSES_NAMES )
 def test_101_accretion( module_qname, class_name ):
     ''' Namespace accretes attributes. '''
     module = cache_import_module( module_qname )
@@ -78,10 +72,8 @@ def test_101_accretion( module_qname, class_name ):
     assert 42 == obj.attr
 
 
-@pytest.mark.parametrize(
-    'module_qname, class_name',
-    product( THESE_MODULE_QNAMES, THESE_CLASSES_NAMES )
-)
+@pytest.mark.parametrize( 'module_qname', THESE_MODULE_QNAMES )
+@pytest.mark.parametrize( 'class_name', THESE_CLASSES_NAMES )
 def test_102_string_representation( module_qname, class_name ):
     ''' Namespace has expected string representations. '''
     module = cache_import_module( module_qname )
@@ -93,10 +85,8 @@ def test_102_string_representation( module_qname, class_name ):
     assert 'a = 1, b = 2' in repr( obj )
 
 
-@pytest.mark.parametrize(
-    'module_qname, class_name',
-    product( THESE_MODULE_QNAMES, THESE_CLASSES_NAMES )
-)
+@pytest.mark.parametrize( 'module_qname', THESE_MODULE_QNAMES )
+@pytest.mark.parametrize( 'class_name', THESE_CLASSES_NAMES )
 def test_105_dictionary_equality( module_qname, class_name ):
     ''' Dictionary is equivalent to another dictionary with same values. '''
     from types import SimpleNamespace
@@ -117,10 +107,8 @@ def test_105_dictionary_equality( module_qname, class_name ):
     assert ns2 != ns1
 
 
-@pytest.mark.parametrize(
-    'module_qname, class_name',
-    product( THESE_MODULE_QNAMES, THESE_CLASSES_NAMES )
-)
+@pytest.mark.parametrize( 'module_qname', THESE_MODULE_QNAMES )
+@pytest.mark.parametrize( 'class_name', THESE_CLASSES_NAMES )
 def test_900_docstring_sanity( module_qname, class_name ):
     ''' Class has valid docstring. '''
     module = cache_import_module( module_qname )
