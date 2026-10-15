@@ -720,7 +720,7 @@ def test_260_subclasses_abc_dictionary( module_qname, class_name ):
     from collections.abc import Mapping as AbstractDictionary
     module = cache_import_module( module_qname )
     factory = getattr( module, class_name )
-    issubclass( factory, AbstractDictionary )
+    assert issubclass( factory, AbstractDictionary )
 
 
 @pytest.mark.parametrize(
