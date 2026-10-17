@@ -89,4 +89,4 @@ package_name = __name__.split( '.', maxsplit = 1 )[ 0 ]
 # ``is_internal_name`` detector consumed by classcore 1.13+
 # metaclass-carried internal-name contributions, so accretive internal
 # names flow into attribute explanations and concealment.
-calculate_attrname = AttrnameCalculator( package_name )
+calculate_attrname = AttrnameCalculator( package_name = package_name )

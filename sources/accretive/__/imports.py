@@ -27,6 +27,7 @@ import                          abc
 import collections.abc as       cabc
 import dataclasses as           dcls
 import functools as             funct
+import                          inspect
 import                          types
 
 import classcore.exceptions as  ccexc

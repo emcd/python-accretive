@@ -112,9 +112,7 @@ def test_140_rejects_noninternal_names( name ):
 def test_200_flows_into_explanations( ):
     ''' Accretive internal names surface in classcore explanations. '''
     ccstd = cache_import_module( 'classcore.standard' )
-    explain_attribute = getattr( ccstd, 'explain_attribute', None )
-    if explain_attribute is None:
-        pytest.skip( 'classcore without attribute explanations' )
+    explain_attribute = ccstd.explain_attribute
     classes = cache_import_module( f"{PACKAGE_NAME}.classes" )
     explanation = explain_attribute(
         classes.Class, '_accretive_class_mutables_names_' )

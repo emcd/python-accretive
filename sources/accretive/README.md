@@ -113,7 +113,9 @@ compatibility with standard Python semantics.
 
 The `assign_attribute_if_absent_mutable` function implements the core logic:
 
-1. Check if attribute exists using `hasattr`
+1. Check if attribute exists via a non-invoking probe
+   (`inspect.getattr_static`, so caching descriptors cannot re-enter
+   the assigner) with slot storage consulted for slot descriptors
 2. If absent, allow assignment
 3. If present, check immutability behaviors configuration
 4. Check mutables exclusions (names, predicates, regexes)

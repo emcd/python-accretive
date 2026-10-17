@@ -39,9 +39,21 @@ def assign_attribute_if_absent_mutable( # noqa: PLR0913
     value: __.typx.Any,
 ) -> None:
     ''' Assigns attribute if it is absent or mutable, else raises error. '''
-    if not hasattr( objct, name ):
+    # Presence probe must not invoke descriptors: caching descriptors
+    # (e.g., Python 3.15 dataclass docstring descriptors) write during
+    # reads, which would re-enter this assigner infinitely.
+    try:
+        static = __.inspect.getattr_static( objct, name )
+    except AttributeError:
         ligation( name, value )
         return
+    if isinstance( static, __.types.MemberDescriptorType ):
+        # Slot: descriptor exists whether or not it holds a value, and
+        # only a slot getter is invocation-safe here, so read directly.
+        try: object.__getattribute__( objct, name )
+        except AttributeError:
+            ligation( name, value )
+            return
     leveli = 'instance' if level == 'instances' else level
     behaviors_name = attributes_namer( leveli, 'behaviors' )
     behaviors = __.ccutils.getattr0( objct, behaviors_name, frozenset( ) )

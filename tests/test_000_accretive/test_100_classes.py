@@ -21,6 +21,7 @@
 ''' Assert correct function of class factory classes. '''
 
 
+from inspect import getmembers as survey_members
 from platform import python_implementation
 
 import pytest
@@ -273,6 +274,71 @@ def test_143_decorator_application_with_no_args(
     exceptions = cache_import_module( f"{PACKAGE_NAME}.exceptions" )
     with pytest.raises( exceptions.AttributeImmutability ):
         foo.a = 3
+
+
+@pytest.mark.parametrize( 'module_qname', THESE_MODULE_QNAMES )
+def test_150_docstring_descriptor_survey( module_qname ):
+    ''' Docstring-less dataclass survives attribute survey.
+
+        Regression: on Python 3.15, dataclasses installs a caching
+        docstring descriptor whose read performs a write; the assigner
+        must probe presence without invoking descriptors.
+    '''
+    module = cache_import_module( module_qname )
+    dataclass_class = getattr( module, 'Dataclass' )
+    class Point( metaclass = dataclass_class ):
+        x: int
+        y: int
+    point = Point( x = 1, y = 2 )
+    assert 1 == point.x
+    assert 2 == point.y
+    surveyed = dict( survey_members( Point ) )
+    assert surveyed
+
+
+@pytest.mark.parametrize( 'module_qname', THESE_MODULE_QNAMES )
+def test_151_unset_slot_first_write( module_qname ):
+    ''' Unset slot accepts first write.
+
+        Regression: the non-invoking presence probe must still treat
+        a slot which holds no value as absent.
+    '''
+    module = cache_import_module( module_qname )
+    decorator = getattr( module, 'with_standard_behaviors' )
+    @decorator( )
+    class Slotted:
+        __slots__ = ( '__dict__', 'value' )
+    obj = Slotted( )
+    obj.value = 1
+    assert 1 == obj.value
+
+
+@pytest.mark.parametrize( 'module_qname', THESE_MODULE_QNAMES )
+def test_152_set_slot_refused( module_qname ):
+    ''' Set slot refuses rewrite, inherited slot accepts first write.
+
+        Pins accretion for slots: initialized values live outside
+        __dict__, so the probe must consult slot storage itself.
+    '''
+    module = cache_import_module( module_qname )
+    decorator = getattr( module, 'with_standard_behaviors' )
+    @decorator( )
+    class Slotted:
+        __slots__ = ( '__dict__', 'value' )
+    @decorator( )
+    class SubSlotted( Slotted ):
+        __slots__ = ( 'extra', )
+    obj = Slotted( )
+    obj.value = 1
+    exceptions = cache_import_module( f"{PACKAGE_NAME}.exceptions" )
+    with pytest.raises( exceptions.AttributeImmutability ):
+        obj.value = 2
+    assert 1 == obj.value
+    sub = SubSlotted( )
+    sub.value = 10
+    assert 10 == sub.value
+    sub.extra = 20
+    assert 20 == sub.extra
 
 
 @pytest.mark.parametrize( 'module_qname', THESE_MODULE_QNAMES )
