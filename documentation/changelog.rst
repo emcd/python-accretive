@@ -23,6 +23,33 @@ Release Notes
 
 .. towncrier release notes start
 
+accretive 4.3 (2026-10-22)
+==========================
+
+Enhancements
+------------
+
+- Require Classcore 1.15 or later and contribute accretive internal
+  names to its attribute explanations via the exported
+  ``AttrnameCalculator`` configured with the accretive package prefix.
+
+
+Removals
+--------
+
+- Require Python 3.12 or later; drop support for Python 3.10 and 3.11
+  as well as PyPy. Classcore 1.15 likewise requires Python 3.12+.
+
+
+Repairs
+-------
+
+- Probe attribute presence without invoking descriptors in the
+  assigner core: fixes infinite recursion on Python 3.15, where caching
+  dataclass docstring descriptors write during reads, while preserving
+  first-write acceptance for uninitialized slots.
+
+
 accretive 4.2.1 (2025-09-25)
 ============================
 
