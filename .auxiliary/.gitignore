@@ -1,2 +1,4 @@
-artifacts/
-caches/
+/artifacts/
+/caches/
+/temporary/
+notes/

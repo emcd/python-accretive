@@ -4,7 +4,6 @@ PositionalArguments     # unused variable
 package_name            # unused variable
 
 # --- BEGIN: Injected by Copier ---
-Omnierror              # unused base exception class for derivation
 # --- END: Injected by Copier ---
 
 # Vulture suppressions for legitimate API methods and exports
@@ -14,6 +13,9 @@ pop                     # dictionary method in API
 popitem                 # dictionary method in API
 setdefault              # dictionary method in API
 ClassDecorationPreparers # import for API
+ClassDecorator          # import for API
+ClassDecoratorFactory   # import for API
+ClassDecorators         # import for API
 concealment_label       # import for API
 DynadocConfiguration    # import for API
 ModuleReclassifier      # variable for API

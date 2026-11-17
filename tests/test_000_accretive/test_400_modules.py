@@ -25,8 +25,6 @@ import sys
 import types
 import uuid
 
-from itertools import product
-
 import pytest
 
 from .__ import (
@@ -81,10 +79,8 @@ def cleanup_temp_modules( *module_names ):
             del sys.modules[ name ]
 
 
-@pytest.mark.parametrize(
-    'module_qname, class_name',
-    product( THESE_MODULE_QNAMES, THESE_CLASSES_NAMES )
-)
+@pytest.mark.parametrize( 'module_qname', THESE_MODULE_QNAMES )
+@pytest.mark.parametrize( 'class_name', THESE_CLASSES_NAMES )
 def test_100_instantiation( module_qname, class_name ):
     ''' Class instantiates. '''
     module = cache_import_module( module_qname )
@@ -94,10 +90,8 @@ def test_100_instantiation( module_qname, class_name ):
     assert 'foo' == obj.__name__
 
 
-@pytest.mark.parametrize(
-    'module_qname, class_name',
-    product( THESE_MODULE_QNAMES, THESE_CLASSES_NAMES )
-)
+@pytest.mark.parametrize( 'module_qname', THESE_MODULE_QNAMES )
+@pytest.mark.parametrize( 'class_name', THESE_CLASSES_NAMES )
 def test_101_accretion( module_qname, class_name ):
     ''' Module accretes attributes. '''
     module = cache_import_module( module_qname )
@@ -334,10 +328,8 @@ def test_560_module_reclassification_no_package( ):
     finally: cleanup_temp_modules(test_module_name, test_module2_name)
 
 
-@pytest.mark.parametrize(
-    'module_qname, class_name',
-    product( THESE_MODULE_QNAMES, THESE_CLASSES_NAMES )
-)
+@pytest.mark.parametrize( 'module_qname', THESE_MODULE_QNAMES )
+@pytest.mark.parametrize( 'class_name', THESE_CLASSES_NAMES )
 def test_600_finalize_module_with_defaults( module_qname, class_name ):
     ''' finalize_module works with default absent values. '''
     module = cache_import_module( module_qname )
@@ -358,10 +350,8 @@ def test_600_finalize_module_with_defaults( module_qname, class_name ):
     finally: cleanup_temp_modules( test_module_name )
 
 
-@pytest.mark.parametrize(
-    'module_qname, class_name',
-    product( THESE_MODULE_QNAMES, THESE_CLASSES_NAMES )
-)
+@pytest.mark.parametrize( 'module_qname', THESE_MODULE_QNAMES )
+@pytest.mark.parametrize( 'class_name', THESE_CLASSES_NAMES )
 def test_601_finalize_module_with_dynadoc_table( module_qname, class_name ):
     ''' finalize_module works with explicit dynadoc_table. '''
     module = cache_import_module( module_qname )
@@ -384,10 +374,8 @@ def test_601_finalize_module_with_dynadoc_table( module_qname, class_name ):
     finally: cleanup_temp_modules( test_module_name )
 
 
-@pytest.mark.parametrize(
-    'module_qname, class_name',
-    product( THESE_MODULE_QNAMES, THESE_CLASSES_NAMES )
-)
+@pytest.mark.parametrize( 'module_qname', THESE_MODULE_QNAMES )
+@pytest.mark.parametrize( 'class_name', THESE_CLASSES_NAMES )
 def test_602_finalize_module_with_dynadoc_introspection(
     module_qname, class_name
 ):
@@ -421,10 +409,8 @@ def test_602_finalize_module_with_dynadoc_introspection(
     finally: cleanup_temp_modules( test_module_name )
 
 
-@pytest.mark.parametrize(
-    'module_qname, class_name',
-    product( THESE_MODULE_QNAMES, THESE_CLASSES_NAMES )
-)
+@pytest.mark.parametrize( 'module_qname', THESE_MODULE_QNAMES )
+@pytest.mark.parametrize( 'class_name', THESE_CLASSES_NAMES )
 def test_603_finalize_module_with_both_dynadoc_params(
     module_qname, class_name
 ):
@@ -460,10 +446,8 @@ def test_603_finalize_module_with_both_dynadoc_params(
     finally: cleanup_temp_modules( test_module_name )
 
 
-@pytest.mark.parametrize(
-    'module_qname, class_name',
-    product( THESE_MODULE_QNAMES, THESE_CLASSES_NAMES )
-)
+@pytest.mark.parametrize( 'module_qname', THESE_MODULE_QNAMES )
+@pytest.mark.parametrize( 'class_name', THESE_CLASSES_NAMES )
 def test_604_finalize_module_recursive( module_qname, class_name ):
     ''' finalize_module works with recursive=True. '''
     module = cache_import_module( module_qname )
@@ -495,10 +479,8 @@ def test_604_finalize_module_recursive( module_qname, class_name ):
     finally: cleanup_temp_modules( *all_modules )
 
 
-@pytest.mark.parametrize(
-    'module_qname, class_name',
-    product( THESE_MODULE_QNAMES, THESE_CLASSES_NAMES )
-)
+@pytest.mark.parametrize( 'module_qname', THESE_MODULE_QNAMES )
+@pytest.mark.parametrize( 'class_name', THESE_CLASSES_NAMES )
 def test_605_finalize_module_by_name( module_qname, class_name ):
     ''' finalize_module works when passed module by name. '''
     module = cache_import_module( module_qname )
@@ -519,10 +501,8 @@ def test_605_finalize_module_by_name( module_qname, class_name ):
     finally: cleanup_temp_modules( test_module_name )
 
 
-@pytest.mark.parametrize(
-    'module_qname, class_name',
-    product( THESE_MODULE_QNAMES, THESE_CLASSES_NAMES )
-)
+@pytest.mark.parametrize( 'module_qname', THESE_MODULE_QNAMES )
+@pytest.mark.parametrize( 'class_name', THESE_CLASSES_NAMES )
 def test_900_docstring_sanity( module_qname, class_name ):
     ''' Class has valid docstring. '''
     module = cache_import_module( module_qname )

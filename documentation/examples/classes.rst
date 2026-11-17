@@ -279,6 +279,14 @@ New dataclasses with accretive class attributes can be produced via metaclass.
     >>> dataclasses.is_dataclass( Point2d )
     True
 
+A docstring-less dataclass whose documentation was never materialized
+(e.g., constructed without Dynadoc processing) reports no ``__doc__``
+once immutable: reads raise an immutability error rather than returning
+a computed docstring. Since that error is an ``AttributeError``,
+standard readers (``hasattr``, ``getattr`` with a default, documentation
+surveys) degrade gracefully. In the normal pipeline this never arises,
+as Dynadoc eagerly writes the generated docstring during decoration.
+
 New dataclasses with accretive instance attributes can inherit from a base.
 
 .. doctest:: Classes

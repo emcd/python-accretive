@@ -21,7 +21,7 @@
 ''' Assert correct function of class factory classes. '''
 
 
-from itertools import product
+from inspect import getmembers as survey_members
 from platform import python_implementation
 
 import pytest
@@ -61,10 +61,8 @@ def test_100_instantiation( module_qname, class_name ):
     assert isinstance( Object, class_factory_class )
 
 
-@pytest.mark.parametrize(
-    'module_qname, class_name',
-    product( THESE_MODULE_QNAMES, THESE_CLASSES_NAMES )
-)
+@pytest.mark.parametrize( 'module_qname', THESE_MODULE_QNAMES )
+@pytest.mark.parametrize( 'class_name', THESE_CLASSES_NAMES )
 def test_101_accretion( module_qname, class_name ):
     ''' Class accretes attributes. '''
     module = cache_import_module( module_qname )
@@ -130,10 +128,8 @@ def test_101_accretion( module_qname, class_name ):
 #         Object.decorator2_attr = 'new_value'
 
 
-@pytest.mark.parametrize(
-    'module_qname, class_name',
-    product( THESE_MODULE_QNAMES, THESE_CLASSES_NAMES )
-)
+@pytest.mark.parametrize( 'module_qname', THESE_MODULE_QNAMES )
+@pytest.mark.parametrize( 'class_name', THESE_CLASSES_NAMES )
 def test_114_decorator_error_handling( module_qname, class_name ):
     ''' Class handles decorator errors appropriately. '''
     module = cache_import_module( module_qname )
@@ -150,10 +146,8 @@ def test_114_decorator_error_handling( module_qname, class_name ):
             ''' test '''
 
 
-@pytest.mark.parametrize(
-    'module_qname, class_name',
-    product( THESE_MODULE_QNAMES, THESE_CLASSES_NAMES )
-)
+@pytest.mark.parametrize( 'module_qname', THESE_MODULE_QNAMES )
+@pytest.mark.parametrize( 'class_name', THESE_CLASSES_NAMES )
 def test_115_mutable_attributes( module_qname, class_name ):
     ''' Mutable attributes behavior via mutables parameter. '''
     module = cache_import_module( module_qname )
@@ -181,15 +175,14 @@ def test_115_mutable_attributes( module_qname, class_name ):
 
 
 @pytest.mark.parametrize(
-    'module_qname, class_name',
-    product(
-        ( qname for qname in MODULES_QNAMES if qname.endswith( '.classes' ) ),
-        ( 'Object', 'ObjectMutable',
-          'DataclassObject', 'DataclassObjectMutable',
-          'Protocol', 'ProtocolMutable',
-          'DataclassProtocol', 'DataclassProtocolMutable' )
-    )
-)
+    'module_qname',
+    [ qname for qname in MODULES_QNAMES if qname.endswith( '.classes' ) ] )
+@pytest.mark.parametrize(
+    'class_name',
+    ( 'Object', 'ObjectMutable',
+      'DataclassObject', 'DataclassObjectMutable',
+      'Protocol', 'ProtocolMutable',
+      'DataclassProtocol', 'DataclassProtocolMutable' ) )
 def test_130_object_instantiation( module_qname, class_name ):
     ''' Object class instantiates. '''
     module = cache_import_module( module_qname )
@@ -198,12 +191,11 @@ def test_130_object_instantiation( module_qname, class_name ):
 
 
 @pytest.mark.parametrize(
-    'module_qname, decorator_name',
-    product(
-        ( qname for qname in MODULES_QNAMES if qname.endswith( '.classes' ) ),
-        ( 'dataclass_with_standard_behaviors', 'with_standard_behaviors' )
-    )
-)
+    'module_qname',
+    [ qname for qname in MODULES_QNAMES if qname.endswith( '.classes' ) ] )
+@pytest.mark.parametrize(
+    'decorator_name',
+    ( 'dataclass_with_standard_behaviors', 'with_standard_behaviors' ) )
 def test_140_decorator_instantiation( module_qname, decorator_name ):
     ''' Decorator class instantiates. '''
     module = cache_import_module( module_qname )
@@ -212,12 +204,11 @@ def test_140_decorator_instantiation( module_qname, decorator_name ):
 
 
 @pytest.mark.parametrize(
-    'module_qname, decorator_name',
-    product(
-        ( qname for qname in MODULES_QNAMES if qname.endswith( '.classes' ) ),
-        ( 'dataclass_with_standard_behaviors', ) # 'with_standard_behaviors' )
-    )
-)
+    'module_qname',
+    [ qname for qname in MODULES_QNAMES if qname.endswith( '.classes' ) ] )
+@pytest.mark.parametrize(
+    'decorator_name',
+    ( 'dataclass_with_standard_behaviors', ) ) # 'with_standard_behaviors'
 def test_141_decorator_application( module_qname, decorator_name ):
     ''' Decorator class applies to class. '''
     module = cache_import_module( module_qname )
@@ -236,12 +227,11 @@ def test_141_decorator_application( module_qname, decorator_name ):
 
 
 @pytest.mark.parametrize(
-    'module_qname, decorator_name',
-    product(
-        ( qname for qname in MODULES_QNAMES if qname.endswith( '.classes' ) ),
-        ( 'dataclass_with_standard_behaviors', ) # 'with_standard_behaviors' )
-    )
-)
+    'module_qname',
+    [ qname for qname in MODULES_QNAMES if qname.endswith( '.classes' ) ] )
+@pytest.mark.parametrize(
+    'decorator_name',
+    ( 'dataclass_with_standard_behaviors', ) ) # 'with_standard_behaviors'
 def test_142_decorator_application_with_args( module_qname, decorator_name ):
     ''' Decorator class applies to class with arguments. '''
     module = cache_import_module( module_qname )
@@ -262,12 +252,11 @@ def test_142_decorator_application_with_args( module_qname, decorator_name ):
 
 
 @pytest.mark.parametrize(
-    'module_qname, decorator_name',
-    product(
-        ( qname for qname in MODULES_QNAMES if qname.endswith( '.classes' ) ),
-        ( 'dataclass_with_standard_behaviors', ) # 'with_standard_behaviors' )
-    )
-)
+    'module_qname',
+    [ qname for qname in MODULES_QNAMES if qname.endswith( '.classes' ) ] )
+@pytest.mark.parametrize(
+    'decorator_name',
+    ( 'dataclass_with_standard_behaviors', ) ) # 'with_standard_behaviors'
 def test_143_decorator_application_with_no_args(
     module_qname, decorator_name
 ):
@@ -287,10 +276,73 @@ def test_143_decorator_application_with_no_args(
         foo.a = 3
 
 
-@pytest.mark.parametrize(
-    'module_qname, class_name',
-    product( THESE_MODULE_QNAMES, THESE_CLASSES_NAMES )
-)
+@pytest.mark.parametrize( 'module_qname', THESE_MODULE_QNAMES )
+def test_150_docstring_descriptor_survey( module_qname ):
+    ''' Docstring-less dataclass survives attribute survey.
+
+        Regression: on Python 3.15, dataclasses installs a caching
+        docstring descriptor whose read performs a write; the assigner
+        must probe presence without invoking descriptors.
+    '''
+    module = cache_import_module( module_qname )
+    dataclass_class = getattr( module, 'Dataclass' )
+    class Point( metaclass = dataclass_class ):
+        x: int
+        y: int
+    point = Point( x = 1, y = 2 )
+    assert 1 == point.x
+    assert 2 == point.y
+    surveyed = dict( survey_members( Point ) )
+    assert surveyed
+
+
+@pytest.mark.parametrize( 'module_qname', THESE_MODULE_QNAMES )
+def test_151_unset_slot_first_write( module_qname ):
+    ''' Unset slot accepts first write.
+
+        Regression: the non-invoking presence probe must still treat
+        a slot which holds no value as absent.
+    '''
+    module = cache_import_module( module_qname )
+    decorator = getattr( module, 'with_standard_behaviors' )
+    @decorator( )
+    class Slotted:
+        __slots__ = ( '__dict__', 'value' )
+    obj = Slotted( )
+    obj.value = 1
+    assert 1 == obj.value
+
+
+@pytest.mark.parametrize( 'module_qname', THESE_MODULE_QNAMES )
+def test_152_set_slot_refused( module_qname ):
+    ''' Set slot refuses rewrite, inherited slot accepts first write.
+
+        Pins accretion for slots: initialized values live outside
+        __dict__, so the probe must consult slot storage itself.
+    '''
+    module = cache_import_module( module_qname )
+    decorator = getattr( module, 'with_standard_behaviors' )
+    @decorator( )
+    class Slotted:
+        __slots__ = ( '__dict__', 'value' )
+    @decorator( )
+    class SubSlotted( Slotted ):
+        __slots__ = ( 'extra', )
+    obj = Slotted( )
+    obj.value = 1
+    exceptions = cache_import_module( f"{PACKAGE_NAME}.exceptions" )
+    with pytest.raises( exceptions.AttributeImmutability ):
+        obj.value = 2
+    assert 1 == obj.value
+    sub = SubSlotted( )
+    sub.value = 10
+    assert 10 == sub.value
+    sub.extra = 20
+    assert 20 == sub.extra
+
+
+@pytest.mark.parametrize( 'module_qname', THESE_MODULE_QNAMES )
+@pytest.mark.parametrize( 'class_name', THESE_CLASSES_NAMES )
 def test_900_docstring_sanity( module_qname, class_name ):
     ''' Class has valid docstring. '''
     module = cache_import_module( module_qname )
@@ -300,10 +352,8 @@ def test_900_docstring_sanity( module_qname, class_name ):
     assert class_factory_class.__doc__
 
 
-@pytest.mark.parametrize(
-    'module_qname, class_name',
-    product( THESE_MODULE_QNAMES, THESE_CLASSES_NAMES )
-)
+@pytest.mark.parametrize( 'module_qname', THESE_MODULE_QNAMES )
+@pytest.mark.parametrize( 'class_name', THESE_CLASSES_NAMES )
 def test_910_dynadoc_sanity( module_qname, class_name ):
     ''' Class has valid dynamic documentation attributes. '''
     module = cache_import_module( module_qname )
@@ -316,10 +366,8 @@ def test_910_dynadoc_sanity( module_qname, class_name ):
     assert class_factory_class.__doc__
 
 
-@pytest.mark.parametrize(
-    'module_qname, class_name',
-    product( THESE_MODULE_QNAMES, THESE_CLASSES_NAMES )
-)
+@pytest.mark.parametrize( 'module_qname', THESE_MODULE_QNAMES )
+@pytest.mark.parametrize( 'class_name', THESE_CLASSES_NAMES )
 def test_920_new_sanity( module_qname, class_name ):
     ''' Class has valid __new__ method. '''
     module = cache_import_module( module_qname )

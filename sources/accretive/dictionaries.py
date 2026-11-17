@@ -96,15 +96,15 @@ class AbstractDictionary( __.cabc.Mapping[ __.H, __.V ] ):
 
     @__.abc.abstractmethod
     def __iter__( self ) -> __.cabc.Iterator[ __.H ]:
-        raise NotImplementedError # pragma: no coverage
+        raise NotImplementedError # pragma: no cover
 
     @__.abc.abstractmethod
     def __len__( self ) -> int:
-        raise NotImplementedError # pragma: no coverage
+        raise NotImplementedError # pragma: no cover
 
     @__.abc.abstractmethod
     def __getitem__( self, key: __.H ) -> __.V:
-        raise NotImplementedError # pragma: no coverage
+        raise NotImplementedError # pragma: no cover
 
     def _pre_setitem_(
         self, key: __.H, value: __.V
@@ -118,7 +118,7 @@ class AbstractDictionary( __.cabc.Mapping[ __.H, __.V ] ):
     @__.abc.abstractmethod
     def _store_item_( self, key: __.H, value: __.V ) -> None:
         ''' Stores entry in underlying storage. '''
-        raise NotImplementedError # pragma: no coverage
+        raise NotImplementedError # pragma: no cover
 
     def __setitem__( self, key: __.H, value: __.V ) -> None:
         key, value = self._pre_setitem_( key, value )
@@ -184,7 +184,13 @@ class _DictionaryOperations( AbstractDictionary[ __.H, __.V ] ):
 
     def __ror__( self, other: __.cabc.Mapping[ __.H, __.V ] ) -> __.typx.Self:
         if not isinstance( other, __.cabc.Mapping ): return NotImplemented
-        return self | other
+        conflicts = set( other.keys( ) ) & set( self.keys( ) )
+        if conflicts:
+            from .exceptions import EntryImmutability
+            raise EntryImmutability( next( iter( conflicts ) ) )
+        data = dict( other )
+        data.update( self )
+        return self.with_data( data )
 
     def __and__(
         self,
@@ -211,7 +217,7 @@ class _DictionaryOperations( AbstractDictionary[ __.H, __.V ] ):
     @__.abc.abstractmethod
     def copy( self ) -> __.typx.Self:
         ''' Provides fresh copy of dictionary. '''
-        raise NotImplementedError # pragma: no coverage
+        raise NotImplementedError # pragma: no cover
 
     @__.abc.abstractmethod
     def with_data(
@@ -220,7 +226,7 @@ class _DictionaryOperations( AbstractDictionary[ __.H, __.V ] ):
         **entries: __.DictionaryNominativeArgument[ __.V ],
     ) -> __.typx.Self:
         ''' Creates new dictionary with same behavior but different data. '''
-        raise NotImplementedError # pragma: no coverage
+        raise NotImplementedError # pragma: no cover
 
 
 class Dictionary(

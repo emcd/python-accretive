@@ -29,15 +29,21 @@ from . import imports as __
 from classcore.standard.nomina import ( # isort: skip
                             AssignerLigation,
                             AttributesNamer,
+                            AttrnameCalculator,
                             BehaviorExclusionNamesOmni,
                             BehaviorExclusionRegexes,
                             BehaviorExclusionPredicates,
                             BehaviorExclusionVerifiersOmni,
+                            ClassDecorator,
+                            ClassDecorators,
+                            ClassDecoratorFactory,
     DecorationPreparers as  ClassDecorationPreparers,
                             DynadocConfiguration,
                             ErrorClassProvider,
+                            ModuleReclassifier,
                             concealment_label,
                             immutability_label,
+                            is_public_identifier,
 )
 
 
@@ -50,17 +56,6 @@ V = __.typx.TypeVar( 'V' ) # Value
 ComparisonResult: __.typx.TypeAlias = bool | __.types.NotImplementedType
 NominativeArguments: __.typx.TypeAlias = __.cabc.Mapping[ str, __.typx.Any ]
 PositionalArguments: __.typx.TypeAlias = __.cabc.Sequence[ __.typx.Any ]
-
-# TODO: Import ClassDecorator aliases from 'classcore' once documentation
-#       fragments have been removed from them.
-ClassDecorator: __.typx.TypeAlias = (
-    __.cabc.Callable[ [ type[ U ] ], type[ U ] ] )
-ClassDecorators: __.typx.TypeAlias = (
-    __.cabc.Sequence[ ClassDecorator[ U ] ] )
-ClassDecoratorFactory: __.typx.TypeAlias = (
-    __.cabc.Callable[ ..., ClassDecorator[ U ] ] )
-ModuleReclassifier: __.typx.TypeAlias = __.cabc.Callable[
-    [ __.cabc.Mapping[ str, __.typx.Any ] ], None ]
 
 DictionaryNominativeArgument: __.typx.TypeAlias = __.typx.Annotated[
     V,
@@ -90,11 +85,8 @@ DictionaryValidator: __.typx.TypeAlias = __.typx.Annotated[
 package_name = __name__.split( '.', maxsplit = 1 )[ 0 ]
 
 
-def calculate_attrname( level: str, core: str ) -> str:
-    return f"_{package_name}_{level}_{core}_"
-
-
-# TODO: Import 'is_public_identifier' from 'classcore'.
-def is_public_identifier( name: str ) -> bool:
-    ''' Is Python identifier public? '''
-    return not name.startswith( '_' )
+# Configured with the accretive package prefix. Exposes the
+# ``is_internal_name`` detector consumed by classcore 1.13+
+# metaclass-carried internal-name contributions, so accretive internal
+# names flow into attribute explanations and concealment.
+calculate_attrname = AttrnameCalculator( package_name = package_name )
